@@ -455,7 +455,7 @@ function normalizeParts(sign: Sign, significand: string, exponent: number): Deci
   let trailingZeros = 0;
   while (significand[leadingZeros] === '0') {
     leadingZeros++
-    exponent--;
+    exponent--
   }
   while (significand[precision - 1 - trailingZeros] === '0') {
     trailingZeros++
