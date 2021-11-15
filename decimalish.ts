@@ -130,15 +130,15 @@ export function lte(a: Numeric, b: Numeric): boolean {
  * @equivalant a == b ? 0 : a > b ? 1 : -1
  */
  export function cmp(a: Numeric, b: Numeric): Sign {
-  const [signA, significandA, exponentA] = toParts(a)
-  const [signB, significandB, exponentB] = toParts(b)
+  const [signA, significandA, exponentA, precisionA] = toParts(a)
+  const [signB, significandB, exponentB, precisionB] = toParts(b)
 
   // Comparison to zero or differing signs
   if (!significandA) return (-signB | 0) as Sign
   if (!significandB || signA !== signB) return signA
 
   // Compare absolute value and flip if negative.
-  return (cmpAbs(significandA, exponentA, significandB, exponentB) * signA | 0) as Sign
+  return (cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) * signA | 0) as Sign
 }
 
 /**
@@ -146,14 +146,12 @@ export function lte(a: Numeric, b: Numeric): boolean {
  *
  * @internal
  */
-function cmpAbs(significandA: string, exponentA: number, significandB: string, exponentB: number): Sign {
+function cmpAbs(significandA: string, exponentA: number, precisionA: number, significandB: string, exponentB: number, precisionB: number): Sign {
   if (exponentA !== exponentB) return exponentA > exponentB ? 1 : -1
-  const digitsA = significandA.length
-  const digitsB = significandB.length
-  for (let i = -1, j = digitsA < digitsB ? digitsA : digitsB; ++i < j;) {
+  for (let i = -1, j = precisionA < precisionB ? precisionA : precisionB; ++i < j;) {
     if (significandA[i] !== significandB[i]) return significandA[i] > significandB[i] ? 1 : -1
   }
-  return digitsA === digitsB ? 0 : digitsA > digitsB ? 1 : -1
+  return precisionA === precisionB ? 0 : precisionA > precisionB ? 1 : -1
 }
 
 // Mathematic operations
@@ -164,8 +162,8 @@ function cmpAbs(significandA: string, exponentA: number, significandB: string, e
  * @equivalent a + b
  */
 export function add(a: Numeric, b: Numeric): decimal {
-  const [signA, significandA, exponentA] = toParts(a)
-  const [signB, significandB, exponentB] = toParts(b)
+  const [signA, significandA, exponentA, precisionA] = toParts(a)
+  const [signB, significandB, exponentB, precisionB] = toParts(b)
 
   // Result normalized form
   let sign = signA
@@ -173,9 +171,7 @@ export function add(a: Numeric, b: Numeric): decimal {
   let exponent = exponentA > exponentB ? exponentA : exponentB
 
   // Operate right to left starting from the most precise digit
-  let precisionA = significandA.length - exponentA
-  let precisionB = significandB.length - exponentB
-  let pos = precisionA > precisionB ? precisionA : precisionB
+  let pos = precisionA - exponentA > precisionB - exponentB ? precisionA - exponentA : precisionB - exponentB
   let digits = new Array(pos + exponent)
   let result = 0
 
@@ -198,7 +194,7 @@ export function add(a: Numeric, b: Numeric): decimal {
   } else {
     // Compare the absolute values of A and B to ensure the smaller is
     // subtracted from the larger.
-    const direction = cmpAbs(significandA, exponentA, significandB, exponentB)
+    const direction = cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB)
 
     // If the two numbers are equivalent (A == B), then: A - B == 0
     if (direction === 0) {
@@ -234,18 +230,15 @@ export function sub(a: Numeric, b: Numeric): decimal {
  * @equivalent a * b
  */
 export function mul(a: Numeric, b: Numeric): decimal {
-  const [signA, significandA, exponentA] = toParts(a)
-  const [signB, significandB, exponentB] = toParts(b)
+  const [signA, significandA, exponentA, precisionA] = toParts(a)
+  const [signB, significandB, exponentB, precisionB] = toParts(b)
 
-  const digitsA = significandA.length
-  const digitsB = significandB.length
-
-  let digits = new Array(digitsA + digitsB)
+  let digits = new Array(precisionA + precisionB)
   let result = 0
 
-  for (let i = digitsA; i--;) {
+  for (let i = precisionA; i--;) {
     result = 0;
-    for (let j = digitsB; j--;) {
+    for (let j = precisionB; j--;) {
       result += (digits[i + j + 1] || 0) + +(significandA[i] || 0) * +(significandB[j] || 0);
       digits[i + j + 1] = result % 10;
       result = result / 10 | 0;
@@ -257,12 +250,8 @@ export function mul(a: Numeric, b: Numeric): decimal {
 }
 
 export function div(a: Numeric, b: Numeric, roundingRules?: RoundingRules): decimal {
-  const [signA, significandA, exponentA] = toParts(a)
-  const [signB, significandB, exponentB] = toParts(b)
-
-  // TODO: this is a common pattern, should precision be a redundancy of "parts"?
-  const digitsA = significandA.length
-  const digitsB = significandB.length
+  const [signA, significandA, exponentA, precisionA] = toParts(a)
+  const [signB, significandB, exponentB, precisionB] = toParts(b)
 
   if (!significandB) throw new TypeError('Divide by 0')
   if (!significandA) return '0' as decimal
@@ -274,7 +263,7 @@ export function div(a: Numeric, b: Numeric, roundingRules?: RoundingRules): deci
 
   // Remainder is a mutable list of digits, starting as a copy of the dividend (a).
   const remainder: number[] = []
-  for (let i=0;i<digitsA;i++) {
+  for (let i=0;i<precisionA;i++) {
     remainder[i] = +significandA[i]
   }
 
@@ -387,7 +376,7 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
 
 // Normalized parts
 
-type DecimalParts = readonly [sign: Sign, significand: string, exponent: number]
+type DecimalParts = readonly [sign: Sign, significand: string, exponent: number, precision: number]
 type Sign = 0 | 1 | -1
 
 const decimalRegex = /^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
@@ -417,8 +406,9 @@ export function sign(value: Numeric): Sign {
  * significand: a string of significant digits expressed in scientific
  * notation, where the first digit is the ones place, or an empty string for 0.
  * exponent: the power of ten the significand is multiplied by, or 0 for 0.
+ * precision: the number of digits found in significand (e.g. number of significant digits).
  *
- * @example toParts('-1.23e4') returns [-1, '123', 4]
+ * @example toParts('-1.23e4') returns [-1, '123', 4, 3]
  */
 export function toParts(value: string | Numeric): DecimalParts {
   const match = decimalRegex.exec(''+value)
@@ -433,7 +423,8 @@ export function toParts(value: string | Numeric): DecimalParts {
 export function fromParts(sign: Sign, significand: string, exponent: number): decimal {
   // Some mathematical algorithms may leave insignificant zeros in the
   // significand. Normalize the parts before printing a canonical decimal value.
-  [sign, significand, exponent] = normalizeParts(sign, significand, exponent)
+  let precision;
+  [sign, significand, exponent, precision] = normalizeParts(sign, significand, exponent)
   let result = sign < 0 ? '-' : ''
   if (!significand) {
     result = '0'
@@ -442,12 +433,11 @@ export function fromParts(sign: Sign, significand: string, exponent: number): de
     while (++exponent) result += '0'
     result += significand
   } else {
-    const digits = significand.length
-    if (++exponent < digits) {
-      result += significand.slice(0, exponent) + '.' + significand.slice(exponent);
+    if (++exponent < precision) {
+      result += significand.slice(0, exponent) + '.' + significand.slice(exponent)
     } else {
       result += significand
-      while (exponent-- > digits) result += '0'
+      while (exponent-- > precision) result += '0'
     }
   }
   return result as decimal
@@ -460,21 +450,22 @@ export function fromParts(sign: Sign, significand: string, exponent: number): de
  * @internal
  */
 function normalizeParts(sign: Sign, significand: string, exponent: number): DecimalParts {
+  let precision = significand.length
   let leadingZeros = 0;
   let trailingZeros = 0;
   while (significand[leadingZeros] === '0') {
     leadingZeros++
     exponent--;
   }
-  while (significand[significand.length - 1 - trailingZeros] === '0') {
+  while (significand[precision - 1 - trailingZeros] === '0') {
     trailingZeros++
   }
   if (leadingZeros || trailingZeros) {
-    significand = significand.slice(leadingZeros, -trailingZeros || undefined)
+    significand = significand.slice(leadingZeros, precision - trailingZeros)
   }
   if (!significand) {
     sign = 0
     exponent = 0
   }
-  return [sign, significand, exponent]
+  return [sign, significand, exponent, precision - leadingZeros - trailingZeros]
 }

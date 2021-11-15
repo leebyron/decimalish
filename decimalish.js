@@ -2,15 +2,18 @@
 /**
  * Done:
  *  - moving between normalized forms
+ *  - sign is done
  *  - constructor/conversion is done
  *  - abs/neg magnitude is done
  *  - all comparisons are done
- *  - addition/subtraction is done
+ *  - add/sub is done
+ *  - mul is done
+ *
  *
  * Todo:
  *  - unit tests
+ *  - cmp ideally can accept +-Infinity
  *  - round - WIP.
- *  - mul - need to look into < O(N2) algorithms for this
  *  - div - should it require a rounding mode?
  *  - idiv or divmod or something that returns an [int, int] of [result, remain]?
  *  - mod - surely there's an arbitrary integer algorithm for this somewhere
@@ -20,7 +23,7 @@
  *  - toLocaleString would be useful, but I'm not sure how to get this working
  */
 exports.__esModule = true;
-exports.fromParts = exports.toParts = exports.sign = exports.round = exports.mul = exports.sub = exports.add = exports.cmp = exports.lte = exports.lt = exports.gte = exports.gt = exports.eq = exports.neg = exports.abs = exports.decimal = void 0;
+exports.fromParts = exports.toParts = exports.sign = exports.round = exports.div = exports.mul = exports.sub = exports.add = exports.cmp = exports.lte = exports.lt = exports.gte = exports.gt = exports.eq = exports.neg = exports.abs = exports.decimal = void 0;
 // Type conversion
 /**
  * Converts any numeric value to a decimal.
@@ -108,15 +111,15 @@ exports.lte = lte;
  * @equivalant a == b ? 0 : a > b ? 1 : -1
  */
 function cmp(a, b) {
-    var _a = toParts(a), signA = _a[0], significandA = _a[1], exponentA = _a[2];
-    var _b = toParts(b), signB = _b[0], significandB = _b[1], exponentB = _b[2];
+    var _a = toParts(a), signA = _a[0], significandA = _a[1], exponentA = _a[2], precisionA = _a[3];
+    var _b = toParts(b), signB = _b[0], significandB = _b[1], exponentB = _b[2], precisionB = _b[3];
     // Comparison to zero or differing signs
     if (!significandA)
         return (-signB | 0);
     if (!significandB || signA !== signB)
         return signA;
     // Compare absolute value and flip if negative.
-    return (cmpAbs(significandA, exponentA, significandB, exponentB) * signA | 0);
+    return (cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) * signA | 0);
 }
 exports.cmp = cmp;
 /**
@@ -124,16 +127,14 @@ exports.cmp = cmp;
  *
  * @internal
  */
-function cmpAbs(significandA, exponentA, significandB, exponentB) {
+function cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) {
     if (exponentA !== exponentB)
         return exponentA > exponentB ? 1 : -1;
-    var digitsA = significandA.length;
-    var digitsB = significandB.length;
-    for (var i = -1, j = digitsA < digitsB ? digitsA : digitsB; ++i < j;) {
+    for (var i = -1, j = precisionA < precisionB ? precisionA : precisionB; ++i < j;) {
         if (significandA[i] !== significandB[i])
             return significandA[i] > significandB[i] ? 1 : -1;
     }
-    return digitsA === digitsB ? 0 : digitsA > digitsB ? 1 : -1;
+    return precisionA === precisionB ? 0 : precisionA > precisionB ? 1 : -1;
 }
 // Mathematic operations
 /**
@@ -142,16 +143,14 @@ function cmpAbs(significandA, exponentA, significandB, exponentB) {
  * @equivalent a + b
  */
 function add(a, b) {
-    var _a = toParts(a), signA = _a[0], significandA = _a[1], exponentA = _a[2];
-    var _b = toParts(b), signB = _b[0], significandB = _b[1], exponentB = _b[2];
+    var _a = toParts(a), signA = _a[0], significandA = _a[1], exponentA = _a[2], precisionA = _a[3];
+    var _b = toParts(b), signB = _b[0], significandB = _b[1], exponentB = _b[2], precisionB = _b[3];
     // Result normalized form
     var sign = signA;
     var significand;
     var exponent = exponentA > exponentB ? exponentA : exponentB;
     // Operate right to left starting from the most precise digit
-    var precisionA = significandA.length - exponentA;
-    var precisionB = significandB.length - exponentB;
-    var pos = precisionA > precisionB ? precisionA : precisionB;
+    var pos = precisionA - exponentA > precisionB - exponentB ? precisionA - exponentA : precisionB - exponentB;
     var digits = new Array(pos + exponent);
     var result = 0;
     // If the operands have the same sign, add the significands.
@@ -172,7 +171,7 @@ function add(a, b) {
     else {
         // Compare the absolute values of A and B to ensure the smaller is
         // subtracted from the larger.
-        var direction = cmpAbs(significandA, exponentA, significandB, exponentB);
+        var direction = cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB);
         // If the two numbers are equivalent (A == B), then: A - B == 0
         if (direction === 0) {
             return '0';
@@ -205,15 +204,13 @@ exports.sub = sub;
  * @equivalent a * b
  */
 function mul(a, b) {
-    var _a = toParts(a), signA = _a[0], significandA = _a[1], exponentA = _a[2];
-    var _b = toParts(b), signB = _b[0], significandB = _b[1], exponentB = _b[2];
-    var digitsA = significandA.length;
-    var digitsB = significandB.length;
-    var digits = new Array(digitsA + digitsB);
+    var _a = toParts(a), signA = _a[0], significandA = _a[1], exponentA = _a[2], precisionA = _a[3];
+    var _b = toParts(b), signB = _b[0], significandB = _b[1], exponentB = _b[2], precisionB = _b[3];
+    var digits = new Array(precisionA + precisionB);
     var result = 0;
-    for (var i = digitsA; i--;) {
+    for (var i = precisionA; i--;) {
         result = 0;
-        for (var j = digitsB; j--;) {
+        for (var j = precisionB; j--;) {
             result += (digits[i + j + 1] || 0) + +(significandA[i] || 0) * +(significandB[j] || 0);
             digits[i + j + 1] = result % 10;
             result = result / 10 | 0;
@@ -223,6 +220,49 @@ function mul(a, b) {
     return fromParts((signA * signB), digits.join(''), exponentA + exponentB + 1);
 }
 exports.mul = mul;
+function div(a, b, roundingRules) {
+    var _a;
+    var _b = toParts(a), signA = _b[0], significandA = _b[1], exponentA = _b[2], precisionA = _b[3];
+    var _c = toParts(b), signB = _c[0], significandB = _c[1], exponentB = _c[2], precisionB = _c[3];
+    if (!significandB)
+        throw new TypeError('Divide by 0');
+    if (!significandA)
+        return '0';
+    var exponent = exponentA - exponentB;
+    // TODO factor out validating and determining precision as a function of rules and exponent
+    var maxPrecision = ((_a = roundingRules === null || roundingRules === void 0 ? void 0 : roundingRules.precision) !== null && _a !== void 0 ? _a : (((roundingRules === null || roundingRules === void 0 ? void 0 : roundingRules.places) || 0) + exponent)) + 1;
+    // Remainder is a mutable list of digits, starting as a copy of the dividend (a).
+    var remainder = [];
+    for (var i = 0; i < precisionA; i++) {
+        remainder[i] = +significandA[i];
+    }
+    var digits = [];
+    var place = 0;
+    // most significant digit of the remainder. Incremented as leading zeros are produced
+    var msd = 0;
+    // TODO:
+    // repeat either until 1 more digit than the desired precision is reached,
+    //            or until all digits of a are used and the remainder is 0
+    while (true) {
+        // Count how many times divisor (b) can be subtracted from remainder at the
+        // current place.
+        var digit = 0;
+        for (digit = 0; digit < 10; digit++) {
+            // Is remainder less than divisor?
+        }
+    }
+    // start by defining a "remainder" of the same number of sigs as b (divisor).
+    // then count the subtractions of the divisor until remainder is smaller than divisor
+    // append count to digits
+    // append the next digit of a (dividend) to remainder (or 0) (and shift off 0? or just change its exponent?)
+    // repeat either until 1 more digit than the desired precision is reached,
+    //            or until all digits of a are used and the remainder is 0
+    // Notes: "remainder" needs to be an array of digits due to mutation
+    // Notes: one extra precision isn't quite enough to round, also need to know
+    //        if there was additional remainder. That's the difference between 0.5 (midpoint) and 0.5 + something (above midpoint)
+    return fromParts((signA * signB), digits.join(''), exponent);
+}
+exports.div = div;
 var roundingMode = {
     'up': 1,
     'down': 2,
@@ -244,7 +284,7 @@ var roundingMode = {
  * precision: The number of significant digits to round to. Overrides places.
  *
  * mode: Determines how a rounded value should be determined.
- *       If not provided, the default mode "half up" is used.
+ *       If not provided, the default mode "half down" is used.
  *  - "up": Rounds up away from zero.
  *  - "down": Rounds down towards zero.
  *  - "ceiling": Rounds up towards positive infinity.
@@ -269,8 +309,7 @@ function round(value, rules) {
     return fromParts(sign, significand, exponent);
 }
 exports.round = round;
-// const decimalRegex = /^([-+])?(?:(?:0*([1-9]\d*))|0+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/
-var decimalRegex = /^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/;
+var decimalRegex = /^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i;
 /**
  * Returns a positive or negative 1 indicating the sign of the provided number.
  * If the provided number is 0, it will return 0. Note that decimal does not
@@ -294,10 +333,11 @@ exports.sign = sign;
  *
  * sign: either 1 for a positive number, -1 for a negative number, or 0 for 0.
  * significand: a string of significant digits expressed in scientific
- * notation, where the first digit is the ones place.
- * exponent: the power of ten the significand is multiplied by.
+ * notation, where the first digit is the ones place, or an empty string for 0.
+ * exponent: the power of ten the significand is multiplied by, or 0 for 0.
+ * precision: the number of digits found in significand (e.g. number of significant digits).
  *
- * @example toParts('-1.23e4') returns [-1, '123', 4]
+ * @example toParts('-1.23e4') returns [-1, '123', 4, 3]
  */
 function toParts(value) {
     var match = decimalRegex.exec('' + value);
@@ -314,7 +354,8 @@ function fromParts(sign, significand, exponent) {
     var _a;
     // Some mathematical algorithms may leave insignificant zeros in the
     // significand. Normalize the parts before printing a canonical decimal value.
-    _a = normalizeParts(sign, significand, exponent), sign = _a[0], significand = _a[1], exponent = _a[2];
+    var precision;
+    _a = normalizeParts(sign, significand, exponent), sign = _a[0], significand = _a[1], exponent = _a[2], precision = _a[3];
     var result = sign < 0 ? '-' : '';
     if (!significand) {
         result = '0';
@@ -326,13 +367,12 @@ function fromParts(sign, significand, exponent) {
         result += significand;
     }
     else {
-        var digits = significand.length;
-        if (++exponent < digits) {
+        if (++exponent < precision) {
             result += significand.slice(0, exponent) + '.' + significand.slice(exponent);
         }
         else {
             result += significand;
-            while (exponent-- > digits)
+            while (exponent-- > precision)
                 result += '0';
         }
     }
@@ -342,23 +382,26 @@ exports.fromParts = fromParts;
 /**
  * Removes unnecessary leading or trailing zeros from the significand, adjusting
  * the exponent and sign if necessary.
+ *
+ * @internal
  */
 function normalizeParts(sign, significand, exponent) {
+    var precision = significand.length;
     var leadingZeros = 0;
     var trailingZeros = 0;
     while (significand[leadingZeros] === '0') {
         leadingZeros++;
         exponent--;
     }
-    while (significand[significand.length - 1 - trailingZeros] === '0') {
+    while (significand[precision - 1 - trailingZeros] === '0') {
         trailingZeros++;
     }
     if (leadingZeros || trailingZeros) {
-        significand = significand.slice(leadingZeros, -trailingZeros || undefined);
+        significand = significand.slice(leadingZeros, precision - trailingZeros);
     }
     if (!significand) {
         sign = 0;
         exponent = 0;
     }
-    return [sign, significand, exponent];
+    return [sign, significand, exponent, precision - leadingZeros - trailingZeros];
 }
