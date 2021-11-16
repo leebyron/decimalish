@@ -249,63 +249,103 @@ export function mul(a: Numeric, b: Numeric): decimal {
   return fromParts((signA * signB) as Sign, digits.join(''), exponentA + exponentB + 1)
 }
 
-export function div(a: Numeric, b: Numeric, roundingRules?: RoundingRules): decimal {
+export function div(a: Numeric, b: Numeric, rules?: RoundingRules): decimal {
   const [signA, significandA, exponentA, precisionA] = toParts(a)
   const [signB, significandB, exponentB, precisionB] = toParts(b)
+
+  // The resulting exponent of a division is the difference between the
+  // exponents of the dividend and divisor.
+  const exponent = exponentA - exponentB
+
+  let [roundingPrecision, roundingMode] = roundingRules(rules, exponent, 20)
 
   if (!significandB) throw new TypeError('Divide by 0')
   if (!significandA) return '0' as decimal
 
-  let exponent = exponentA - exponentB
-
-  // TODO factor out validating and determining precision as a function of rules and exponent
-  const maxPrecision = (roundingRules?.precision ?? ((roundingRules?.places || 0) + exponent)) + 1
-
-  // Remainder is a mutable list of digits, starting as a copy of the dividend (a).
+  // Remainder is a mutable list of digits, starting as a copy of the dividend
+  // (a) which is at least as long as the divisor (b).
   const remainder: number[] = []
-  for (let i=0;i<precisionA;i++) {
-    remainder[i] = +significandA[i]
+  for (let i = 0; i < precisionA || i < precisionB; i++) {
+    remainder[i] = +significandA[i] || 0
   }
 
+  // The most significant digit of the remainder.
+  let msd = 0
+  let hasRemainder
+
+  let place = 0
   const digits: number[] = []
-  let place = 0;
-  // most significant digit of the remainder. Incremented as leading zeros are produced
-  let msd = 0;
 
-  // TODO:
-  // repeat either until 1 more digit than the desired precision is reached,
-  //            or until all digits of a are used and the remainder is 0
-  while (true) {
+  // Compute digits of the quotient by repeatedly subtracting the divisor from
+  // each place of the dividend while:
+  while (
+    // Not all places of dividend have been divided or remainder is non zero,
+    (place <= precisionA - precisionB || (hasRemainder = msd < place + precisionB - 1))
+    // and the total digits are not yet at the maximum precision.
 
+    // TODO need extra precision if the first digit is 0? only affects precision but not places?
+    // TODO: yeah this is definitely not working correctly...
+    && place <= roundingPrecision + +!digits[0]
+  ) {
     // Count how many times divisor (b) can be subtracted from remainder at the
-    // current place.
-    let digit = 0;
-    for (digit = 0; digit < 10; digit++) {
+    // current place (between 0 and 9 times).
+    let digit = -1;
+    countSubtractions: while (digit++ < 9) {
 
-      // Is remainder less than divisor?
+      // If the divisor cannot be subtracted from the remainder at the
+      // current place (because the remainder is less than the divisor),
+      // then stop counting subtractions.
+      if (msd >= place) {
+        for (let i = -1, difference = 0; !difference && ++i < precisionB;) {
+          difference = remainder[place + i] - +significandB[i]
+          if (difference < 0) {
+            break countSubtractions
+          }
+        }
+      }
 
+      // Subtract at this location
+      for (let i = place + precisionB; i-- > place;) {
+        remainder[i] -= +(significandB[i - place] || 0)
+        if (remainder[i] < 0) {
+          remainder[i] += 10
+          remainder[i - 1] -= 1
+        }
+      }
 
+      // Then update the location of the most significant digit of the remainder.
+      while (remainder[msd] === 0) {
+        msd++
+      }
     }
 
+    // Append a zero to the remainder if necessary.
+    remainder[place + precisionB] ||= 0
+
+    // Append this digit to the result.
+    digits[place++] = digit
   }
 
+  // If there is still a remainder, adjust the rounding mode.
+  // For example, if the final rounding digit is 5 with remainder left over and
+  // the rounding mode is half down (or half even) then it would be incorrect to
+  // round down since the remainder means the number is actually greater than
+  // the midpoint and should be rounded up.
+  if (hasRemainder && (roundingMode === ROUND_HALF_DOWN || roundingMode === ROUND_HALF_EVEN)) {
+    roundingMode = ROUND_HALF_UP
+  }
 
+  // const hasRemainder = (msd < place + precisionB - 1)
+  // console.log({ hasRemainder })
 
+  // console.log(`remainder: ${fromParts((signA * signB) as Sign, remainder.join(''), exponent)}`)
 
+  return round(
+    fromParts((signA * signB) as Sign, digits.join(''), exponent),
+    { precision: roundingPrecision, mode: roundingMode }
+  )
 
-  // start by defining a "remainder" of the same number of sigs as b (divisor).
-  // then count the subtractions of the divisor until remainder is smaller than divisor
-  // append count to digits
-  // append the next digit of a (dividend) to remainder (or 0) (and shift off 0? or just change its exponent?)
-  // repeat either until 1 more digit than the desired precision is reached,
-  //            or until all digits of a are used and the remainder is 0
-
-  // Notes: "remainder" needs to be an array of digits due to mutation
-  // Notes: one extra precision isn't quite enough to round, also need to know
-  //        if there was additional remainder. That's the difference between 0.5 (midpoint) and 0.5 + something (above midpoint)
-
-
-  return fromParts((signA * signB) as Sign, digits.join(''), exponent)
+  // return fromParts((signA * signB) as Sign, digits.join(''), exponent)
 }
 
 // Rounding
@@ -314,25 +354,31 @@ type RoundingRules =
   | { places?: number, mode?: RoundingMode, precision?: never }
   | { precision?: number, mode?: RoundingMode, places?: never }
 
-type RoundingMode =
-  | 'up'
-  | 'down'
-  | 'ceiling'
-  | 'floor'
-  | 'half up'
-  | 'half down'
-  | 'half even'
-  | 'unnecessary'
+type RoundingMode = keyof typeof roundingModes
+  // | 'up'
+  // | 'down'
+  // | 'ceiling'
+  // | 'floor'
+  // | 'half up'
+  // | 'half down'
+  // | 'half even'
 
-const roundingMode = {
-  'up': 1,
-  'down': 2,
-  'ceiling': 3,
-  'floor': 4,
-  'half up': 5,
-  'half down': 6,
-  'half even': 7,
-  'unnecessary': 8
+const ROUND_UP = 'up'
+const ROUND_DOWN = 'down'
+const ROUND_CEILING = 'ceiling'
+const ROUND_FLOOR = 'floor'
+const ROUND_HALF_UP = 'half up'
+const ROUND_HALF_DOWN = 'half down'
+const ROUND_HALF_EVEN = 'half even'
+
+const roundingModes = {
+  [ROUND_UP]: ROUND_UP,
+  [ROUND_DOWN]: ROUND_DOWN,
+  [ROUND_CEILING]: ROUND_CEILING,
+  [ROUND_FLOOR]: ROUND_FLOOR,
+  [ROUND_HALF_UP]: ROUND_HALF_UP,
+  [ROUND_HALF_DOWN]: ROUND_HALF_DOWN,
+  [ROUND_HALF_EVEN]: ROUND_HALF_EVEN,
 }
 
 /**
@@ -346,7 +392,7 @@ const roundingMode = {
  * precision: The number of significant digits to round to. Overrides places.
  *
  * mode: Determines how a rounded value should be determined.
- *       If not provided, the default mode "half down" is used.
+ *       If not provided, the default mode "half up" is used.
  *  - "up": Rounds up away from zero.
  *  - "down": Rounds down towards zero.
  *  - "ceiling": Rounds up towards positive infinity.
@@ -355,11 +401,50 @@ const roundingMode = {
  *  - "half down": Rounds towards the nearest neighbor, otherwise down.
  *  - "half even": Rounds towards the nearest neighbor, otherwise towards the
  *    even neighbor. Useful to avoid aggregated bias.
- *  - "unnecessary": Asserts that the no rounding is necessary by throwing an
- *    Error if rounding occurs.
  */
 export function round(value: Numeric, rules?: RoundingRules): decimal {
-  let [sign, significand, exponent] = toParts(value)
+  let [sign, significand, exponent, precision] = toParts(value)
+  let [roundingPrecision, roundingMode] = roundingRules(rules, exponent, 0)
+
+  if (roundingPrecision < precision) {
+
+
+    let lastDigit = +significand[roundingPrecision - 1]
+    let roundingDigit = +significand[roundingPrecision]
+
+    // Normalize rounding mode
+    roundingMode =
+      roundingMode === ROUND_CEILING ? sign < 0 ? ROUND_DOWN : ROUND_UP :
+      roundingMode === ROUND_FLOOR ? roundingMode = sign < 0 ? ROUND_UP : ROUND_DOWN :
+      roundingMode === ROUND_HALF_EVEN ? roundingMode = lastDigit % 2 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
+      roundingMode
+
+    if (
+      roundingMode === ROUND_HALF_UP ? roundingDigit > 4 : roundingMode === ROUND_HALF_DOWN ? roundingDigit > 5 : roundingMode === ROUND_UP
+    ) {
+      // TODO: if this is > 9 then it needs to overflow... is this just add(1)?
+      lastDigit++
+    }
+
+  }
+
+  /*
+
+  take the (precision + 1)th digit from significand. Using the rules, determine
+  how to adjust the (precision)th digit. Then slice up to (and including) the
+  precisionth digit
+
+  ceiling: sign ? up : down
+  floor: sign ? down : up
+  half even: if precisionth mod 2 === 0 (even) ? half down : half up
+
+  up: increment if != 0
+  down: do nothing
+
+  half up: increment if > 4
+  half down: increment if > 5
+
+  */
 
   // // TODO: validate and throw TypeError if necessary
   // const mode = roundingMode[rules?.mode] || 3
@@ -372,6 +457,24 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
   // const precision = rules?.precision ?? ((rules?.places || 0) + exponent)
 
   return fromParts(sign, significand, exponent)
+}
+
+/**
+ * Given rounding rules, a number's exponent, and a default, produce a rounding
+ * precision and mode. If there are problems with rounding rules, throw an Error.
+ *
+ * @internal
+ */
+function roundingRules(rules: RoundingRules | undefined, exponent: number, defaultPlaces: number): [number, RoundingMode] {
+  let { precision, places = defaultPlaces, mode } = rules || {}
+  if (precision != undefined) {
+    if (~~precision !== precision || precision < 1) throw new Error('Rounding precision must be a positive integer')
+  } else {
+    if (~~places !== places) throw new Error('Rounding places must be an integer')
+    precision = places + exponent
+  }
+  if (mode && !(mode in roundingModes)) throw new Error(`Unknown rounding mode: ${mode}`)
+  return [precision, mode || ROUND_HALF_UP]
 }
 
 // Normalized parts
@@ -421,6 +524,7 @@ export function toParts(value: string | Numeric): DecimalParts {
  * Given a decimal's three parts, produce a canonical decimal value.
  */
 export function fromParts(sign: Sign, significand: string, exponent: number): decimal {
+  console.log({sign,significand,exponent})
   // Some mathematical algorithms may leave insignificant zeros in the
   // significand. Normalize the parts before printing a canonical decimal value.
   let precision;
