@@ -1,6 +1,6 @@
 /**
  * Done:
- *  - moving between normalized forms
+ *  - moving between normalized forms and predicate
  *  - sign is done
  *  - constructor/conversion is done
  *  - abs/neg magnitude is done
@@ -16,10 +16,15 @@
  *  - div - should it require a rounding mode?
  *  - idiv or divmod or something that returns an [int, int] of [result, remain]?
  *  - mod - surely there's an arbitrary integer algorithm for this somewhere
+ *  - min/max/sum
  *  - pow - ECMA proposal has this with a positive integer
  *  - sqrt - is this actually useful? Big.js has this, but ECMA does not
+ *  - cbrt?
+ *  - trig / PI?
  *  - toFixed / toExponential / toPrecision - are these useful?
  *  - toLocaleString would be useful, but I'm not sure how to get this working
+ *
+ *  - rest of decimal.js lib?
  */
 
 /**
@@ -50,6 +55,15 @@ export type Numeric = `${number}` | number | bigint
 export function decimal(value: string | Numeric): decimal {
   const [sign, significand, exponent] = toParts(value)
   return fromParts(sign, significand, exponent)
+}
+
+/**
+ * Returns true if the provided value is a decimal value.
+ *
+ * A value is decimal if it is a numeric string in a canonical decimal form.
+ */
+export function isDecimal(value: string): value is decimal {
+  return decimalRegex.test(value) && decimal(value) === value
 }
 
 // Magnitude
@@ -255,6 +269,7 @@ export function div(a: Numeric, b: Numeric, rules?: RoundingRules): decimal {
 
   // The resulting exponent of a division is the difference between the
   // exponents of the dividend and divisor.
+  const sign = (signA * signB) as Sign
   const exponent = exponentA - exponentB
 
   let [roundingPrecision, roundingMode] = roundingRules(rules, exponent, 20)
@@ -326,13 +341,17 @@ export function div(a: Numeric, b: Numeric, rules?: RoundingRules): decimal {
     digits[place++] = digit
   }
 
-  // If there is still a remainder, adjust the rounding mode.
+  // If there is still additional remainder, adjust the rounding mode.
   // For example, if the final rounding digit is 5 with remainder left over and
-  // the rounding mode is half down (or half even) then it would be incorrect to
-  // round down since the remainder means the number is actually greater than
-  // the midpoint and should be rounded up.
-  if (hasRemainder && (roundingMode === ROUND_HALF_DOWN || roundingMode === ROUND_HALF_EVEN)) {
-    roundingMode = ROUND_HALF_UP
+  // the rounding mode is half down then it would be incorrect to round down
+  // since the remainder means the number is actually greater than the midpoint
+  // and should be rounded up.
+  if (hasRemainder) {
+    roundingMode =
+      roundingMode === ROUND_HALF_DOWN || roundingMode === ROUND_HALF_EVEN ? ROUND_HALF_UP :
+      roundingMode === ROUND_HALF_FLOOR && sign > 0 ? ROUND_HALF_CEILING :
+      roundingMode === ROUND_HALF_CEILING && sign < 0 ? ROUND_HALF_FLOOR :
+      roundingMode
   }
 
   // const hasRemainder = (msd < place + precisionB - 1)
@@ -341,7 +360,7 @@ export function div(a: Numeric, b: Numeric, rules?: RoundingRules): decimal {
   // console.log(`remainder: ${fromParts((signA * signB) as Sign, remainder.join(''), exponent)}`)
 
   return round(
-    fromParts((signA * signB) as Sign, digits.join(''), exponent),
+    fromParts(sign, digits.join(''), exponent),
     { precision: roundingPrecision, mode: roundingMode }
   )
 
@@ -355,13 +374,6 @@ type RoundingRules =
   | { precision?: number, mode?: RoundingMode, places?: never }
 
 type RoundingMode = keyof typeof roundingModes
-  // | 'up'
-  // | 'down'
-  // | 'ceiling'
-  // | 'floor'
-  // | 'half up'
-  // | 'half down'
-  // | 'half even'
 
 const ROUND_UP = 'up'
 const ROUND_DOWN = 'down'
@@ -369,6 +381,8 @@ const ROUND_CEILING = 'ceiling'
 const ROUND_FLOOR = 'floor'
 const ROUND_HALF_UP = 'half up'
 const ROUND_HALF_DOWN = 'half down'
+const ROUND_HALF_CEILING = 'half ceiling'
+const ROUND_HALF_FLOOR = 'half floor'
 const ROUND_HALF_EVEN = 'half even'
 
 const roundingModes = {
@@ -378,6 +392,8 @@ const roundingModes = {
   [ROUND_FLOOR]: ROUND_FLOOR,
   [ROUND_HALF_UP]: ROUND_HALF_UP,
   [ROUND_HALF_DOWN]: ROUND_HALF_DOWN,
+  [ROUND_HALF_CEILING]: ROUND_HALF_CEILING,
+  [ROUND_HALF_FLOOR]: ROUND_HALF_FLOOR,
   [ROUND_HALF_EVEN]: ROUND_HALF_EVEN,
 }
 
@@ -392,69 +408,82 @@ const roundingModes = {
  * precision: The number of significant digits to round to. Overrides places.
  *
  * mode: Determines how a rounded value should be determined.
- *       If not provided, the default mode "half up" is used.
+ *       If not provided, the default mode "half ceiling" is used.
  *  - "up": Rounds up away from zero.
  *  - "down": Rounds down towards zero.
  *  - "ceiling": Rounds up towards positive infinity.
  *  - "floor": Rounds down towards negative infinity.
  *  - "half up": Rounds towards the nearest neighbor, otherwise up.
  *  - "half down": Rounds towards the nearest neighbor, otherwise down.
+ *  - "half ceiling": Rounds towards the nearest neighbor, otherwise ceiling.
+ *  - "half floor": Rounds towards the nearest neighbor, otherwise floor.
  *  - "half even": Rounds towards the nearest neighbor, otherwise towards the
  *    even neighbor. Useful to avoid aggregated bias.
+ *
+ * Note: the default "half ceiling" rounding mode is different from the behavior
+ * of round() in many other libraries and programming languages, but matches the
+ * behavior of Math.round(). Most other languages default to "half up".
  */
 export function round(value: Numeric, rules?: RoundingRules): decimal {
   let [sign, significand, exponent, precision] = toParts(value)
   let [roundingPrecision, roundingMode] = roundingRules(rules, exponent, 0)
 
-  if (roundingPrecision < precision) {
+  // Only round if the rounded precision is less than the original precision.
+  if (precision > roundingPrecision) {
 
+    // Create a copy of the significand roundingPrecision in length.
+    const digits = []
+    for (let i = 0; i < roundingPrecision; i++) {
+      digits[i] = +significand[i]
+    }
 
-    let lastDigit = +significand[roundingPrecision - 1]
-    let roundingDigit = +significand[roundingPrecision]
+    // Increment the rounded digits if:
+    let roundingDigit = +(significand[roundingPrecision] || 0)
 
-    // Normalize rounding mode
+    // Normalize the rounding mode to either: up, down, half up, or half down.
     roundingMode =
       roundingMode === ROUND_CEILING ? sign < 0 ? ROUND_DOWN : ROUND_UP :
-      roundingMode === ROUND_FLOOR ? roundingMode = sign < 0 ? ROUND_UP : ROUND_DOWN :
-      roundingMode === ROUND_HALF_EVEN ? roundingMode = lastDigit % 2 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
+      roundingMode === ROUND_FLOOR ? sign < 0 ? ROUND_UP : ROUND_DOWN :
+      roundingMode === ROUND_HALF_CEILING ? sign < 0 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
+      roundingMode === ROUND_HALF_FLOOR ? sign < 0 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
+      roundingMode === ROUND_HALF_EVEN ? (digits[roundingPrecision - 1] || 0) % 2 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
       roundingMode
 
     if (
-      roundingMode === ROUND_HALF_UP ? roundingDigit > 4 : roundingMode === ROUND_HALF_DOWN ? roundingDigit > 5 : roundingMode === ROUND_UP
+      // A half up mode found the subsequent digit to be 5 or greater
+      roundingMode === ROUND_HALF_UP ? roundingDigit > 4 :
+      // A half down mode found the subsequent digit to be greater than 5, or 5 with additional digits
+      roundingMode === ROUND_HALF_DOWN ? roundingDigit > 5 || roundingDigit === 5 && precision > roundingPrecision + 1 :
+      // The rounding mode is up and the value is non-zero
+      roundingMode === ROUND_UP && significand
     ) {
-      // TODO: if this is > 9 then it needs to overflow... is this just add(1)?
-      lastDigit++
+
+      // roundingPrecision can be a non positive integer, in which case the
+      // number is rounded to a 1 at a higher exponent.
+      if (roundingPrecision < 1) {
+        exponent -= roundingPrecision - 1
+        digits[0] = 1
+      } else {
+        // Increment, rounding up as necessary.
+        let pos = roundingPrecision
+        do {
+          if (!pos) {
+            // For the highest digit, we cannot increment a higher digit. Instead,
+            // allow this digit to remain 10 and just increment the exponent.
+            // When joined, this will appear as two digits.
+            exponent++
+          } else {
+            digits[pos-1]++
+            if (pos < roundingPrecision) {
+              digits[pos] -= 10
+            }
+          }
+        } while (digits[--pos] > 9)
+      }
     }
 
+    significand = digits.join('')
   }
-
-  /*
-
-  take the (precision + 1)th digit from significand. Using the rules, determine
-  how to adjust the (precision)th digit. Then slice up to (and including) the
-  precisionth digit
-
-  ceiling: sign ? up : down
-  floor: sign ? down : up
-  half even: if precisionth mod 2 === 0 (even) ? half down : half up
-
-  up: increment if != 0
-  down: do nothing
-
-  half up: increment if > 4
-  half down: increment if > 5
-
-  */
-
-  // // TODO: validate and throw TypeError if necessary
-  // const mode = roundingMode[rules?.mode] || 3
-
-  // // TODO: this could result in "negative precision" eg round(5, -2) === 100
-  // // Expressed as "precision" this only makes sense for positive values.
-  // // Maybe this can be explained as removing precision from a value?
-  // // eg {precision:0} will take any value and round it to the next higher power:
-  // // round(789, { precision: 0 }) === 1000
-  // const precision = rules?.precision ?? ((rules?.places || 0) + exponent)
 
   return fromParts(sign, significand, exponent)
 }
@@ -468,13 +497,13 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
 function roundingRules(rules: RoundingRules | undefined, exponent: number, defaultPlaces: number): [number, RoundingMode] {
   let { precision, places = defaultPlaces, mode } = rules || {}
   if (precision != undefined) {
-    if (~~precision !== precision || precision < 1) throw new Error('Rounding precision must be a positive integer')
+    if (~~precision !== precision) throw new Error('Rounding precision must be an integer')
   } else {
     if (~~places !== places) throw new Error('Rounding places must be an integer')
-    precision = places + exponent
+    precision = places + exponent + 1
   }
   if (mode && !(mode in roundingModes)) throw new Error(`Unknown rounding mode: ${mode}`)
-  return [precision, mode || ROUND_HALF_UP]
+  return [precision, mode || ROUND_HALF_CEILING]
 }
 
 // Normalized parts
