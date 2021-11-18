@@ -9,51 +9,59 @@
  *  - mul is done
  *  - round is done and tested
  *  - pow - matching ECMA proposal has this with a positive integer - needs tests
- *
+ *  - mod and rem done - need tests
+ *  - div needs more tests
+ *  - divmod done but needs more tests
+ *  - EUCLIDIAN mode for divmod/round. floor/truncated mode.
  *
  * Todo:
  *  - unit tests
- *  - cmp ideally can accept +-Infinity
- *  - div - should it require a rounding mode?
- *  - idiv or divmod or something that returns an [int, int] of [result, remain]?
- *  - mod - surely there's an arbitrary integer algorithm for this somewhere
+ *  - toFixed / toExponential / toPrecision - are these useful?
  *  - min/max/sum
+ *  - cmp ideally can accept +-Infinity
  *  - sqrt - is this actually useful? Big.js has this, but ECMA does not
  *  - cbrt?
  *  - trig / PI?
- *  - toFixed / toExponential / toPrecision - are these useful?
  *  - toLocaleString would be useful, but I'm not sure how to get this working
  *  - Error quality
+ *  - "unnecessary" rounding mode?
  *
- *  - should mod be called rem/remainder? see: https://en.wikipedia.org/wiki/Modulo_operation
- *  - EUCLIDIAN mode for divmod/round? as well as floor/truncated mode? (and rounded?)
  *  - rest of decimal.js lib?
- */
-
-/**
- * The decimal type.
  *
- * A decimal is represented as a numeric string, allowing arbitrary precision.
- * It is a subtype of numeric string, that is all decimal types are numeric
- * strings, but not all numeric strings are decimals.
- *
- * Note: unlike number, decimal cannot represent Infinity, NaN, or negative zero.
+ *  - prettier
+ *  - eslint
+ *  - build outputs
+ *  - test tree shaking
+ *  - doc generator
+ *  - performance testing
  */
-export type decimal = `${number}` & { [$decimal]: typeof $decimal }
-declare const $decimal: unique symbol
 
 /**
  * The Numeric type represents all numeric values: numbers, bigint, and
- * numeric strings (including decimal).
+ * numeric strings (including `decimal`).
  */
 export type Numeric = `${number}` | number | bigint
 
 // Type conversion
 
 /**
+ * **The decimal type:**
+ *
+ * A decimal is represented as a numeric string, allowing arbitrary precision.
+ * It is a subtype of numeric string, that is all decimal types are numeric
+ * strings, but not all numeric strings are decimals.
+ */
+export type decimal = `${number}` & { [$decimal]: typeof $decimal }
+declare const $decimal: unique symbol
+
+
+/**
  * Converts any numeric value to a decimal.
  *
  * Throws a TypeError if the provided value cannot be translated to decimal.
+ *
+ * Note: unlike number, decimal cannot represent Infinity, NaN, or -0.
+ *
  */
 export function decimal(value: string | Numeric): decimal {
   const [sign, significand, exponent] = toParts(value)
@@ -151,8 +159,8 @@ export function lte(a: Numeric, b: Numeric): boolean {
   const [signB, significandB, exponentB, precisionB] = toParts(b)
 
   // Comparison to zero or differing signs
-  if (!significandA) return (-signB | 0) as Sign
-  if (!significandB || signA !== signB) return signA
+  if (!signA) return (-signB | 0) as Sign
+  if (!signB || signA !== signB) return signA
 
   // Compare absolute value and flip if negative.
   return (cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) * signA | 0) as Sign
@@ -181,6 +189,10 @@ function cmpAbs(significandA: string, exponentA: number, precisionA: number, sig
 export function add(a: Numeric, b: Numeric): decimal {
   const [signA, significandA, exponentA, precisionA] = toParts(a)
   const [signB, significandB, exponentB, precisionB] = toParts(b)
+
+  // Additive identity
+  if (!signA) return fromParts(signB, significandB, exponentB)
+  if (!signB) return fromParts(signA, significandA, exponentA)
 
   // Result normalized form
   let sign = signA
@@ -219,7 +231,7 @@ export function add(a: Numeric, b: Numeric): decimal {
     }
 
     // Correct the resulting sign for the subtraction direction.
-    sign = (sign * direction) as Sign
+    sign = (sign * direction) as 1 | -1
     while (pos-- > -exponent) {
       result += 10 + direction * (+(significandA[pos + exponentA] || 0) - +(significandB[pos + exponentB] || 0))
       digits[pos + exponent] = result % 10
@@ -299,37 +311,37 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
 }
 
 /**
+ * Returns the result of dividing `dividend` by `divisor`.
+ *
+ * Defaults to 20 decimal places of precision and the `"half even"` rounding
+ * mode, configurable by providing rounding rules.
  *
  * @equivalent a / b
  */
-export function div(a: Numeric, b: Numeric, rules?: RoundingRules): decimal {
-  const [signA, , exponentA] = toParts(a)
-  const [signB, , exponentB] = toParts(b)
-  let { precision, mode } = normalizeRules(rules, exponentA - exponentB, 20)
-  // Divide with extra precision so there is data to round correctly.
-  const [quotient, remainder] = divmod(a, b, { precision: precision + 1 })
-
-  // If there is still additional remainder, adjust the rounding mode.
-  // For example, if the final rounding digit is 5 with remainder left over and
-  // the rounding mode is half down then it would be incorrect to round down
-  // since the remainder means the number is actually greater than the midpoint
-  // and should be rounded up.
-  if (remainder !== '0') {
-    const sign = (signA * signB) as Sign
-    mode =
-      mode === ROUND_HALF_DOWN || mode === ROUND_HALF_EVEN ? ROUND_HALF_UP :
-      mode === ROUND_HALF_FLOOR && sign > 0 ? ROUND_HALF_CEILING :
-      mode === ROUND_HALF_CEILING && sign < 0 ? ROUND_HALF_FLOOR :
-      mode
-  }
-
-  return round(quotient, { precision, mode })
+export function div(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
+  const [quotient] = divmod(dividend, divisor, normalizeRules(rules, 20, ROUND_HALF_EVEN))
+  return quotient
 }
 
 /**
- * Returns the remainder of dividing a by b (using truncated division).
+ * Returns the remainder of dividing a by b using truncated (round 'down') division.
+ * The result always has the same sign as the first argument (or 0).
  *
  * @equivalent a % b
+ */
+export function rem(a: Numeric, b: Numeric): decimal {
+  const [, remainder] = divmod(a, b, { [MODE]: ROUND_DOWN })
+  return remainder
+}
+
+/**
+ * Returns the modulo of dividing a by b using floored (round 'floor') division.
+ * The result always has the same sign as the second argument (or 0).
+ *
+ * Note: this does not have the same as the % (remainder) operator. rem()
+ *
+ * @equivalent ((a % b) + b) % b
+ * @see rem
  */
 export function mod(a: Numeric, b: Numeric): decimal {
   const [, remainder] = divmod(a, b)
@@ -337,11 +349,37 @@ export function mod(a: Numeric, b: Numeric): decimal {
 }
 
 /**
- * Divides two numeric values to a given precision (using truncated division),
- * returning both the quotient and the remainder such that:
- * `dividend = divisor * quotient + remainder`.
+ * Divides two numeric values to a given places or precision returning both the
+ * quotient and the remainder while satisfying the two conditions:
+ *
+ *   - `dividend = divisor * quotient + remainder`
+ *   - `abs(remainder) < abs(divisor)`.
+ *
+ * However there is not only one quotient and remainder which satisfies these
+ * conditions. A choice of the sign of the remainder (via rounding mode) and
+ * precision of the quotient can be provided via `rules`.
+ *
+ * Result of dividing 10 by 3 with different signs and rounding modes:
+ *
+ * | Example            | Note
+ * | ------------------ | ---------------
+ * | `divmod(10, 3, { mode: "floor" }) === [ '3', '1' ]` | "floor" is the default rounding mode
+ * | `divmod(10, -3, { mode: "floor" }) === [ '-4', '-2' ]` | The remainder has the same sign as the divisor
+ * | `divmod(-10, 3, { mode: "floor" }) === [ '-4', '2' ]` |
+ * | `divmod(-10, -3, { mode: "floor" }) === [ '3', '-1' ]` |
+ * | `divmod(10, 3, { mode: "down" }) === [ '3', '1' ]` | The remainder has the same sign as the dividend
+ * | `divmod(10, -3, { mode: "down" }) === [ '-3', '1' ]` |
+ * | `divmod(-10, 3, { mode: "down" }) === [ '-3', '-1' ]` |
+ * | `divmod(-10, -3, { mode: "down" }) === [ '3', '-1' ]` |
+ * | `divmod(10, 3, { mode: "euclidean" }) === [ '3', '1' ]` | The remainder is always positive
+ * | `divmod(10, -3, { mode: "euclidean" }) === [ '-3', '1' ]` |
+ * | `divmod(-10, 3, { mode: "euclidean" }) === [ '-4', '2' ]` |
+ * | `divmod(-10, -3, { mode: "euclidean" }) === [ '4', '2' ]` |
+ *
+ * All rounding modes may be used.
  */
-export function divmod(dividend: Numeric, divisor: Numeric, rules?: PrecisionRules): [quotient: decimal, remainder: decimal] {
+export function divmod(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): [quotient: decimal, remainder: decimal] {
+  const roundingRules = normalizeRules(rules, 0, ROUND_FLOOR)
   const [signA, significandA, exponentA, precisionA] = toParts(dividend)
   const [signB, significandB, exponentB, precisionB] = toParts(divisor)
 
@@ -350,38 +388,45 @@ export function divmod(dividend: Numeric, divisor: Numeric, rules?: PrecisionRul
   const sign = (signA * signB) as Sign
   const exponent = exponentA - exponentB
 
-  let { precision } = normalizeRules(rules, exponent, 0)
+  // Determine the desired rounding mode and precision.
+  let roundingMode = roundingRules[MODE]
+  let roundingPrecision = roundingRules[PRECISION]
+  if (roundingPrecision == null) {
+    roundingPrecision = roundingRules[PLACES] as number + exponent + 1
+  }
 
   if (!significandB) throw new TypeError('Divide by 0')
-  // TODO: Necessary?
-  if (!significandA) return ['0' as decimal, '0' as decimal]
 
-  // The most significant digit of the remainder.
-  let msd = 0
-  let place = 0
-  const digits: number[] = []
+  // Collect the digits of the quotient.
+  let quotientSignificand = ''
 
   // Remainder is a mutable list of digits, starting as a copy of the dividend
   // (a) which is at least as long as the divisor (b).
-  const remainDigits: number[] = []
+  const remainderDigits: number[] = []
   for (let i = 0; i < precisionA || i < precisionB; i++) {
-    remainDigits[i] = +significandA[i] || 0
+    remainderDigits[i] = +significandA[i] || 0
   }
+
+  // The most significant digit of the remainder.
+  let msd = 0
 
   // Compute digits of the quotient by repeatedly subtracting the divisor from
   // each place of the dividend while:
-  while (
-    // Not all places of dividend have been divided or remainder is non zero,
-    (place <= precisionA - precisionB || msd < place + precisionB - 1)
-    // and the total digits are not yet at the maximum precision.
-
-    // TODO need extra precision if the first digit is 0? only affects precision but not places?
-    // TODO: yeah this is definitely not working correctly...
-    && place < precision //+ +!digits[0]
+  let place = 0
+  let digit = 0
+  for (;
+    // The total number of digits are not yet at the desired precision,
+    place < roundingPrecision &&
+    // and not all places of dividend have been divided or there is a remainder.
+    (place <= precisionA - precisionB || msd < place + precisionB - 1);
+    place++
   ) {
+    // Append a zero to the remainder if necessary.
+    remainderDigits[place + precisionB - 1] ||= 0
+
     // Count how many times divisor (b) can be subtracted from remainder at the
     // current place (between 0 and 9 times).
-    let digit = -1;
+    digit = -1
     countSubtractions: while (digit++ < 9) {
 
       // If the divisor cannot be subtracted from the remainder at the
@@ -389,7 +434,7 @@ export function divmod(dividend: Numeric, divisor: Numeric, rules?: PrecisionRul
       // then stop counting subtractions.
       if (msd >= place) {
         for (let i = -1, difference = 0; !difference && ++i < precisionB;) {
-          difference = remainDigits[place + i] - +significandB[i]
+          difference = remainderDigits[place + i] - +significandB[i]
           if (difference < 0) {
             break countSubtractions
           }
@@ -398,81 +443,104 @@ export function divmod(dividend: Numeric, divisor: Numeric, rules?: PrecisionRul
 
       // Subtract at this location
       for (let i = place + precisionB; i-- > place;) {
-        remainDigits[i] -= +(significandB[i - place] || 0)
-        if (remainDigits[i] < 0) {
-          remainDigits[i] += 10
-          remainDigits[i - 1] -= 1
+        remainderDigits[i] -= +(significandB[i - place] || 0)
+        if (remainderDigits[i] < 0) {
+          remainderDigits[i] += 10
+          remainderDigits[i - 1] -= 1
         }
       }
 
       // Then update the location of the most significant digit of the remainder.
-      while (remainDigits[msd] === 0) {
+      while (remainderDigits[msd] === 0) {
         msd++
       }
     }
 
-    // Append a zero to the remainder if necessary.
-    remainDigits[place + precisionB] ||= 0
+    // If precision was directly specified and the first digit is 0, then
+    // 1 additional digit is necessary to reach the desired precision.
+    if (place === 0 && digit === 0 && roundingRules[PRECISION] != null) {
+      roundingPrecision++
+    }
 
     // Append this digit to the result.
-    digits[place++] = digit
+    quotientSignificand += digit
   }
 
-  // // If there is still additional remainder, adjust the rounding mode.
-  // // For example, if the final rounding digit is 5 with remainder left over and
-  // // the rounding mode is half down then it would be incorrect to round down
-  // // since the remainder means the number is actually greater than the midpoint
-  // // and should be rounded up.
-  // if (hasRemainder) {
-  //   mode =
-  //     mode === ROUND_HALF_DOWN || mode === ROUND_HALF_EVEN ? ROUND_HALF_UP :
-  //     mode === ROUND_HALF_FLOOR && sign > 0 ? ROUND_HALF_CEILING :
-  //     mode === ROUND_HALF_CEILING && sign < 0 ? ROUND_HALF_FLOOR :
-  //     mode
-  // }
+  // Determine the quotient and remainder from the resulting digits.
+  let remainderSignificand = remainderDigits.join('')
+  let quotient = fromParts(sign, quotientSignificand, exponent)
+  let remainder = fromParts(signA, remainderSignificand, exponentA)
 
-  // const hasRemainder = (msd < place + precisionB - 1)
-  // console.log({ hasRemainder })
+  // If there is a remainder, consider the provided rounding rule.
+  if (remainder !== '0') {
 
-  // console.log(`remainder: ${fromParts((signA * signB) as Sign, remainder.join(''), exponent)}`)
+    // Normalize the rounding mode based on sign and other context; reducing the
+    // set of possible rounding modes to four (up, down, half up, and half down)
+    // which apply to the absolute value of quotient.
+    // TODO: can this be shared with round()?
+    roundingMode =
+      roundingMode === ROUND_CEILING ? sign < 0 ? ROUND_DOWN : ROUND_UP :
+      roundingMode === ROUND_FLOOR ? sign < 0 ? ROUND_UP : ROUND_DOWN :
+      roundingMode === ROUND_EUCLIDEAN ? sign === signB ? ROUND_DOWN : ROUND_UP :
+      roundingMode === ROUND_HALF_CEILING ? sign < 0 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
+      roundingMode === ROUND_HALF_FLOOR ? sign < 0 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
+      roundingMode === ROUND_HALF_EVEN ? digit % 2 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
+      roundingMode
 
-  const quotient = fromParts(sign, digits.join(''), exponent)
-  const remainder = fromParts(signA, remainDigits.join(''), exponent)
+    // Determine whether to round up the quotient. This is trivial for whole
+    // rounding modes, however half rounding modes need to compare the remainder
+    // to the midpoint of the divisor, treating exactly the midpoint specially.
+    let shouldRoundUp
+    if (roundingMode === ROUND_UP || roundingMode === ROUND_DOWN) {
+      shouldRoundUp = roundingMode === ROUND_UP
+    } else {
+      const midpointCmp = cmp(mul(2, remainderSignificand as decimal), significandB as decimal)
+      shouldRoundUp = roundingMode === ROUND_HALF_UP ? midpointCmp >= 0 : midpointCmp > 0
+    }
+
+    if (shouldRoundUp) {
+      // In order to "round up" the absolute value of the quotient, add 1 to the
+      // least significant digit. Then subtract one additional dividend from the
+      // remainder at the same exponent.
+      quotient = add(quotient, fromParts(sign, '1', exponent - place + 1))
+      remainder = sub(remainder, fromParts(signA, significandB, exponentA - place + 1))
+    }
+  }
+
   return [quotient, remainder]
-
-  // return round(
-  //   fromParts(sign, digits.join(''), exponent),
-  //   { precision: precision, mode: mode }
-  // )
-
-  // return fromParts((signA * signB) as Sign, digits.join(''), exponent)
 }
 
 // Rounding
 
-type PrecisionRules =
-  | { places: number, precision?: never }
-  | { precision: number, places?: never }
-
 type RoundingRules =
   | { places?: number, mode?: RoundingMode, precision?: never }
   | { precision?: number, mode?: RoundingMode, places?: never }
+
+type NormalizedRoundingRules =
+  | { places: number, mode: RoundingMode, precision: never }
+  | { precision: number, mode: RoundingMode, places: never }
 
 type RoundingMode =
   | 'up'
   | 'down'
   | 'ceiling'
   | 'floor'
+  | 'euclidean'
   | 'half up'
   | 'half down'
   | 'half ceiling'
   | 'half floor'
   | 'half even'
 
+const PLACES = 'places'
+const PRECISION = 'precision'
+const MODE = 'mode'
+
 const ROUND_UP = 'up'
 const ROUND_DOWN = 'down'
 const ROUND_CEILING = 'ceiling'
 const ROUND_FLOOR = 'floor'
+const ROUND_EUCLIDEAN = 'euclidean'
 const ROUND_HALF_UP = 'half up'
 const ROUND_HALF_DOWN = 'half down'
 const ROUND_HALF_CEILING = 'half ceiling'
@@ -484,6 +552,7 @@ const roundingModes = {
   [ROUND_DOWN]: ROUND_DOWN,
   [ROUND_CEILING]: ROUND_CEILING,
   [ROUND_FLOOR]: ROUND_FLOOR,
+  [ROUND_EUCLIDEAN]: ROUND_EUCLIDEAN,
   [ROUND_HALF_UP]: ROUND_HALF_UP,
   [ROUND_HALF_DOWN]: ROUND_HALF_DOWN,
   [ROUND_HALF_CEILING]: ROUND_HALF_CEILING,
@@ -497,16 +566,24 @@ const roundingModes = {
  *
  * @internal
  */
- function normalizeRules(rules: RoundingRules | undefined, exponent: number, defaultPlaces?: number): { precision: number, mode: RoundingMode } {
-  let { precision, places = defaultPlaces || 0, mode = ROUND_HALF_CEILING } = rules || {}
-  if (precision != undefined) {
+function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number, defaultMode: RoundingMode): NormalizedRoundingRules {
+  let precision = rules && rules[PRECISION]
+  let places = rules && rules[PLACES]
+  let mode = rules && rules[MODE]
+  if (precision != null) {
+    if (places != null) throw new TypeError('Cannot provide both precision and places')
     if (~~precision !== precision) throw new RangeError('precision must be a whole number')
-  } else {
+  } else if (places != null) {
     if (~~places !== places) throw new RangeError('places must be a whole number')
-    precision = places + exponent + 1
+  } else {
+    places = defaultPlaces
   }
-  if (!(mode in roundingModes)) throw new RangeError(`Unknown rounding mode: ${mode}`)
-  return { precision, mode }
+  if (mode && !(mode in roundingModes)) throw new RangeError(`Unknown rounding mode: ${mode}`)
+  return {
+    [PRECISION]: precision,
+    [PLACES]: places,
+    [MODE]: mode || defaultMode
+  } as NormalizedRoundingRules
 }
 
 /**
@@ -521,83 +598,64 @@ const roundingModes = {
  *
  * mode: Determines how a rounded value should be determined.
  *       If not provided, the default mode "half ceiling" is used.
- *  - "up": Rounds up away from zero.
- *  - "down": Rounds down towards zero.
- *  - "ceiling": Rounds up towards positive infinity.
- *  - "floor": Rounds down towards negative infinity.
- *  - "half up": Rounds towards the nearest neighbor, otherwise up.
- *  - "half down": Rounds towards the nearest neighbor, otherwise down.
- *  - "half ceiling": Rounds towards the nearest neighbor, otherwise ceiling.
- *  - "half floor": Rounds towards the nearest neighbor, otherwise floor.
- *  - "half even": Rounds towards the nearest neighbor, otherwise towards the
+ *  - `"up"`: Rounds up away from zero.
+ *  - `"down"`: Rounds down towards zero.
+ *  - `"ceiling"`: Rounds up towards positive infinity.
+ *  - `"floor"`: Rounds down towards negative infinity.
+ *  - `"euclidean"`: Same as floor, but with specific behavior for division.
+ *  - `"half up"`: Rounds towards the nearest neighbor, otherwise up.
+ *  - `"half down"`: Rounds towards the nearest neighbor, otherwise down.
+ *  - `"half ceiling"`: Rounds towards the nearest neighbor, otherwise ceiling.
+ *  - `"half floor"`: Rounds towards the nearest neighbor, otherwise floor.
+ *  - `"half even"`: Rounds towards the nearest neighbor, otherwise towards the
  *    even neighbor. Useful to avoid aggregated bias.
  *
  * Note: the default "half ceiling" rounding mode is different from the behavior
  * of round() in many other libraries and programming languages, but matches the
- * behavior of Math.round(). Most other languages default to "half up".
+ * behavior of JavaScript's Math.round(). Other languages default to "half up".
  */
 export function round(value: Numeric, rules?: RoundingRules): decimal {
-  let [sign, significand, exponent, valuePrecision] = toParts(value)
-  let {precision, mode} = normalizeRules(rules, exponent, 0)
+  const roundingRules = normalizeRules(rules, 0, ROUND_HALF_CEILING)
+  let [sign, significand, exponent, precision] = toParts(value)
 
-  // Only round if the rounded precision is less than the original precision.
-  if (valuePrecision > precision) {
-
-    // Create a copy of the significand roundingPrecision in length.
-    const digits = []
-    for (let i = 0; i < precision; i++) {
-      digits[i] = +significand[i]
-    }
-
-    // Increment the rounded digits if:
-    let roundingDigit = +(significand[precision] || 0)
-
-    // Normalize the rounding mode to either: up, down, half up, or half down.
-    mode =
-      mode === ROUND_CEILING ? sign < 0 ? ROUND_DOWN : ROUND_UP :
-      mode === ROUND_FLOOR ? sign < 0 ? ROUND_UP : ROUND_DOWN :
-      mode === ROUND_HALF_CEILING ? sign < 0 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
-      mode === ROUND_HALF_FLOOR ? sign < 0 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
-      mode === ROUND_HALF_EVEN ? (digits[precision - 1] || 0) % 2 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
-      mode
-
-    if (
-      // A half up mode found the subsequent digit to be 5 or greater
-      mode === ROUND_HALF_UP ? roundingDigit > 4 :
-      // A half down mode found the subsequent digit to be greater than 5, or 5 with additional digits
-      mode === ROUND_HALF_DOWN ? roundingDigit > 5 || roundingDigit === 5 && valuePrecision > precision + 1 :
-      // The rounding mode is up and the value is non-zero
-      mode === ROUND_UP && significand
-    ) {
-
-      // roundingPrecision can be a non positive integer, in which case the
-      // number is rounded to a 1 at a higher exponent.
-      if (precision < 1) {
-        exponent -= precision - 1
-        digits[0] = 1
-      } else {
-        // Increment, rounding up as necessary.
-        let pos = precision
-        do {
-          if (!pos) {
-            // For the highest digit, we cannot increment a higher digit.
-            // Instead, allow this digit to remain 10 and just increment the
-            // exponent. When joined, this will appear as two digits.
-            exponent++
-          } else {
-            digits[pos-1]++
-            if (pos < precision) {
-              digits[pos] -= 10
-            }
-          }
-        } while (digits[--pos] > 9)
-      }
-    }
-
-    significand = digits.join('')
+  // Determine the desired rounding mode and precision.
+  // TODO factor out?
+  let roundingMode = roundingRules[MODE]
+  let roundingPrecision = roundingRules[PRECISION]
+  if (roundingPrecision == null) {
+    roundingPrecision = roundingRules[PLACES] as number + exponent + 1
   }
 
-  return fromParts(sign, significand, exponent)
+  // Start the rounded value as a truncated value to the desired precision.
+  let rounded = fromParts(sign, roundingPrecision > 0 ? significand.slice(0, roundingPrecision) : '', exponent)
+
+  // Only round if the rounded precision is less than the original precision.
+  if (precision > roundingPrecision) {
+
+    // Normalize the rounding mode to either: up, down, half up, or half down.
+    roundingMode =
+      roundingMode === ROUND_CEILING ? sign < 0 ? ROUND_DOWN : ROUND_UP :
+      roundingMode === ROUND_FLOOR || roundingMode === ROUND_EUCLIDEAN ? sign < 0 ? ROUND_UP : ROUND_DOWN :
+      roundingMode === ROUND_HALF_CEILING ? sign < 0 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
+      roundingMode === ROUND_HALF_FLOOR ? sign < 0 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
+      roundingMode === ROUND_HALF_EVEN ? +(significand[roundingPrecision - 1] || 0) % 2 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
+      roundingMode
+
+    const roundingDigit = +(significand[roundingPrecision] || 0)
+    if (
+      // A half up mode found the subsequent digit to be 5 or greater
+      roundingMode === ROUND_HALF_UP ? roundingDigit > 4 :
+      // A half down mode found the subsequent digit to be greater than 5, or 5 with additional digits
+      roundingMode === ROUND_HALF_DOWN ? roundingDigit > 5 || roundingDigit === 5 && precision > roundingPrecision + 1 :
+      // The rounding mode is up and the value is non-zero
+      roundingMode === ROUND_UP && sign
+    ) {
+      // Round up by adding one to the the least significant digit of the absolute value
+      rounded = add(rounded, fromParts(sign, '1', exponent - roundingPrecision + 1))
+    }
+  }
+
+  return rounded
 }
 
 // Normalized parts
@@ -653,7 +711,7 @@ export function fromParts(sign: Sign, significand: string, exponent: number): de
   let precision;
   [sign, significand, exponent, precision] = normalizeParts(sign, significand, exponent)
   let result = sign < 0 ? '-' : ''
-  if (!significand) {
+  if (!sign) {
     result = '0'
   } else if (exponent < 0) {
     result += '0.'

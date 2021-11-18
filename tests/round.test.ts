@@ -149,6 +149,17 @@ describe('round', () => {
     expect(round(-1, { mode: 'half even' })).toBe('-1')
     expect(round(-1.5, { mode: 'half even' })).toBe('-2')
     expect(round(-2.5, { mode: 'half even' })).toBe('-2')
+
+    // euclidean (note: for round(), this is equivalent to floor)
+    expect(round(1, { mode: 'euclidean' })).toBe('1')
+    expect(round(0.501, { mode: 'euclidean' })).toBe('0')
+    expect(round(0.5, { mode: 'euclidean' })).toBe('0')
+    expect(round(0.499, { mode: 'euclidean' })).toBe('0')
+    expect(round(0, { mode: 'euclidean' })).toBe('0')
+    expect(round(-0.499, { mode: 'euclidean' })).toBe('-1')
+    expect(round(-0.5, { mode: 'euclidean' })).toBe('-1')
+    expect(round(-0.501, { mode: 'euclidean' })).toBe('-1')
+    expect(round(-1, { mode: 'euclidean' })).toBe('-1')
   })
 
 })

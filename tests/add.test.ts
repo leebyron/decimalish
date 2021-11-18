@@ -26,6 +26,10 @@ describe('add', () => {
   })
 
   it('Adds numbers with differing signs', () => {
+    expect(add(1, 0)).toBe('1')
+    expect(add(0, 1)).toBe('1')
+    expect(add(0, -1)).toBe('-1')
+    expect(add(-1, 0)).toBe('-1')
     expect(add(10, -3)).toBe('7')
     expect(add(-3, 10)).toBe('7')
     expect(add(3, -10)).toBe('-7')
