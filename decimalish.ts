@@ -13,6 +13,7 @@
  *  - div needs more tests
  *  - divmod done but needs more tests
  *  - EUCLIDIAN mode for divmod/round. floor/truncated mode.
+ *  - divToInt
  *  - toFixed / toExponential. with all rounding modes.
  *  - scale - needs tests
  *
@@ -60,7 +61,7 @@
  * It is a subtype of numeric string, that is all decimal types are numeric
  * strings, but not all numeric strings are decimals.
  */
-export type decimal = `${number}` & { [$decimal]: typeof $decimal }
+export type decimal = NumericString & { [$decimal]: typeof $decimal }
 declare const $decimal: unique symbol
 
 
@@ -90,7 +91,12 @@ export function isDecimal(value: unknown): value is decimal {
  * The Numeric type represents all numeric values: numbers, bigint, and
  * numeric strings (including `decimal`).
  */
-export type Numeric = `${number}` | number | bigint
+export type Numeric = NumericString | number | bigint
+
+/**
+ * The NumericString type represents strings that can be parsed as a number.
+ */
+export type NumericString = `${number}`
 
 
 // Arithmetic
@@ -239,8 +245,25 @@ export function div(dividend: Numeric, divisor: Numeric, rules?: RoundingRules):
 }
 
 /**
- * Returns the remainder of dividing a by b using truncated (round 'down') division.
- * The result always has the same sign as the first argument (or 0).
+ * Returns the integer result of dividing `dividend` by `divisor` using floored
+ * (round 'floor') division.
+ *
+ * Note: The remainder can be found using `mod()`, or better yet use `divmod()`.
+ *
+ * @see divmod
+ */
+ export function divToInt(dividend: Numeric, divisor: Numeric): decimal {
+  const [quotient] = divmod(dividend, divisor)
+  return quotient
+}
+
+/**
+ * Returns the remainder of dividing a by b using truncated (round 'down')
+ * division. The result always has the same sign as the first argument (or 0).
+ *
+ * Note: `rem()` and `div()` use different division rounding rules and should
+ * not be used together. To get both a quotient and remainder, use `divmod()`
+ * with the desired rounding rule.
  *
  * @equivalent a % b
  */
@@ -430,7 +453,7 @@ export function divmod(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
  *
  * @equivalent a == b
  */
- export function eq(a: Numeric, b: Numeric): boolean {
+export function eq(a: Numeric, b: Numeric): boolean {
   return cmp(a, b) === 0
 }
 
@@ -478,7 +501,7 @@ export function lte(a: Numeric, b: Numeric): boolean {
  *
  * @equivalant a == b ? 0 : a > b ? 1 : -1
  */
- export function cmp(a: Numeric, b: Numeric): Sign {
+export function cmp(a: Numeric, b: Numeric): Sign {
   const [signA, significandA, exponentA, precisionA] = toRepresentation(a)
   const [signB, significandB, exponentB, precisionB] = toRepresentation(b)
 
@@ -738,14 +761,14 @@ export function toNumber(value: Numeric, options?: { strict: boolean }): number 
  *
  * @see decimal
  */
-export const toString: (value: Numeric) => string = decimal
+export const toString: (value: Numeric) => NumericString = decimal
 
 /**
  * A string representation of the provided Numeric `value` using fixed notation.
  * Uses rules to specify `precision` or `places` and the rounding `mode` should
  * that result in fewer digits.
  */
-export function toFixed(value: Numeric, rules?: RoundingRules): string {
+export function toFixed(value: Numeric, rules?: RoundingRules): NumericString {
   return toFormat(false, value, rules)
 }
 
@@ -754,7 +777,7 @@ export function toFixed(value: Numeric, rules?: RoundingRules): string {
  * scientific notation. Uses rules to specify `precision` or `places` and the
  * rounding `mode` should that result in fewer digits.
  */
-export function toExponential(value: Numeric, rules?: RoundingRules): string {
+export function toExponential(value: Numeric, rules?: RoundingRules): NumericString {
   // Interpret "places" relative to the final exponential notation rather than
   // the original number. In exponential scientific notation, the precision of
   // a number is always exactly one more than the number of decimal places.
@@ -766,7 +789,7 @@ export function toExponential(value: Numeric, rules?: RoundingRules): string {
  *
  * @internal
  */
-function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules): string {
+function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules): NumericString {
   const [sign, significand, exponent, precision] = toRepresentation(rules ? round(value, rules) : value)
   const printPrecision = rules ? getRoundingPrecision(rules, exponent) : precision
   return print(sign, significand, exponent, precision, printPrecision, asExponential)
@@ -777,14 +800,14 @@ function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules)
  *
  * @internal
  */
- function print(
+function print(
   sign: Sign,
   significand: string,
   exponent: number,
   precision: number,
   printPrecision: number,
   asExponential?: boolean
-): string {
+): NumericString {
   let result = sign < 0 ? '-' : ''
   let decimalPoint = asExponential ? 1 : exponent + 1
 
@@ -808,7 +831,7 @@ function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules)
     result += (exponent < 0 ? 'e' : 'e+') + exponent
   }
 
-  return result
+  return result as NumericString
 }
 
 
