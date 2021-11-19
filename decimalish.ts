@@ -50,11 +50,6 @@
  *  - or at worst, only 5KB minified!
  */
 
-/**
- * The Numeric type represents all numeric values: numbers, bigint, and
- * numeric strings (including `decimal`).
- */
-export type Numeric = `${number}` | number | bigint
 
 // Decimal type
 
@@ -91,140 +86,14 @@ export function isDecimal(value: unknown): value is decimal {
   return decimalRegex.test(''+value) && decimal(value) === value
 }
 
-// Magnitude
-
 /**
- * Absolute value, always positive.
- *
- * @equivalent Math.abs(value)
+ * The Numeric type represents all numeric values: numbers, bigint, and
+ * numeric strings (including `decimal`).
  */
-export function abs(value: Numeric): decimal {
-  const [, significand, exponent] = toRepresentation(value)
-  return fromRepresentation(1, significand, exponent)
-}
-
-/**
- * Negated value, same magnitude but opposite sign.
- *
- * @equivalent -value
- */
-export function neg(value: Numeric): decimal {
-  const [sign, significand, exponent] = toRepresentation(value)
-  return fromRepresentation(-sign as Sign, significand, exponent)
-}
-
-/**
- * Returns a positive `1` or negative `-1` indicating the sign of the provided
- * number. If the provided number is zero, it will return `0`.
- *
- * Note: decimal does not represent negative zero.
- *
- * @equivalent Math.sign(value)
- */
-export function sign(value: Numeric): Sign {
-  const [sign] = toRepresentation(value)
-  return sign
-}
+export type Numeric = `${number}` | number | bigint
 
 
-/**
- * Returns the `value` scaled up or down by `power`. In other words, this moves
- * the decimal point right `power` places.
- *
- * Note: decimal does not represent negative zero.
- *
- * @equivalent value * 10 ^ power
- */
-export function scale(value: Numeric, power: Numeric): decimal {
-  const [sign, significand, exponent] = toRepresentation(value)
-  power = toNumber(power)
-  if (~~power !== power) {
-    throw RangeError('power must be a whole number.');
-  }
-  return fromRepresentation(sign, significand, exponent + power)
-}
-
-// Comparisons
-
-/**
- * Compares two numeric values and returns true if they are equivalent.
- *
- * @equivalent a == b
- */
-export function eq(a: Numeric, b: Numeric): boolean {
-  return cmp(a, b) === 0
-}
-
-/**
- * Compares two numeric values and returns true if a is greater than b.
- *
- * @equivalent a > b
- */
-export function gt(a: Numeric, b: Numeric): boolean {
-  return cmp(a, b) === 1
-}
-
-/**
- * Compares two numeric values and returns true if a is greater than or equal to b.
- *
- * @equivalent a >= b
- */
-export function gte(a: Numeric, b: Numeric): boolean {
-  return cmp(a, b) !== -1
-}
-
-/**
- * Compares two numeric values and returns true if a is less than b.
- *
- * @equivalent a < b
- */
-export function lt(a: Numeric, b: Numeric): boolean {
-  return cmp(a, b) === -1
-}
-
-/**
- * Compares two numeric values and returns true if a is less than or equal to b.
- *
- * @equivalent a <= b
- */
-export function lte(a: Numeric, b: Numeric): boolean {
-  return cmp(a, b) !== 1
-}
-
-/**
- * Compares two numeric values and returns `1` if a is greater than b, `-1` if b
- * is greater than a, and `0` if a and b are equivalent.
- *
- * Note: This is equivalent to, but much faster than, `sign(sub(a, b))`.
- *
- * @equivalant a == b ? 0 : a > b ? 1 : -1
- */
- export function cmp(a: Numeric, b: Numeric): Sign {
-  const [signA, significandA, exponentA, precisionA] = toRepresentation(a)
-  const [signB, significandB, exponentB, precisionB] = toRepresentation(b)
-
-  // Comparison to zero or differing signs
-  if (!signA) return (-signB | 0) as Sign
-  if (!signB || signA !== signB) return signA
-
-  // Compare absolute value and flip if negative.
-  return (cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) * signA | 0) as Sign
-}
-
-/**
- * Compares two normalized absolute values
- *
- * @internal
- */
-function cmpAbs(significandA: string, exponentA: number, precisionA: number, significandB: string, exponentB: number, precisionB: number): Sign {
-  if (exponentA !== exponentB) return exponentA > exponentB ? 1 : -1
-  for (let i = -1, j = precisionA < precisionB ? precisionA : precisionB; ++i < j;) {
-    if (significandA[i] !== significandB[i]) return significandA[i] > significandB[i] ? 1 : -1
-  }
-  return precisionA === precisionB ? 0 : precisionA > precisionB ? 1 : -1
-}
-
-// Mathematic operations
+// Arithmetic
 
 /**
  * Adds two numeric values as a decimal result.
@@ -553,6 +422,143 @@ export function divmod(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
   return [quotient, remainder]
 }
 
+
+// Comparisons
+
+/**
+ * Compares two numeric values and returns true if they are equivalent.
+ *
+ * @equivalent a == b
+ */
+ export function eq(a: Numeric, b: Numeric): boolean {
+  return cmp(a, b) === 0
+}
+
+/**
+ * Compares two numeric values and returns true if a is greater than b.
+ *
+ * @equivalent a > b
+ */
+export function gt(a: Numeric, b: Numeric): boolean {
+  return cmp(a, b) === 1
+}
+
+/**
+ * Compares two numeric values and returns true if a is greater than or equal to b.
+ *
+ * @equivalent a >= b
+ */
+export function gte(a: Numeric, b: Numeric): boolean {
+  return cmp(a, b) !== -1
+}
+
+/**
+ * Compares two numeric values and returns true if a is less than b.
+ *
+ * @equivalent a < b
+ */
+export function lt(a: Numeric, b: Numeric): boolean {
+  return cmp(a, b) === -1
+}
+
+/**
+ * Compares two numeric values and returns true if a is less than or equal to b.
+ *
+ * @equivalent a <= b
+ */
+export function lte(a: Numeric, b: Numeric): boolean {
+  return cmp(a, b) !== 1
+}
+
+/**
+ * Compares two numeric values and returns `1` if a is greater than b, `-1` if b
+ * is greater than a, and `0` if a and b are equivalent.
+ *
+ * Note: This is equivalent to, but much faster than, `sign(sub(a, b))`.
+ *
+ * @equivalant a == b ? 0 : a > b ? 1 : -1
+ */
+ export function cmp(a: Numeric, b: Numeric): Sign {
+  const [signA, significandA, exponentA, precisionA] = toRepresentation(a)
+  const [signB, significandB, exponentB, precisionB] = toRepresentation(b)
+
+  // Comparison to zero or differing signs
+  if (!signA) return (-signB | 0) as Sign
+  if (!signB || signA !== signB) return signA
+
+  // Compare absolute value and flip if negative.
+  return (cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) * signA | 0) as Sign
+}
+
+/**
+ * Compares two normalized absolute values
+ *
+ * @internal
+ */
+function cmpAbs(significandA: string, exponentA: number, precisionA: number, significandB: string, exponentB: number, precisionB: number): Sign {
+  if (exponentA !== exponentB) return exponentA > exponentB ? 1 : -1
+  for (let i = -1, j = precisionA < precisionB ? precisionA : precisionB; ++i < j;) {
+    if (significandA[i] !== significandB[i]) return significandA[i] > significandB[i] ? 1 : -1
+  }
+  return precisionA === precisionB ? 0 : precisionA > precisionB ? 1 : -1
+}
+
+
+// Magnitude
+
+/**
+ * Absolute value, always positive.
+ *
+ * @equivalent Math.abs(value)
+ */
+export function abs(value: Numeric): decimal {
+  const [, significand, exponent] = toRepresentation(value)
+  return fromRepresentation(1, significand, exponent)
+}
+
+/**
+ * Negated value, same magnitude but opposite sign.
+ *
+ * @equivalent -value
+ */
+export function neg(value: Numeric): decimal {
+  const [sign, significand, exponent] = toRepresentation(value)
+  return fromRepresentation(-sign as Sign, significand, exponent)
+}
+
+/**
+ * Returns a positive `1` or negative `-1` indicating the sign of the provided
+ * number. If the provided number is zero, it will return `0`.
+ *
+ * Note: decimal does not represent negative zero.
+ *
+ * @equivalent Math.sign(value)
+ */
+export function sign(value: Numeric): Sign {
+  const [sign] = toRepresentation(value)
+  return sign
+}
+
+/**
+ * Returns the `value` scaled up or down by `power`. In other words, this moves
+ * the decimal point right `power` places.
+ *
+ * Note: This is equivalent to, but much faster than, `mul(value, pow(10, power))`.
+ *
+ * Note: decimal does not represent negative zero.
+ *
+ * @equivalent value * Math.pow(10, power)
+ */
+export function scale(value: Numeric, power: Numeric): decimal {
+  const [sign, significand, exponent] = toRepresentation(value)
+  power = toNumber(power)
+  if (~~power !== power) {
+    throw RangeError('power must be a whole number.');
+  }
+  return fromRepresentation(sign, significand, exponent + power)
+}
+
+
 // Rounding
 
 /**
@@ -689,7 +695,7 @@ function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number,
   } else {
     places = defaultPlaces
   }
-  if (mode && !(mode in roundingModes)) throw new RangeError(`Unknown rounding mode: ${mode}`)
+  if (mode && !(mode in roundingModes)) throw new TypeError(`Unknown rounding mode: ${mode}`)
   return {
     [PRECISION]: precision,
     [PLACES]: places,
@@ -702,6 +708,7 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
     rules[PRECISION] as number :
     (rules[PLACES] || 0) + exponent + 1
 }
+
 
 // Conversions
 
@@ -803,6 +810,7 @@ function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules)
 
   return result
 }
+
 
 // Normalized representation
 
