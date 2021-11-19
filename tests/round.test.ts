@@ -35,6 +35,16 @@ describe('round', () => {
     expect(round(99, { places: -1 })).toBe('100')
     expect(round(99, { places: -2 })).toBe('100')
     expect(round(99, { places: -3 })).toBe('0')
+
+    // And supports numeric strings places
+    expect(round(12.34567, { places: '1' })).toBe('12.3')
+    expect(round(12.34567, { places: '0' })).toBe('12')
+    expect(round(12.34567, { places: '-1' })).toBe('10')
+
+    // And bigint places
+    expect(round(12.34567, { places: 1n })).toBe('12.3')
+    expect(round(12.34567, { places: 0n })).toBe('12')
+    expect(round(12.34567, { places: -1n })).toBe('10')
   })
 
   it('rounds to a specified precision', () => {
@@ -44,6 +54,16 @@ describe('round', () => {
     expect(round(12.34567, { precision: 2 })).toBe('12')
     expect(round(12.34567, { precision: 1 })).toBe('10')
     expect(round(12.34567, { precision: 0 })).toBe('0')
+
+    // And supports numeric strings precision
+    expect(round(12.34567, { precision: '3' })).toBe('12.3')
+    expect(round(12.34567, { precision: '2' })).toBe('12')
+    expect(round(12.34567, { precision: '1' })).toBe('10')
+
+    // And bigint precision
+    expect(round(12.34567, { precision: 3n })).toBe('12.3')
+    expect(round(12.34567, { precision: 2n })).toBe('12')
+    expect(round(12.34567, { precision: 1n })).toBe('10')
   })
 
   it('rounds using different modes', () => {

@@ -8,6 +8,7 @@
  *  - add/sub is done
  *  - mul is done
  *  - round is done and tested
+ *  - rounding modes take Numeric
  *  - pow - matching ECMA proposal has this with a positive integer - needs tests
  *  - mod and rem done - need tests
  *  - div needs more tests
@@ -18,7 +19,6 @@
  *  - scale - needs tests
  *
  * Todo:
- *  - rounding modes should take Numeric instead of number
  *  - unit tests
  *  - min/max/sum
  *  - cmp ideally can accept +-Infinity
@@ -652,15 +652,15 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
   return rounded
 }
 
-type RoundingRules =
-  | { places?: number, mode?: RoundingMode, precision?: never }
-  | { precision?: number, mode?: RoundingMode, places?: never }
+export type RoundingRules =
+  | { places?: Numeric, mode?: RoundingMode, precision?: never }
+  | { precision?: Numeric, mode?: RoundingMode, places?: never }
 
 type NormalizedRoundingRules =
   | { places: number, mode: RoundingMode, precision: never }
   | { precision: number, mode: RoundingMode, places: never }
 
-type RoundingMode =
+export type RoundingMode =
   | 'up'
   | 'down'
   | 'ceiling'
@@ -711,9 +711,11 @@ function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number,
   let places = rules && rules[PLACES]
   let mode = rules && rules[MODE]
   if (precision != null) {
+    precision = toNumber(precision)
     if (places != null) throw new TypeError('Cannot provide both precision and places')
     if (~~precision !== precision) throw new RangeError('precision must be a whole number')
   } else if (places != null) {
+    places = toNumber(places)
     if (~~places !== places) throw new RangeError('places must be a whole number')
   } else {
     places = defaultPlaces
@@ -728,8 +730,8 @@ function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number,
 
 function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
   return rules[PRECISION] != null ?
-    rules[PRECISION] as number :
-    (rules[PLACES] || 0) + exponent + 1
+    toNumber(rules[PRECISION] as Numeric) :
+    toNumber(rules[PLACES] || 0) + exponent + 1
 }
 
 
@@ -739,18 +741,20 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
  * Converts a `Numeric` value (including `decimal`) to a JavaScript number.
  *
  * Throws an Error if the converting the value would lead to a loss of precision
- * unless `{ strict: false }` is provided to the `options` argument.
+ * unless `{ lossy: true }` is provided to the `options` argument.
  */
-export function toNumber(value: Numeric, options?: { strict: boolean }): number {
-  const canonical = decimal(value)
-  const number = +canonical
-  // Unless `strict` has been explicitly set to false, check to ensure the
-  // number conversion has not lost information by converting it back to a
-  // canonical decimal and comparing it to the original.
-  if ((!options || options.strict !== false) && decimal(number) !== canonical) {
-    throw new RangeError(`Lost precision converting ${canonical} to ${number}`)
+export function toNumber(value: Numeric, options?: { lossy: boolean }): number {
+  if (typeof value !== 'number') {
+    const canonical = decimal(value)
+    value = +canonical
+    // Unless `lossy` has been explicitly set, check to ensure the number
+    // conversion has not lost information by converting it back to a canonical
+    // decimal and comparing it to the original.
+    if (!(options && options.lossy) && decimal(value) !== canonical) {
+      throw new RangeError(`Lost precision converting ${canonical} to ${value}`)
+    }
   }
-  return number
+  return value
 }
 
 /**
@@ -781,7 +785,7 @@ export function toExponential(value: Numeric, rules?: RoundingRules): NumericStr
   // Interpret "places" relative to the final exponential notation rather than
   // the original number. In exponential scientific notation, the precision of
   // a number is always exactly one more than the number of decimal places.
-  return toFormat(true, value, rules && rules[PLACES] != null ? { [PRECISION]: rules[PLACES]! + 1, [MODE]: rules[MODE] } : rules)
+  return toFormat(true, value, rules && rules[PLACES] != null ? { [PRECISION]: toNumber(rules[PLACES]!) + 1, [MODE]: rules[MODE] } : rules)
 }
 
 /**
@@ -843,19 +847,19 @@ type Sign = 0 | 1 | -1
 const decimalRegex = /^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
 
 /**
- * Given a numeric value, return a normalized form of a decimal:
- * a [significand, exponent, sign] tuple.
+ * Given a numeric value, return a normalized representation of a decimal:
+ * a [significand, exponent, sign, precision] tuple.
  *
- * Functions within this library internally operate on the normalized form
- * before converting back to a canonical decimal via fromParts. These
- * functions are exported to enable user-defined mathematical functions on the
- * decimal type.
+ * Functions within this library internally operate on the normalized
+ * representation before converting back to a canonical decimal via
+ * `fromRepresentation()`. These functions are exported to enable user-defined
+ * mathematical functions on the decimal type.
  *
- * sign: either 1 for a positive number, -1 for a negative number, or 0 for 0.
- * significand: a string of significant digits expressed in scientific
- * notation, where the first digit is the ones place, or an empty string for 0.
- * exponent: the power of ten the significand is multiplied by, or 0 for 0.
- * precision: the number of digits found in significand (e.g. number of significant digits).
+ *  - `sign`: Either 1 for a positive number, -1 for a negative number, or 0 for 0.
+ *  - `significand`: A string of significant digits expressed in scientific
+ *    notation, where the first digit is the ones place, or an empty string for 0.
+ *  - `exponent`: The power of ten the significand is multiplied by, or 0 for 0.
+ *  - `precision`: The number of digits found in significand (e.g. number of significant digits).
  *
  * @example toRepresentation('-1.23e4') returns [-1, '123', 4, 3]
  */
