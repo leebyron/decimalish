@@ -91,16 +91,16 @@ describe('round', () => {
     expect(round(-0.501, { mode: 'down' })).toBe('0')
     expect(round(-1, { mode: 'down' })).toBe('-1')
 
-    // ceiling
-    expect(round(1, { mode: 'ceiling' })).toBe('1')
-    expect(round(0.501, { mode: 'ceiling' })).toBe('1')
-    expect(round(0.5, { mode: 'ceiling' })).toBe('1')
-    expect(round(0.499, { mode: 'ceiling' })).toBe('1')
-    expect(round(0, { mode: 'ceiling' })).toBe('0')
-    expect(round(-0.499, { mode: 'ceiling' })).toBe('0')
-    expect(round(-0.5, { mode: 'ceiling' })).toBe('0')
-    expect(round(-0.501, { mode: 'ceiling' })).toBe('0')
-    expect(round(-1, { mode: 'ceiling' })).toBe('-1')
+    // ceil
+    expect(round(1, { mode: 'ceil' })).toBe('1')
+    expect(round(0.501, { mode: 'ceil' })).toBe('1')
+    expect(round(0.5, { mode: 'ceil' })).toBe('1')
+    expect(round(0.499, { mode: 'ceil' })).toBe('1')
+    expect(round(0, { mode: 'ceil' })).toBe('0')
+    expect(round(-0.499, { mode: 'ceil' })).toBe('0')
+    expect(round(-0.5, { mode: 'ceil' })).toBe('0')
+    expect(round(-0.501, { mode: 'ceil' })).toBe('0')
+    expect(round(-1, { mode: 'ceil' })).toBe('-1')
 
     // floor
     expect(round(1, { mode: 'floor' })).toBe('1')
@@ -135,16 +135,16 @@ describe('round', () => {
     expect(round(-0.501, { mode: 'half down' })).toBe('-1')
     expect(round(-1, { mode: 'half down' })).toBe('-1')
 
-    // half ceiling
-    expect(round(1, { mode: 'half ceiling' })).toBe('1')
-    expect(round(0.501, { mode: 'half ceiling' })).toBe('1')
-    expect(round(0.5, { mode: 'half ceiling' })).toBe('1')
-    expect(round(0.499, { mode: 'half ceiling' })).toBe('0')
-    expect(round(0, { mode: 'half ceiling' })).toBe('0')
-    expect(round(-0.499, { mode: 'half ceiling' })).toBe('0')
-    expect(round(-0.5, { mode: 'half ceiling' })).toBe('0')
-    expect(round(-0.501, { mode: 'half ceiling' })).toBe('-1')
-    expect(round(-1, { mode: 'half ceiling' })).toBe('-1')
+    // half ceil
+    expect(round(1, { mode: 'half ceil' })).toBe('1')
+    expect(round(0.501, { mode: 'half ceil' })).toBe('1')
+    expect(round(0.5, { mode: 'half ceil' })).toBe('1')
+    expect(round(0.499, { mode: 'half ceil' })).toBe('0')
+    expect(round(0, { mode: 'half ceil' })).toBe('0')
+    expect(round(-0.499, { mode: 'half ceil' })).toBe('0')
+    expect(round(-0.5, { mode: 'half ceil' })).toBe('0')
+    expect(round(-0.501, { mode: 'half ceil' })).toBe('-1')
+    expect(round(-1, { mode: 'half ceil' })).toBe('-1')
 
     // half floor
     expect(round(1, { mode: 'half floor' })).toBe('1')

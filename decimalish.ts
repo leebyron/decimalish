@@ -20,6 +20,7 @@
  *  - Error quality
  *  - min/max - needs tests
  *  - floor/ceil/trunc - needs tests
+ *  - places/precision/exponent
  *
  * Todo:
  *  - unit tests
@@ -71,6 +72,8 @@ declare const $decimal: unique symbol
 
 
 /**
+ * Convert to decimal
+ *
  * Converts any numeric value to a decimal.
  *
  * Throws an Error if the provided value cannot be translated to decimal.
@@ -84,6 +87,8 @@ export function decimal(value: unknown): decimal {
 }
 
 /**
+ * Is decimal?
+ *
  * Returns true if the provided value is a decimal value.
  *
  * A value is decimal if it is a numeric string in a canonical decimal form.
@@ -107,6 +112,8 @@ export type NumericString = `${number}`
 // Arithmetic
 
 /**
+ * Add (Plus)
+ *
  * Adds two numeric values as a decimal result.
  *
  * @equivalent a + b
@@ -171,6 +178,8 @@ export function add(a: Numeric, b: Numeric): decimal {
 }
 
 /**
+ * Subtract (Minus)
+ *
  * Subtracts the numeric b from the numeric a, returning a decimal result.
  *
  * @equivalent a - b
@@ -181,6 +190,8 @@ export function sub(a: Numeric, b: Numeric): decimal {
 }
 
 /**
+ * Multiply (Times)
+ *
  * Multiplies two numeric values as a decimal result.
  *
  * @equivalent a * b
@@ -205,7 +216,9 @@ export function mul(a: Numeric, b: Numeric): decimal {
   return fromRepresentation((signA * signB) as Sign, digits.join(''), exponentA + exponentB + 1)
 }
 
-/*
+/**
+ * Power
+ *
  * Raises `base` to the power `exponent`, where `exponent` must be a positive
  * whole number.
  *
@@ -468,6 +481,8 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
 // Comparisons
 
 /**
+ * Equals
+ *
  * Compares two numeric values and returns true if they are equivalent.
  *
  * @equivalent a == b
@@ -477,6 +492,8 @@ export function eq(a: Numeric, b: Numeric): boolean {
 }
 
 /**
+ * Greater than
+ *
  * Compares two numeric values and returns true if a is greater than b.
  *
  * @equivalent a > b
@@ -486,6 +503,8 @@ export function gt(a: Numeric, b: Numeric): boolean {
 }
 
 /**
+ * Greater than or equals
+ *
  * Compares two numeric values and returns true if a is greater than or equal to b.
  *
  * @equivalent a >= b
@@ -495,6 +514,8 @@ export function gte(a: Numeric, b: Numeric): boolean {
 }
 
 /**
+ * Less than
+ *
  * Compares two numeric values and returns true if a is less than b.
  *
  * @equivalent a < b
@@ -504,6 +525,8 @@ export function lt(a: Numeric, b: Numeric): boolean {
 }
 
 /**
+ * Less than or equals
+ *
  * Compares two numeric values and returns true if a is less than or equal to b.
  *
  * @equivalent a <= b
@@ -513,6 +536,8 @@ export function lte(a: Numeric, b: Numeric): boolean {
 }
 
 /**
+ * Compare
+ *
  * Compares two numeric values and returns `1` if a is greater than b, `-1` if b
  * is greater than a, and `0` if a and b are equivalent.
  *
@@ -535,6 +560,8 @@ export function cmp(a: Numeric, b: Numeric): Sign {
 }
 
 /**
+ * Maximum
+ *
  * Returns the maximum of the provided values as a decimal.
  *
  * @equivalent Math.max(...values)
@@ -545,7 +572,9 @@ export function max(): decimal {
 }
 
 /**
- * Returns the maximum of the provided values as a decimal.
+ * Minimum
+ *
+ * Returns the minimum of the provided values as a decimal.
  *
  * @equivalent Math.min(...values)
  */
@@ -585,7 +614,9 @@ function cmpAbs(significandA: string, exponentA: number, precisionA: number, sig
 // Magnitude
 
 /**
- * Absolute value, always positive.
+ * Absolute value
+ *
+ * Returns a decimal with the same value but always positive.
  *
  * @equivalent Math.abs(value)
  */
@@ -595,7 +626,9 @@ export function abs(value: Numeric): decimal {
 }
 
 /**
- * Negated value, same magnitude but opposite sign.
+ * Negate
+ *
+ * Returns a decimal with the same value but an opposite sign.
  *
  * @equivalent -value
  */
@@ -605,8 +638,10 @@ export function neg(value: Numeric): decimal {
 }
 
 /**
- * Returns a positive `1` or negative `-1` indicating the sign of the provided
- * number. If the provided number is zero, it will return `0`.
+ * Sign
+ *
+ * Returns a number indicating the sign of the provided value. A `1` for
+ * positive values, `-1` for negative, or `0` for zero.
  *
  * Note: decimal does not represent negative zero.
  *
@@ -618,12 +653,44 @@ export function sign(value: Numeric): Sign {
 }
 
 /**
- * Returns the `value` scaled up or down by `power`. In other words, this moves
- * the decimal point right `power` places.
+ * Decimal Places
+ *
+ * Returns the number of significant digits after the decimal point.
+ */
+export function places(value: Numeric): number {
+  const [,, exponent, precision] = toRepresentation(value)
+  const places = precision - exponent - 1
+  return places > 0 ? places : 0
+}
+
+/**
+ * Precision (Significant digits)
+ *
+ * Returns the number of significant digits of the provided value.
+ */
+export function precision(value: Numeric): number {
+  const [,,, precision] = toRepresentation(value)
+  return precision
+}
+
+/**
+ * Exponent (Most significant digit)
+ *
+ * Returns a number indicating the exponent of the provided value, which is also
+ * the most significant digit.
+ */
+ export function exponent(value: Numeric): number {
+  const [,, exponent] = toRepresentation(value)
+  return exponent
+}
+
+/**
+ * Scale
+ *
+ * Returns the `value` with the exponent scaled up or down by `power`. In other
+ * words, this moves the decimal point to the right `power` places.
  *
  * Note: This is equivalent to, but much faster than, `mul(value, pow(10, power))`.
- *
- * Note: decimal does not represent negative zero.
  *
  * @equivalent value * Math.pow(10, power)
  */
@@ -636,6 +703,8 @@ export function scale(value: Numeric, power: Numeric): decimal {
 // Rounding
 
 /**
+ * Round
+ *
  * Rounds a numeric value according to the provided rules.
  *
  * places: The number of decimal places to round to. Negative places rounds
@@ -706,33 +775,43 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
 }
 
 /**
- * Rounds down to the nearest whole number.
+ * Floor
+ *
+ * Rounds down to the nearest whole number in the direction of -Infinity.
  *
  * Note: Equivalent to `round(value, { mode: 'floor' })`
  *
  * @equivalent Math.floor(value)
+ * @see round
  */
 export function floor(value: Numeric): decimal {
   return round(value, { [MODE]: ROUND_FLOOR })
 }
 
 /**
- * Rounds up to the nearest whole number.
+ * Ceiling
+ *
+ * Rounds up to the nearest whole number in the direction of Infinity.
  *
  * Note: Equivalent to `round(value, { mode: 'ceiling' })`
  *
  * @equivalent Math.ceil(value)
+ * @see round
  */
 export function ceil(value: Numeric): decimal {
   return round(value, { [MODE]: ROUND_CEILING })
 }
 
 /**
- * Returns the integer part of a number.
+ * Truncate
+ *
+ * Returns the integer part of a number by rounding to the nearest whole number
+ * in the direction of 0.
  *
  * Note: Equivalent to `round(value, { mode: 'down' })`
  *
  * @equivalent Math.trunc(value)
+ * @see round
  */
 export function trunc(value: Numeric): decimal {
   return round(value, { [MODE]: ROUND_DOWN })
@@ -820,6 +899,8 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
 // Conversions
 
 /**
+ * Convert to Number
+ *
  * Converts a `Numeric` value (including `decimal`) to a JavaScript number.
  *
  * Throws an Error if the converting the value would lead to a loss of precision
@@ -840,6 +921,8 @@ export function toNumber(value: Numeric, options?: { lossy: boolean }): number {
 }
 
 /**
+ * Convert to String
+ *
  * A string representation of the provided Numeric `value` using canonical
  * decimal format.
  *
@@ -850,6 +933,8 @@ export function toNumber(value: Numeric, options?: { lossy: boolean }): number {
 export const toString: (value: Numeric) => NumericString = decimal
 
 /**
+ * Format as Fixed
+ *
  * A string representation of the provided Numeric `value` using fixed notation.
  * Uses rules to specify `precision` or `places` and the rounding `mode` should
  * that result in fewer digits.
@@ -859,6 +944,8 @@ export function toFixed(value: Numeric, rules?: RoundingRules): NumericString {
 }
 
 /**
+ * Format as Exponential
+ *
  * A string representation of the provided Numeric `value` using exponential
  * scientific notation. Uses rules to specify `precision` or `places` and the
  * rounding `mode` should that result in fewer digits.
@@ -929,6 +1016,8 @@ type Sign = 0 | 1 | -1
 const decimalRegex = /^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
 
 /**
+ * Normalized Representation
+ *
  * Given a numeric value, return a normalized representation of a decimal:
  * a [significand, exponent, sign, precision] tuple.
  *
@@ -958,6 +1047,8 @@ export function toRepresentation(value: unknown): DecimalRepresentation {
 }
 
 /**
+ * Canonical from Representation
+ *
  * Given a decimal's decomposed representation, return a canonical decimal value.
  */
 export function fromRepresentation(sign: Sign, significand: string, exponent: number): decimal {
