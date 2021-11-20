@@ -18,10 +18,11 @@
  *  - toFixed / toExponential. with all rounding modes.
  *  - scale - needs tests
  *  - Error quality
+ *  - min/max - needs tests
  *
  * Todo:
  *  - unit tests
- *  - min/max/sum
+ *  - sum
  *  - sqrt - is this actually useful? Big.js has this, but ECMA does not
  *  - cbrt?
  *  - trig / PI?
@@ -516,6 +517,40 @@ export function cmp(a: Numeric, b: Numeric): Sign {
     // Otherwise they are the same sign, so compare absolute values and flip if negative.
     cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) * signA | 0
   ) as Sign
+}
+
+/**
+ * Returns the maximum of the provided values as a decimal.
+ *
+ * @equivalent Math.max(...values)
+ */
+export function max(...values: Numeric[]): decimal
+export function max(): decimal {
+  return extreme(arguments, 1)
+}
+
+/**
+ * Returns the maximum of the provided values as a decimal.
+ *
+ * @equivalent Math.min(...values)
+ */
+export function min(...values: Numeric[]): decimal
+export function min(): decimal {
+  return extreme(arguments, -1)
+}
+
+/**
+ * @internal
+ */
+function extreme(values: IArguments, direction: number): decimal {
+  let value = decimal(values[0])
+  for (let i = 1; i < values.length; i++) {
+    let arg = decimal(values[i])
+    if (cmp(arg, value) === direction) {
+      value = arg
+    }
+  }
+  return value
 }
 
 /**
