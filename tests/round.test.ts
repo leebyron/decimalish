@@ -4,11 +4,13 @@ describe('round', () => {
 
   it('throws on bad input', () => {
     // @ts-expect-error 'abc' is not Numeric
-    expect(() => round('abc')).toThrow('Expected a numeric string: abc')
-    expect(() => round('123', { places: 0.5 })).toThrow('places must be a whole number')
-    expect(() => round('123', { precision: 0.5 })).toThrow('precision must be a whole number')
+    expect(() => round('abc')).toThrow('[decimalish] Not numeric: abc')
+    expect(() => round('123', { places: 0.5 })).toThrow('[decimalish] places must be a whole number')
+    expect(() => round('123', { precision: 0.5 })).toThrow('[decimalish] precision must be a whole number')
+    // @ts-expect-error cannot provide both.
+    expect(() => round('123', { precision: 1, places: 1 })).toThrow('[decimalish] Cannot provide both precision and places')
     // @ts-expect-error 'sideways' is not a valid mode.
-    expect(() => round('123', { mode: 'sideways' })).toThrow('Unknown rounding mode: sideways')
+    expect(() => round('123', { mode: 'sideways' })).toThrow('[decimalish] Unknown rounding mode: sideways')
   })
 
   it('rounds with defaults similar to Math.round()', () => {

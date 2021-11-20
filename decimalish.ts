@@ -17,18 +17,18 @@
  *  - divToInt
  *  - toFixed / toExponential. with all rounding modes.
  *  - scale - needs tests
+ *  - Error quality
  *
  * Todo:
  *  - unit tests
  *  - min/max/sum
- *  - cmp ideally can accept +-Infinity
  *  - sqrt - is this actually useful? Big.js has this, but ECMA does not
  *  - cbrt?
  *  - trig / PI?
  *  - exp/ln/log?
  *  - toLocaleString would be useful, but I'm not sure how to get this working
- *  - Error quality
  *  - "unnecessary" rounding mode?
+ *  - cmp ideally can accept +-Infinity - is this actually useful?
  *
  *  - rest of decimal.js lib?
  *
@@ -49,6 +49,9 @@
  *  - no global configuration or state
  *  - use it or lose it! per-method tree shaking supported
  *  - or at worst, only 5KB minified!
+ *  - does not support -0, NaN, or Infinity. -0 isn't useful outside of floating
+ *    point, Infinity is not a decimal, and the only case which might produce
+ *    Infinity or NaN, dividing by zero, throws.
  */
 
 
@@ -68,7 +71,7 @@ declare const $decimal: unique symbol
 /**
  * Converts any numeric value to a decimal.
  *
- * Throws a TypeError if the provided value cannot be translated to decimal.
+ * Throws an Error if the provided value cannot be translated to decimal.
  *
  * Note: unlike number, decimal cannot represent Infinity, NaN, or -0.
  *
@@ -210,9 +213,9 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
   let baseToPowerOf2 = decimal(base)
   let result = '1' as decimal
 
-  exponent = toNumber(exponent)
-  if (~~exponent !== exponent || exponent < 0) {
-    throw RangeError('exponent must be a positive whole number.');
+  exponent = wholeNumber('exponent', exponent)
+  if (exponent < 0) {
+    error('exponent must be positive')
   }
 
   // Iterate through the bits of exponent
@@ -252,7 +255,7 @@ export function div(dividend: Numeric, divisor: Numeric, rules?: RoundingRules):
  *
  * @see divmod
  */
- export function divToInt(dividend: Numeric, divisor: Numeric): decimal {
+export function divToInt(dividend: Numeric, divisor: Numeric): decimal {
   const [quotient] = divmod(dividend, divisor)
   return quotient
 }
@@ -330,7 +333,7 @@ export function divmod(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
   let roundingMode = roundingRules[MODE]
   let roundingPrecision = getRoundingPrecision(roundingRules, exponent)
 
-  if (!significandB) throw new TypeError('Divide by 0')
+  if (!significandB) error('Divide by 0')
 
   // Collect the digits of the quotient.
   let quotientSignificand = ''
@@ -499,18 +502,20 @@ export function lte(a: Numeric, b: Numeric): boolean {
  *
  * Note: This is equivalent to, but much faster than, `sign(sub(a, b))`.
  *
- * @equivalant a == b ? 0 : a > b ? 1 : -1
+ * @equivalant a > b ? 1 : a < b ? -1 : 0
  */
 export function cmp(a: Numeric, b: Numeric): Sign {
   const [signA, significandA, exponentA, precisionA] = toRepresentation(a)
   const [signB, significandB, exponentB, precisionB] = toRepresentation(b)
 
-  // Comparison to zero or differing signs
-  if (!signA) return (-signB | 0) as Sign
-  if (!signB || signA !== signB) return signA
-
-  // Compare absolute value and flip if negative.
-  return (cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) * signA | 0) as Sign
+  return (
+    // If a is zero, return the opposite of b's sign.
+    !signA ? (-signB | 0) :
+    // If b is zero, or the signs differ, return a's sign.
+    !signB || signA !== signB ? signA :
+    // Otherwise they are the same sign, so compare absolute values and flip if negative.
+    cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) * signA | 0
+  ) as Sign
 }
 
 /**
@@ -574,11 +579,7 @@ export function sign(value: Numeric): Sign {
  */
 export function scale(value: Numeric, power: Numeric): decimal {
   const [sign, significand, exponent] = toRepresentation(value)
-  power = toNumber(power)
-  if (~~power !== power) {
-    throw RangeError('power must be a whole number.');
-  }
-  return fromRepresentation(sign, significand, exponent + power)
+  return fromRepresentation(sign, significand, exponent + wholeNumber('power', power))
 }
 
 
@@ -711,16 +712,12 @@ function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number,
   let places = rules && rules[PLACES]
   let mode = rules && rules[MODE]
   if (precision != null) {
-    precision = toNumber(precision)
-    if (places != null) throw new TypeError('Cannot provide both precision and places')
-    if (~~precision !== precision) throw new RangeError('precision must be a whole number')
-  } else if (places != null) {
-    places = toNumber(places)
-    if (~~places !== places) throw new RangeError('places must be a whole number')
+    if (places != null) error('Cannot provide both precision and places')
+    precision = wholeNumber('precision', precision)
   } else {
-    places = defaultPlaces
+    places = places != null ? wholeNumber('places', places) : defaultPlaces
   }
-  if (mode && !(mode in roundingModes)) throw new TypeError(`Unknown rounding mode: ${mode}`)
+  if (mode && !(mode in roundingModes)) error(`Unknown rounding mode: ${mode}`)
   return {
     [PRECISION]: precision,
     [PLACES]: places,
@@ -751,7 +748,7 @@ export function toNumber(value: Numeric, options?: { lossy: boolean }): number {
     // conversion has not lost information by converting it back to a canonical
     // decimal and comparing it to the original.
     if (!(options && options.lossy) && decimal(value) !== canonical) {
-      throw new RangeError(`Lost precision converting ${canonical} to ${value}`)
+      error(`Lossy conversion from ${canonical} to ${value}`)
     }
   }
   return value
@@ -865,9 +862,14 @@ const decimalRegex = /^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
  */
 export function toRepresentation(value: unknown): DecimalRepresentation {
   const match = decimalRegex.exec(''+value)
-  if (!match) throw new TypeError(`Expected a numeric string: ${value}`)
-  const [, signStr, integer = '', fractional = '', exponentStr = '0'] = match
-  return normalizeRepresentation(signStr === '-' ? -1 : 1, integer + fractional, +exponentStr + integer.length - 1)
+  if (!match) error(`Not numeric: ${value}`)
+  let [, sign, integer, fractional, exponent] = match
+  integer ||= ''
+  return normalizeRepresentation(
+    sign === '-' ? -1 : 1,
+    fractional ? integer + fractional : integer,
+    +(exponent || 0) + integer.length - 1
+  )
 }
 
 /**
@@ -889,18 +891,49 @@ function normalizeRepresentation(sign: Sign, significand: string, exponent: numb
   let precision = significand.length
   let leadingZeros = 0;
   let trailingZeros = 0;
+
   while (significand[leadingZeros] === '0') {
     leadingZeros++
     exponent--
   }
+
+  // Normalized zero
   if (leadingZeros === precision) {
     return [0, '', 0, 0]
   }
+
   while (significand[precision - 1 - trailingZeros] === '0') {
     trailingZeros++
   }
+
   if (leadingZeros || trailingZeros) {
     significand = significand.slice(leadingZeros, precision - trailingZeros)
   }
+
   return [sign, significand, exponent, precision - leadingZeros - trailingZeros]
+}
+
+
+// Errors and validation
+
+/**
+ * Converts and validates a Numeric as a whole number (integer).
+ *
+ * @internal
+ */
+function wholeNumber(name: string, value: Numeric): number {
+  value = toNumber(value)
+  if (~~value !== value) {
+    error(name + ' must be a whole number')
+  }
+  return value
+}
+
+/**
+ * Throws an error.
+ *
+ * @internal
+ */
+function error(message: string): never {
+  throw new Error('[decimalish] ' + message)
 }

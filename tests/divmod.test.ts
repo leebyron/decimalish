@@ -3,10 +3,11 @@ import { divmod } from '../decimalish'
 describe('divmod', () => {
 
   it('throws for divide by zero', () => {
-    expect(() => divmod(1, 0)).toThrow('Divide by 0')
-    expect(() => divmod(123, 123, { places: 0.5 })).toThrow('places must be a whole number')
-    expect(() => divmod(123, 123, { precision: 0.5 })).toThrow('precision must be a whole number')
-
+    expect(() => divmod(1, 0)).toThrow('[decimalish] Divide by 0')
+    expect(() => divmod(123, 123, { places: 0.5 })).toThrow('[decimalish] places must be a whole number')
+    expect(() => divmod(123, 123, { precision: 0.5 })).toThrow('[decimalish] precision must be a whole number')
+    // @ts-expect-error
+    expect(() => divmod(123, 123, { precision: 1, places: 1 })).toThrow('[decimalish] Cannot provide both precision and places')
   })
 
   it('returns 0 when 0 is divided', () => {
