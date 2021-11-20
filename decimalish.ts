@@ -12,9 +12,9 @@
  *  - pow - matching ECMA proposal has this with a positive integer - needs tests
  *  - mod and rem done - need tests
  *  - div needs more tests
- *  - divmod done but needs more tests
- *  - EUCLIDIAN mode for divmod/round. floor/truncated mode.
- *  - divToInt
+ *  - divRem done but needs more tests
+ *  - EUCLIDIAN mode for divRem/round. floor/truncated mode.
+ *  - divInt
  *  - toFixed / toExponential. with all rounding modes.
  *  - scale - needs tests
  *  - Error quality
@@ -237,61 +237,75 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
 }
 
 /**
+ * Divide
+ *
  * Returns the result of dividing `dividend` by `divisor`.
  *
  * Defaults to 20 decimal places of precision and the `"half even"` rounding
- * mode, configurable by providing rounding rules.
+ * mode, configurable by providing rounding `rules`.
  *
  * @equivalent a / b
  */
 export function div(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
-  const [quotient] = divmod(dividend, divisor, normalizeRules(rules, 20, ROUND_HALF_EVEN))
+  const [quotient] = divRem(dividend, divisor, normalizeRules(rules, 20, ROUND_HALF_EVEN))
   return quotient
 }
 
 /**
- * Returns the integer result of dividing `dividend` by `divisor` using floored
- * (round 'floor') division.
+ * Divide to integer
  *
- * Note: The remainder can be found using `mod()`, or better yet use `divmod()`.
+ * Returns the integer result of dividing `dividend` by `divisor` using
+ * truncated (round 'down') division.
  *
- * @see divmod
+ * Note: The remainder can be found using `rem()`, or better yet use `divRem()`.
+ *
+ * @see rem
+ * @see divRem
  */
-export function divToInt(dividend: Numeric, divisor: Numeric): decimal {
-  const [quotient] = divmod(dividend, divisor)
+export function divInt(dividend: Numeric, divisor: Numeric): decimal {
+  const [quotient] = divRem(dividend, divisor)
   return quotient
 }
 
 /**
- * Returns the remainder of dividing a by b using truncated (round 'down')
- * division. The result always has the same sign as the first argument (or 0).
+ * Remainder
  *
- * Note: `rem()` and `div()` use different division rounding rules and should
- * not be used together. To get both a quotient and remainder, use `divmod()`
- * with the desired rounding rule.
+ * Returns the remainder of dividing `dividend` by `divisor` using truncated
+ * (round 'down') division by default. The result always has the same sign as
+ * the first argument (or 0).
  *
- * @equivalent a % b
+ * Note: `rem()` and `div()` use different default division rounding rules and
+ * should not be used together. The quotient can be found using `divInt()`, or
+ * better yet use `divRem()`.
+ *
+ * @equivalent dividend % divisor
+ * @see divInt
+ * @see divRem
  */
-export function rem(a: Numeric, b: Numeric): decimal {
-  const [, remainder] = divmod(a, b, { [MODE]: ROUND_DOWN })
+export function rem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
+  const [, remainder] = divRem(dividend, divisor, rules)
   return remainder
 }
 
 /**
+ * Modulo
+ *
  * Returns the modulo of dividing a by b using floored (round 'floor') division.
  * The result always has the same sign as the second argument (or 0).
  *
- * Note: this does not have the same as the % (remainder) operator. rem()
+ * Note: this is not the same as the % (remainder) operator. Use `rem()` for an
+ * equivalent to `%`.
  *
  * @equivalent ((a % b) + b) % b
  * @see rem
  */
 export function mod(a: Numeric, b: Numeric): decimal {
-  const [, remainder] = divmod(a, b)
-  return remainder
+  return rem(a, b, { [MODE]: ROUND_FLOOR })
 }
 
 /**
+ * Divide and remainder
+ *
  * Divides two numeric values to a given places or precision returning both the
  * quotient and the remainder while satisfying the two conditions:
  *
@@ -306,23 +320,23 @@ export function mod(a: Numeric, b: Numeric): decimal {
  *
  * | Example            | Note
  * | ------------------ | ---------------
- * | `divmod(10, 3, { mode: "floor" }) === [ '3', '1' ]` | "floor" is the default rounding mode
- * | `divmod(10, -3, { mode: "floor" }) === [ '-4', '-2' ]` | The remainder has the same sign as the divisor
- * | `divmod(-10, 3, { mode: "floor" }) === [ '-4', '2' ]` |
- * | `divmod(-10, -3, { mode: "floor" }) === [ '3', '-1' ]` |
- * | `divmod(10, 3, { mode: "down" }) === [ '3', '1' ]` | The remainder has the same sign as the dividend
- * | `divmod(10, -3, { mode: "down" }) === [ '-3', '1' ]` |
- * | `divmod(-10, 3, { mode: "down" }) === [ '-3', '-1' ]` |
- * | `divmod(-10, -3, { mode: "down" }) === [ '3', '-1' ]` |
- * | `divmod(10, 3, { mode: "euclidean" }) === [ '3', '1' ]` | The remainder is always positive
- * | `divmod(10, -3, { mode: "euclidean" }) === [ '-3', '1' ]` |
- * | `divmod(-10, 3, { mode: "euclidean" }) === [ '-4', '2' ]` |
- * | `divmod(-10, -3, { mode: "euclidean" }) === [ '4', '2' ]` |
+ * | `divRem(10, 3, { mode: "down" }) === [ '3', '1' ]` | The remainder has the same sign as the dividend
+ * | `divRem(10, -3, { mode: "down" }) === [ '-3', '1' ]` | "down" is the default rounding mode
+ * | `divRem(-10, 3, { mode: "down" }) === [ '-3', '-1' ]` |
+ * | `divRem(-10, -3, { mode: "down" }) === [ '3', '-1' ]` |
+ * | `divRem(10, 3, { mode: "floor" }) === [ '3', '1' ]` | The remainder has the same sign as the divisor
+ * | `divRem(10, -3, { mode: "floor" }) === [ '-4', '-2' ]` |
+ * | `divRem(-10, 3, { mode: "floor" }) === [ '-4', '2' ]` |
+ * | `divRem(-10, -3, { mode: "floor" }) === [ '3', '-1' ]` |
+ * | `divRem(10, 3, { mode: "euclidean" }) === [ '3', '1' ]` | The remainder is always positive
+ * | `divRem(10, -3, { mode: "euclidean" }) === [ '-3', '1' ]` |
+ * | `divRem(-10, 3, { mode: "euclidean" }) === [ '-4', '2' ]` |
+ * | `divRem(-10, -3, { mode: "euclidean" }) === [ '4', '2' ]` |
  *
- * All rounding modes may be used.
+ * All rounding modes may be used and these conditions will be satisfied.
  */
-export function divmod(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): [quotient: decimal, remainder: decimal] {
-  const roundingRules = normalizeRules(rules, 0, ROUND_FLOOR)
+export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): [quotient: decimal, remainder: decimal] {
+  const roundingRules = normalizeRules(rules, 0, ROUND_DOWN)
   const [signA, significandA, exponentA, precisionA] = toRepresentation(dividend)
   const [signB, significandB, exponentB, precisionB] = toRepresentation(divisor)
 
