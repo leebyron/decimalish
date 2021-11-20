@@ -6,6 +6,10 @@ describe('div', () => {
     expect(() => div(1, 0)).toThrow('[decimalish] Divide by 0')
   })
 
+  it('throws for inexact division', () => {
+    expect(() => div(1, 3, { mode: 'exact' })).toThrow('[decimalish] Inexact division of 1 / 3')
+  })
+
   it('specifies places', () => {
     expect(div(1, 3, { places: 0 })).toBe('0')
     expect(div(7, 3, { places: 0 })).toBe('2')

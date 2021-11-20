@@ -4,7 +4,7 @@ describe('round', () => {
 
   it('throws on bad input', () => {
     // @ts-expect-error 'abc' is not Numeric
-    expect(() => round('abc')).toThrow('[decimalish] Not numeric: abc')
+    expect(() => round('abc')).toThrow('[decimalish] Cannot represent: abc')
     expect(() => round('123', { places: 0.5 })).toThrow('[decimalish] places must be a whole number')
     expect(() => round('123', { precision: 0.5 })).toThrow('[decimalish] precision must be a whole number')
     // @ts-expect-error cannot provide both.
@@ -182,6 +182,11 @@ describe('round', () => {
     expect(round(-0.5, { mode: 'euclidean' })).toBe('-1')
     expect(round(-0.501, { mode: 'euclidean' })).toBe('-1')
     expect(round(-1, { mode: 'euclidean' })).toBe('-1')
+
+    // exact
+    expect(round(1, { mode: 'exact' })).toBe('1')
+    expect(() => round(0.5, { mode: 'exact' })).toThrow('[decimalish] Inexact rounding of 0.5')
+    expect(round(0, { mode: 'exact' })).toBe('0')
   })
 
 })
