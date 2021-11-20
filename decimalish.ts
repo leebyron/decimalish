@@ -19,6 +19,7 @@
  *  - scale - needs tests
  *  - Error quality
  *  - min/max - needs tests
+ *  - floor/ceil/trunc - needs tests
  *
  * Todo:
  *  - unit tests
@@ -526,7 +527,7 @@ export function cmp(a: Numeric, b: Numeric): Sign {
  */
 export function max(...values: Numeric[]): decimal
 export function max(): decimal {
-  return extreme(arguments, 1)
+  return extremum(arguments, 1)
 }
 
 /**
@@ -536,13 +537,13 @@ export function max(): decimal {
  */
 export function min(...values: Numeric[]): decimal
 export function min(): decimal {
-  return extreme(arguments, -1)
+  return extremum(arguments, -1)
 }
 
 /**
  * @internal
  */
-function extreme(values: IArguments, direction: number): decimal {
+function extremum(values: IArguments, direction: number): decimal {
   let value = decimal(values[0])
   for (let i = 1; i < values.length; i++) {
     let arg = decimal(values[i])
@@ -647,6 +648,8 @@ export function scale(value: Numeric, power: Numeric): decimal {
  * Note: the default "half ceiling" rounding mode is different from the behavior
  * of round() in many other libraries and programming languages, but matches the
  * behavior of JavaScript's Math.round(). Other languages default to "half up".
+ *
+ * @equivalent Math.round(value)
  */
 export function round(value: Numeric, rules?: RoundingRules): decimal {
   const roundingRules = normalizeRules(rules, 0, ROUND_HALF_CEILING)
@@ -686,6 +689,39 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
   }
 
   return rounded
+}
+
+/**
+ * Rounds down to the nearest whole number.
+ *
+ * Note: Equivalent to `round(value, { mode: 'floor' })`
+ *
+ * @equivalent Math.floor(value)
+ */
+export function floor(value: Numeric): decimal {
+  return round(value, { [MODE]: ROUND_FLOOR })
+}
+
+/**
+ * Rounds up to the nearest whole number.
+ *
+ * Note: Equivalent to `round(value, { mode: 'ceiling' })`
+ *
+ * @equivalent Math.ceil(value)
+ */
+export function ceil(value: Numeric): decimal {
+  return round(value, { [MODE]: ROUND_CEILING })
+}
+
+/**
+ * Returns the integer part of a number.
+ *
+ * Note: Equivalent to `round(value, { mode: 'down' })`
+ *
+ * @equivalent Math.trunc(value)
+ */
+export function trunc(value: Numeric): decimal {
+  return round(value, { [MODE]: ROUND_DOWN })
 }
 
 export type RoundingRules =
