@@ -22,10 +22,11 @@
  *  - floor/ceil/trunc - needs tests
  *  - places/precision/exponent
  *  - "exact" rounding mode?
+ *  - sqrt
+
  *
  * Todo:
  *  - unit tests
- *  - sqrt - is this actually useful? Big.js has this, but ECMA does not
  *  - cbrt?
  *  - trig / PI?
  *  - exp/ln/log?
@@ -42,7 +43,7 @@
  *  - doc generator
  *  - build size testing
  *  - performance testing
- *  - compare to other libraries?
+ *  - compare to other libraries and standards? http://speleotrove.com/decimal/
  *
  * Pitch:
  *
@@ -232,39 +233,6 @@ export function mul(a: Numeric, b: Numeric): decimal {
 }
 
 /**
- * Power
- *
- * Raises `base` to the power `exponent`, where `exponent` must be a positive
- * whole number.
- *
- * @equivalent Math.pow(base, exponent)
- */
-export function pow(base: Numeric, exponent: Numeric): decimal {
-  let baseToPowerOf2 = decimal(base)
-  let result = '1' as decimal
-
-  exponent = wholeNumber('exponent', exponent)
-  if (exponent < 0) {
-    error('exponent must be positive')
-  }
-
-  // Iterate through the bits of exponent
-  while (exponent) {
-    // If a bit is set, multiply the result by that power of two.
-    if (exponent & 1) {
-      result = mul(result, baseToPowerOf2)
-    }
-    // Shift the exponent to align the next bit and if any bits are still set,
-    // square to get the next power of two.
-    if (exponent >>= 1) {
-      baseToPowerOf2 = mul(baseToPowerOf2, baseToPowerOf2)
-    }
-  }
-
-  return result
-}
-
-/**
  * Divide
  *
  * Returns the result of dividing `dividend` by `divisor`.
@@ -364,9 +332,9 @@ export function mod(a: Numeric, b: Numeric): decimal {
  * All rounding modes may be used and these conditions will be satisfied.
  */
 export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): [quotient: decimal, remainder: decimal] {
-  const roundingRules = normalizeRules(rules, 0, ROUND_DOWN)
   const [signA, significandA, exponentA, precisionA] = toRepresentation(dividend)
   const [signB, significandB, exponentB, precisionB] = toRepresentation(divisor)
+  rules = normalizeRules(rules, 0, ROUND_DOWN)
 
   // The resulting exponent of a division is the difference between the
   // exponents of the dividend and divisor.
@@ -374,8 +342,8 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
   const exponent = exponentA - exponentB
 
   // Determine the desired rounding mode and precision.
-  let roundingMode = roundingRules[MODE]
-  let roundingPrecision = getRoundingPrecision(roundingRules, exponent)
+  let roundingMode = rules[MODE]
+  let roundingPrecision = getRoundingPrecision(rules, exponent)
 
   if (!significandB) error('Divide by 0')
 
@@ -440,7 +408,7 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
 
     // If precision was directly specified and the first digit is 0, then
     // 1 additional digit is necessary to reach the desired precision.
-    if (place === 0 && digit === 0 && roundingRules[PRECISION] != null) {
+    if (place === 0 && digit === 0 && rules[PRECISION] != null) {
       roundingPrecision++
     }
 
@@ -493,6 +461,84 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
   }
 
   return [quotient, remainder]
+}
+
+/**
+ * Power
+ *
+ * Raises `base` to the power `exponent`, where `exponent` must be a positive
+ * whole number.
+ *
+ * @equivalent Math.pow(base, exponent)
+ */
+export function pow(base: Numeric, exponent: Numeric): decimal {
+  let baseToPowerOf2 = decimal(base)
+  let result = '1' as decimal
+
+  exponent = wholeNumber('exponent', exponent)
+  if (exponent < 0) {
+    error('exponent must be positive')
+  }
+
+  // Iterate through the bits of exponent
+  while (exponent) {
+    // If a bit is set, multiply the result by that power of two.
+    if (exponent & 1) {
+      result = mul(result, baseToPowerOf2)
+    }
+    // Shift the exponent to align the next bit and if any bits are still set,
+    // square to get the next power of two.
+    if (exponent >>= 1) {
+      baseToPowerOf2 = mul(baseToPowerOf2, baseToPowerOf2)
+    }
+  }
+
+  return result
+}
+
+/**
+ * Square root
+ *
+ * Returns the square root of `value`.
+ *
+ * Defaults to 20 decimal places of precision using the `"half even"` rounding
+ * mode, configurable by providing rounding `rules`.
+ *
+ * @equivalent Math.sqrt(value)
+ */
+export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
+  let [sign, significand, exponent, precision] = toRepresentation(value)
+
+  // Negative number
+  if (sign < 0) {
+    error('Square root of negative')
+  }
+
+  rules = normalizeRules(rules, 20, ROUND_HALF_EVEN)
+  const iterationPrecision = getRoundingPrecision(rules, exponent) + 4
+
+  // Sqrt 0 -> 0
+  let result = '0' as decimal
+  if (sign) {
+
+    // Start with an estimated result using floating point sqrt based on the idea
+    // that the result is independent of original value's exponent as long as it
+    // is the same parity.
+    const estimate = Math.sqrt(+(significand + (precision + exponent & 1 ? '' : '0')))
+    significand = (estimate == 1 / 0 ? '5' : toRepresentation(estimate)[1]).slice(0, iterationPrecision)
+    result = fromRepresentation(1, significand, ((exponent + 1) / 2 | 0) - +(exponent < 0 || exponent & 1))
+
+    // Use Newton's method to generate and confirm additional precision.
+    let prevSignificand = significand
+    do {
+      result = mul(0.5, add(result, div(value, result, { [PRECISION]: iterationPrecision })))
+      prevSignificand = significand
+      significand = toRepresentation(result)[1].slice(0, iterationPrecision)
+    } while (prevSignificand !== significand)
+  }
+
+  // Round the final result
+  return round(result, rules)
 }
 
 
