@@ -53,7 +53,7 @@
  *  - 11 rounding modes
  *  - no global configuration or state
  *  - use it or lose it! per-method tree shaking supported
- *  - or at worst, only 5.8kb minified!
+ *  - or at worst, only 5.7kb minified (2.7kb gzipped)!
  *  - does not support -0, NaN, or Infinity. -0 isn't useful outside of floating
  *    point, Infinity is not a decimal, and the only case which might produce
  *    Infinity or NaN, dividing by zero, throws.
@@ -308,7 +308,7 @@ export function rem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules):
  * @__PURE__
  */
 export function mod(a: Numeric, b: Numeric): decimal {
-  return rem(a, b, { [MODE]: ROUND_FLOOR })
+  return rem(a, b, { mode: ROUND_FLOOR })
 }
 
 /**
@@ -534,7 +534,7 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
   }
 
   rules = normalizeRules(rules, 20, ROUND_HALF_EVEN)
-  const iterationPrecision = getRoundingPrecision(rules, exponent) + 4
+  const iterationPrecision = getRoundingPrecision(rules, exponent)
 
   // Sqrt 0 -> 0
   let result = '0' as decimal
@@ -550,7 +550,7 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
     // Use Newton's method to generate and confirm additional precision.
     let prevSignificand = significand
     do {
-      result = mul(0.5, add(result, div(value, result, { [PRECISION]: iterationPrecision })))
+      result = mul(0.5, add(result, div(value, result, { precision: iterationPrecision + 4 })))
       prevSignificand = significand
       significand = toRepresentation(result)[1].slice(0, iterationPrecision)
     } while (prevSignificand !== significand)
@@ -894,7 +894,7 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
  * @__PURE__
  */
 export function floor(value: Numeric): decimal {
-  return round(value, { [MODE]: ROUND_FLOOR })
+  return round(value, { mode: ROUND_FLOOR })
 }
 
 /**
@@ -909,7 +909,7 @@ export function floor(value: Numeric): decimal {
  * @__PURE__
  */
 export function ceil(value: Numeric): decimal {
-  return round(value, { [MODE]: ROUND_CEIL })
+  return round(value, { mode: ROUND_CEIL })
 }
 
 /**
@@ -925,7 +925,7 @@ export function ceil(value: Numeric): decimal {
  * @__PURE__
  */
 export function trunc(value: Numeric): decimal {
-  return round(value, { [MODE]: ROUND_DOWN })
+  return round(value, { mode: ROUND_DOWN })
 }
 
 export type RoundingRules =
@@ -993,9 +993,9 @@ function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number,
 
   if (precision != null) {
     if (places != null) error('Cannot provide both precision and places')
-    precision = wholeNumber('precision', precision)
+    precision = wholeNumber(PRECISION, precision)
   } else {
-    places = places != null ? wholeNumber('places', places) : defaultPlaces
+    places = places != null ? wholeNumber(PLACES, places) : defaultPlaces
   }
 
   // Note: indexOf() or find() would work, however neither are available in ES3.
@@ -1090,7 +1090,7 @@ export function toExponential(value: Numeric, rules?: RoundingRules): NumericStr
   // Interpret "places" relative to the final exponential notation rather than
   // the original number. In exponential scientific notation, the precision of
   // a number is always exactly one more than the number of decimal places.
-  return toFormat(true, value, rules && rules[PLACES] != null ? { [PRECISION]: toNumber(rules[PLACES]!) + 1, [MODE]: rules[MODE] } : rules)
+  return toFormat(true, value, rules && rules[PLACES] != null ? { precision: toNumber(rules[PLACES]!) + 1, mode: rules[MODE] } : rules)
 }
 
 /**
@@ -1102,7 +1102,9 @@ export function toExponential(value: Numeric, rules?: RoundingRules): NumericStr
 function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules): NumericString {
   const [sign, significand, exponent, precision] = toRepresentation(rules ? round(value, rules) : value)
   const printPrecision = rules ? getRoundingPrecision(rules, exponent) : precision
-  return print(sign, significand, exponent, precision, printPrecision, asExponential)
+  const decimalPart = print(sign, significand, precision, printPrecision, asExponential ? 1 : exponent + 1)
+  const exponentialPart = asExponential ? (exponent < 0 ? 'e' : 'e+') + exponent : ''
+  return (decimalPart + exponentialPart) as NumericString
 }
 
 /**
@@ -1114,13 +1116,11 @@ function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules)
 function print(
   sign: Sign,
   significand: string,
-  exponent: number,
   precision: number,
   printPrecision: number,
-  asExponential?: boolean
+  decimalPoint: number
 ): NumericString {
   let result = sign < 0 ? '-' : ''
-  let decimalPoint = asExponential ? 1 : exponent + 1
 
   while (precision < printPrecision) {
     significand += '0'
@@ -1136,10 +1136,6 @@ function print(
   } else {
     result += significand
     while (decimalPoint-- > precision) result += '0'
-  }
-
-  if (asExponential) {
-    result += (exponent < 0 ? 'e' : 'e+') + exponent
   }
 
   return result as NumericString
@@ -1197,7 +1193,7 @@ type Sign = 1 | -1 | 0
 export function fromRepresentation(sign: Sign, significand: string, exponent: number): decimal {
   let precision
   [sign, significand, exponent, precision] = normalizeRepresentation(sign, significand, exponent)
-  return print(sign, significand, exponent, precision, precision) as decimal
+  return print(sign, significand, precision, precision, exponent + 1) as decimal
 }
 
 /**
