@@ -1,0 +1,14 @@
+{
+  "name": "decimalish-test-webpack-tree-shaking",
+  "private": true,
+  "dependencies": {
+    "decimalish": "../../dist",
+    "webpack": "^5.64.2",
+    "webpack-cli": "^4.9.1"
+  },
+  "scripts": {
+    "test:install": "npm_config_package_lock=false npm install",
+    "test:build": "webpack ./index.js --mode production --stats none",
+    "test:run": "node dist/main.js"
+  }
+}
