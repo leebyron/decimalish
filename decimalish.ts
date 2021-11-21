@@ -23,7 +23,7 @@
  *  - places/precision/exponent
  *  - "exact" rounding mode?
  *  - sqrt
-
+ *  - build outputs
  *
  * Todo:
  *  - unit tests
@@ -38,7 +38,7 @@
  *
  *  - prettier
  *  - eslint
- *  - build outputs (optimized for build size?)
+ *  - optimized for build size?
  *  - test tree shaking
  *  - doc generator
  *  - build size testing
@@ -352,9 +352,10 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
 
   // Remainder is a mutable list of digits, starting as a copy of the dividend
   // (a) which is at least as long as the divisor (b).
+  let remainderLength = precisionB > precisionA ? precisionB : precisionA
   const remainderDigits: number[] = []
-  for (let i = 0; i < precisionA || i < precisionB; i++) {
-    remainderDigits[i] = +significandA[i] || 0
+  for (let i = remainderLength; i--;) {
+    remainderDigits[i] = +(significandA[i] || 0)
   }
 
   // The most significant digit of the remainder.
@@ -372,7 +373,9 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
     place++
   ) {
     // Append a zero to the remainder if necessary.
-    remainderDigits[place + precisionB - 1] ||= 0
+    if (remainderLength < place + precisionB) {
+      remainderDigits[remainderLength++] = 0
+    }
 
     // Count how many times divisor (b) can be subtracted from remainder at the
     // current place (between 0 and 9 times).
@@ -435,7 +438,7 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
       roundingMode === ROUND_CEIL ? sign < 0 ? ROUND_DOWN : ROUND_UP :
       roundingMode === ROUND_FLOOR ? sign < 0 ? ROUND_UP : ROUND_DOWN :
       roundingMode === ROUND_EUCLIDEAN ? sign === signB ? ROUND_DOWN : ROUND_UP :
-      roundingMode === ROUND_HALF_CEILING ? sign < 0 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
+      roundingMode === ROUND_HALF_CEIL ? sign < 0 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
       roundingMode === ROUND_HALF_FLOOR ? sign < 0 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
       roundingMode === ROUND_HALF_EVEN ? digit % 2 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
       roundingMode
@@ -800,7 +803,7 @@ export function scale(value: Numeric, power: Numeric): decimal {
  * @equivalent Math.round(value)
  */
 export function round(value: Numeric, rules?: RoundingRules): decimal {
-  const roundingRules = normalizeRules(rules, 0, ROUND_HALF_CEILING)
+  const roundingRules = normalizeRules(rules, 0, ROUND_HALF_CEIL)
   let [sign, significand, exponent, precision] = toRepresentation(value)
 
   // Determine the desired rounding mode and precision.
@@ -820,7 +823,7 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
     roundingMode =
       roundingMode === ROUND_CEIL ? sign < 0 ? ROUND_DOWN : ROUND_UP :
       roundingMode === ROUND_FLOOR || roundingMode === ROUND_EUCLIDEAN ? sign < 0 ? ROUND_UP : ROUND_DOWN :
-      roundingMode === ROUND_HALF_CEILING ? sign < 0 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
+      roundingMode === ROUND_HALF_CEIL ? sign < 0 ? ROUND_HALF_DOWN : ROUND_HALF_UP :
       roundingMode === ROUND_HALF_FLOOR ? sign < 0 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
       roundingMode === ROUND_HALF_EVEN ? +(significand[roundingPrecision - 1] || 0) % 2 ? ROUND_HALF_UP : ROUND_HALF_DOWN :
       roundingMode
@@ -917,24 +920,24 @@ const ROUND_FLOOR = 'floor'
 const ROUND_EUCLIDEAN = 'euclidean'
 const ROUND_HALF_UP = 'half up'
 const ROUND_HALF_DOWN = 'half down'
-const ROUND_HALF_CEILING = 'half ceil'
+const ROUND_HALF_CEIL = 'half ceil'
 const ROUND_HALF_FLOOR = 'half floor'
 const ROUND_HALF_EVEN = 'half even'
 const ROUND_EXACT = 'exact'
 
-const roundingModes = {
-  [ROUND_UP]: ROUND_UP,
-  [ROUND_DOWN]: ROUND_DOWN,
-  [ROUND_CEIL]: ROUND_CEIL,
-  [ROUND_FLOOR]: ROUND_FLOOR,
-  [ROUND_EUCLIDEAN]: ROUND_EUCLIDEAN,
-  [ROUND_HALF_UP]: ROUND_HALF_UP,
-  [ROUND_HALF_DOWN]: ROUND_HALF_DOWN,
-  [ROUND_HALF_CEILING]: ROUND_HALF_CEILING,
-  [ROUND_HALF_FLOOR]: ROUND_HALF_FLOOR,
-  [ROUND_HALF_EVEN]: ROUND_HALF_EVEN,
-  [ROUND_EXACT]: ROUND_EXACT,
-}
+const roundingModes = [
+  ROUND_UP,
+  ROUND_DOWN,
+  ROUND_CEIL,
+  ROUND_FLOOR,
+  ROUND_EUCLIDEAN,
+  ROUND_HALF_UP,
+  ROUND_HALF_DOWN,
+  ROUND_HALF_CEIL,
+  ROUND_HALF_FLOOR,
+  ROUND_HALF_EVEN,
+  ROUND_EXACT,
+]
 
 /**
  * Given rounding rules, a number's exponent, and a default, produce a rounding
@@ -952,7 +955,7 @@ function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number,
   } else {
     places = places != null ? wholeNumber('places', places) : defaultPlaces
   }
-  if (mode && !(mode in roundingModes)) error(`Unknown rounding mode: ${mode}`)
+  if (mode && roundingModes.indexOf(mode) < 0) error(`Unknown rounding mode: ${mode}`)
   return {
     [PRECISION]: precision,
     [PLACES]: places,
@@ -1001,7 +1004,9 @@ export function toNumber(value: Numeric, options?: { inexact: boolean }): number
  *
  * @see decimal
  */
-export const toString: (value: Numeric) => NumericString = decimal
+export function toString(value: Numeric): NumericString {
+  return decimal(value)
+}
 
 /**
  * Format as Fixed
@@ -1109,7 +1114,9 @@ export function toRepresentation(value: unknown): DecimalRepresentation {
   const match = decimalRegex.exec(''+value)
   if (!match) error(`Cannot represent: ${value}`)
   let [, sign, integer, fractional, exponent] = match
-  integer ||= ''
+  if (!integer) {
+    integer = ''
+  }
   return normalizeRepresentation(
     sign === '-' ? -1 : 1,
     fractional ? integer + fractional : integer,
