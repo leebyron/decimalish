@@ -39,7 +39,7 @@
     "build:files:main:min": "terser dist/decimalish.js -o dist/decimalish.min.js -cm --ie8 --safari10",
     "build:files:module": "rollup decimalish.ts -o dist/decimalish.mjs -f esm -p typescript",
     "build:files:types": "tsc decimalish.ts --outFile dist/decimalish.d.ts --declaration --emitDeclarationOnly --stripInternal",
-    "build:report": "row(){ printf \"$(tput setaf 6)%-22s $(tput setaf 5)%8s $(tput setaf 3)%8s$(tput sgr0)\n\" $1 $2 $3;}; row File Size Zipped; for file in dist/*; do row $file $(cat $file | wc -c) $(cat $file | gzip -9c | wc -c); done",
+    "build:size-report": "row(){ printf \"$(tput setaf 6)%-22s $(tput setaf 5)%8s $(tput setaf 3)%8s$(tput sgr0)\n\" $1 $2 $3;}; row File Size Zipped; for file in dist/*; do row $file $(cat $file | wc -c) $(cat $file | gzip -9c | wc -c); done",
     "integration": "run-p integration:*",
     "integration:es3": "es-check es3 dist/decimalish.js dist/decimalish.min.js",
     "integration:webpack": "cd tests/webpack-tree-shaking && run-s --silent test:*"
