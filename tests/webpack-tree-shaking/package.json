@@ -8,8 +8,8 @@
   },
   "scripts": {
     "test:install": "npm_config_package_lock=false npm install",
-    "test:build-tree-shake": "webpack ./tree-shake.js --mode production --stats none",
     "test:build-minimal": "webpack ./minimal.js --output-filename minimal.js --mode production --stats none",
+    "test:build-tree-shake": "webpack ./tree-shake.js --mode production --stats none",
     "test:run": "node dist/main.js",
     "test:size-report": "row(){ printf \"$(tput setaf 6)%-22s $(tput setaf 5)%8s $(tput setaf 3)%8s$(tput sgr0)\n\" $1 $2 $3;}; row File Size Zipped; for file in dist/*; do row $file $(cat $file | wc -c) $(cat $file | gzip -9c | wc -c); done"
   }

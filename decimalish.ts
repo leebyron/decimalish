@@ -27,6 +27,7 @@
  *
  * Todo:
  *  - unit tests
+ *  - toEngineering ? (or argument to toExponential?)
  *  - cbrt?
  *  - trig / PI?
  *  - exp/ln/log?
