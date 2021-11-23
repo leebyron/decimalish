@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>
+      decimalish — JavaScript arbitrary-precision decimal primitives
+    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <%- '<style>' + include("style.css") + include("split-flap.css") + '</style>' -%>
+  </head>
+  <body>
+    <header>
+      <div id="split-flap"></div>
+    </header>
+    <section id="faq">
+      <h2><a href="#id">FAQ</a></h2>
+    </section>
+    <footer>
+      <div>
+        Made with &#9829; in San Francisco by <a href="https://twitter.com/leeb">@leeb</a>
+      </div>
+    </footer>
+    <%-
+      include("split-flap.svg") +
+      '<script type="text/javascript">(()=>{' +
+      include("split-flap.js") +
+      '})()</script>'
+    -%>
+  </body>
+</html>
