@@ -3,6 +3,7 @@ html {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
+  font-feature-settings: "ccmp", "case", "calt", "ss01";
 }
 @supports (font-variation-settings: normal) {
   html {
@@ -17,6 +18,9 @@ html {
   --text-color: #222;
   --underline-color: #2222224d;
   --link-highlight-color: rgb(248, 203, 0);
+  --max-width: 800px;
+  --gutter-size: 20px;
+  --nav-size: 50px;
 }
 
 header,
@@ -39,11 +43,41 @@ h3 {
 }
 
 header {
-  height: 50vh;
+  position: relative;
+  height: max(33vh, calc(0.52 * min(100vw - 20px, 800px) - 2 * var(--nav-size)));
+  padding: 0 var(--gutter-size) var(--nav-size);
   background: var(--header-color);
   display: flex;
+  flex-direction: column;
   align-items: center;
   color: var(--text-color);
+}
+
+header nav {
+  width: 100%;
+  max-width: var(--max-width);
+  list-style: none;
+  padding: 0 20px;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  white-space: nowrap;
+  --underline-color: transparent;
+  --edge-alignment: calc(0.026 * min(100vw - 20px, 800px));
+  height: var(--nav-size);
+  align-items: center;
+}
+
+header nav a {
+  padding: 0 1em;
+}
+
+header nav a:first-child {
+  padding-left: var(--edge-alignment);
+}
+header nav a:last-child {
+  margin-left: auto;
+  padding-right: var(--edge-alignment);
 }
 
 section {

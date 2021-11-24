@@ -43,6 +43,7 @@
     "integration": "run-p integration:*",
     "integration:es3": "es-check es3 dist/decimalish.js dist/decimalish.min.js",
     "integration:webpack": "cd tests/webpack-tree-shaking && run-s --silent test:*",
+    "website:start": "npm run website:clean; npm run website:build; chokidar \"website/*\" -c \"npm run website:build\"",
     "website:clean": "rm -rf website/dist",
     "website:build": "cd website; mkdir -p dist; ejs index.ejs -o dist/index.html"
   },
@@ -73,5 +74,8 @@
       ],
       "@babel/preset-typescript"
     ]
+  },
+  "dependencies": {
+    "chokidar-cli": "^3.0.0"
   }
 }

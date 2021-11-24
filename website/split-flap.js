@@ -174,6 +174,9 @@ function sleep(ms) {
 (async () => {
   sfDisplay("decimalish", true);
 
+  // during development
+  return
+
   while (true) {
     await sfDisplay([
       { char: "d", extra: 0 },
