@@ -1,16 +1,18 @@
-@import url("https://rsms.me/inter/inter.css");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono&display=swap");
+
 html {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
     "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  font-feature-settings: "ccmp", "case", "calt", "ss01";
+  font-kerning: normal;
+  font-variant-ligatures: contextual common-ligatures;
+  font-feature-settings: "kern" 1, "liga" 1, "ccmp" 1, "case" 1, "calt" 1,
+    "ss01" 1;
 }
-@supports (font-variation-settings: normal) {
-  html {
-    font-family: "Inter var", -apple-system, BlinkMacSystemFont, "Segoe UI",
-      "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-      "Helvetica Neue", sans-serif;
-  }
+
+pre,
+code {
+  font-family: "Roboto Mono", monospace;
 }
 
 :root {
@@ -18,7 +20,7 @@ html {
   --text-color: #222;
   --underline-color: #2222224d;
   --link-highlight-color: rgb(248, 203, 0);
-  --max-width: 800px;
+  --max-width: 880px;
   --gutter-size: 20px;
   --nav-size: 50px;
 }
@@ -31,20 +33,42 @@ footer {
 
 html,
 body {
-  margin: 0;
   background: var(--header-color);
   color: var(--text-color);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1rem;
 }
 
 h1,
 h2,
 h3 {
+  margin: 1em 0;
   --underline-color: transparent;
 }
 
 header {
   position: relative;
-  height: max(33vh, calc(0.52 * min(100vw - 20px, 800px) - 2 * var(--nav-size)));
+  height: max(
+    33vh,
+    calc(0.52 * min(100vw - 20px, 800px) - 2 * var(--nav-size))
+  );
   padding: 0 var(--gutter-size) var(--nav-size);
   background: var(--header-color);
   display: flex;
@@ -54,6 +78,7 @@ header {
 }
 
 header nav {
+  font-size: 1.25rem;
   width: 100%;
   max-width: var(--max-width);
   list-style: none;
@@ -69,7 +94,7 @@ header nav {
 }
 
 header nav a {
-  padding: 0 1em;
+  padding: 0.5em 1em;
 }
 
 header nav a:first-child {
@@ -85,6 +110,12 @@ section {
   padding: 20px;
   display: flex;
   justify-content: center;
+}
+
+section > * {
+  width: 100%;
+  max-width: var(--max-width);
+  flex: 1 0 100%;
 }
 
 footer {
@@ -111,20 +142,34 @@ a {
   transition-duration: 0.2s;
 }
 
-a:hover,
-a:focus {
-  --underline-offset: 0.25em;
+a:hover {
+  --underline-offset: 0.15em;
   text-decoration-color: var(--link-highlight-color);
   text-decoration-thickness: 0.2em;
 }
 
 @supports not (background: paint(something)) {
   a {
-    transition: text-underline-offset, text-decoration-color;
+    transition: text-underline-offset, text-decoration-color, text-decoration-thickness;
   }
 
-  a:hover,
-  a:focus {
-    text-underline-offset: 0.25em;
+  a:hover {
+    text-underline-offset: 0.15em;
   }
+}
+
+ul.api {
+  width: fit-content;
+  list-style: none;
+  --underline-color: transparent;
+}
+
+ul.api a {
+  display: flex;
+  justify-content: space-between;
+}
+
+ul.api a pre {
+  color: #555;
+  margin-left: 2em;
 }

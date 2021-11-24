@@ -178,6 +178,7 @@ function sleep(ms) {
   return
 
   while (true) {
+    // TODO: check on screen before continuing loop?
     await sfDisplay([
       { char: "d", extra: 0 },
       { char: "e", extra: 0 },

@@ -77,7 +77,7 @@
  */
 
 
-// Decimal type
+// Types
 
 /**
  * **The decimal type:**
@@ -88,7 +88,6 @@
  */
 export type decimal = NumericString & { [$decimal]: typeof $decimal }
 declare const $decimal: unique symbol
-
 
 /**
  * Convert to decimal
@@ -102,8 +101,8 @@ declare const $decimal: unique symbol
  * @__PURE__
  */
 export function decimal(value: unknown): decimal {
-  const [sign, significand, exponent] = toRepresentation(value)
-  return fromRepresentation(sign, significand, exponent)
+  const [sign, significand, exponent] = deconstruct(value)
+  return construct(sign, significand, exponent)
 }
 
 /**
@@ -111,12 +110,12 @@ export function decimal(value: unknown): decimal {
  *
  * Returns true if the provided value is a decimal value.
  *
- * A value is decimal if it is a numeric string in a canonical decimal form.
+ * A value is `decimal` if it is a numeric string in a canonical decimal form.
  *
  * @__PURE__
  */
 export function isDecimal(value: unknown): value is decimal {
-  return decimalRegex.test(''+value) && decimal(value) === value
+  return isNumericString(value) && decimal(value) === value
 }
 
 /**
@@ -126,9 +125,36 @@ export function isDecimal(value: unknown): value is decimal {
 export type Numeric = NumericString | number | bigint
 
 /**
+ * Is numeric?
+ *
+ * Returns true if the provided value is a (finite) numeric value.
+ *
+ * A value is considered numeric if it can be coerced to a numeric string.
+ *
+ * @__PURE__
+ */
+export function isNumeric(value: unknown): value is Numeric {
+  return decimalRegex.test(''+value)
+}
+
+/**
  * The NumericString type represents strings that can be parsed as a number.
  */
 export type NumericString = `${number}`
+
+/**
+ * Is numeric string?
+ *
+ * Returns true if the provided value is a (finite) numeric string.
+ *
+ * A numeric string allows more variation than `decimal`, such as scientific
+ * notation, and leading or trailing zeros or decimal points.
+ *
+ * @__PURE__
+ */
+export function isNumericString(value: unknown): value is NumericString {
+  return value === (''+value) && isNumeric(value)
+}
 
 
 // Arithmetic
@@ -142,13 +168,13 @@ export type NumericString = `${number}`
  * @__PURE__
  */
 export function add(a: Numeric, b: Numeric): decimal {
-  const [signA, significandA, exponentA, precisionA] = toRepresentation(a)
-  const [signB, significandB, exponentB, precisionB] = toRepresentation(b)
+  const [signA, significandA, exponentA, precisionA] = deconstruct(a)
+  const [signB, significandB, exponentB, precisionB] = deconstruct(b)
 
   // Additive identity. Return early so the rest of the method can safely assume
   // both operands are signed non-zero numbers.
-  if (!signA) return fromRepresentation(signB, significandB, exponentB)
-  if (!signB) return fromRepresentation(signA, significandA, exponentA)
+  if (!signA) return construct(signB, significandB, exponentB)
+  if (!signB) return construct(signA, significandA, exponentA)
 
   // Result normalized form
   let sign = signA
@@ -197,7 +223,7 @@ export function add(a: Numeric, b: Numeric): decimal {
     significand = digits.join('')
   }
 
-  return fromRepresentation(sign, significand, exponent)
+  return construct(sign, significand, exponent)
 }
 
 /**
@@ -222,8 +248,8 @@ export function sub(a: Numeric, b: Numeric): decimal {
  * @__PURE__
  */
 export function mul(a: Numeric, b: Numeric): decimal {
-  const [signA, significandA, exponentA, precisionA] = toRepresentation(a)
-  const [signB, significandB, exponentB, precisionB] = toRepresentation(b)
+  const [signA, significandA, exponentA, precisionA] = deconstruct(a)
+  const [signB, significandB, exponentB, precisionB] = deconstruct(b)
 
   let digits = new Array(precisionA + precisionB)
   let result = 0
@@ -238,7 +264,7 @@ export function mul(a: Numeric, b: Numeric): decimal {
     digits[i] = result
   }
 
-  return fromRepresentation((signA * signB) as Sign, digits.join(''), exponentA + exponentB + 1)
+  return construct((signA * signB) as Sign, digits.join(''), exponentA + exponentB + 1)
 }
 
 /**
@@ -255,61 +281,6 @@ export function mul(a: Numeric, b: Numeric): decimal {
 export function div(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
   const [quotient] = divRem(dividend, divisor, normalizeRules(rules, 20, ROUND_HALF_EVEN))
   return quotient
-}
-
-/**
- * Divide to integer
- *
- * Returns the integer result of dividing `dividend` by `divisor` using
- * truncated (round 'down') division.
- *
- * Note: The remainder can be found using `rem()`, or better yet use `divRem()`.
- *
- * @see rem
- * @see divRem
- * @__PURE__
- */
-export function divInt(dividend: Numeric, divisor: Numeric): decimal {
-  const [quotient] = divRem(dividend, divisor)
-  return quotient
-}
-
-/**
- * Remainder
- *
- * Returns the remainder of dividing `dividend` by `divisor` using truncated
- * (round 'down') division by default. The result always has the same sign as
- * the first argument (or 0).
- *
- * Note: `rem()` and `div()` use different default division rounding rules and
- * should not be used together. The quotient can be found using `divInt()`, or
- * better yet use `divRem()`.
- *
- * @equivalent dividend % divisor
- * @see divInt
- * @see divRem
- * @__PURE__
- */
-export function rem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
-  const [, remainder] = divRem(dividend, divisor, rules)
-  return remainder
-}
-
-/**
- * Modulo
- *
- * Returns the modulo of dividing a by b using floored (round 'floor') division.
- * The result always has the same sign as the second argument (or 0).
- *
- * Note: this is not the same as the % (remainder) operator. Use `rem()` for an
- * equivalent to `%`.
- *
- * @equivalent ((a % b) + b) % b
- * @see rem
- * @__PURE__
- */
-export function mod(a: Numeric, b: Numeric): decimal {
-  return rem(a, b, { mode: ROUND_FLOOR })
 }
 
 /**
@@ -347,8 +318,8 @@ export function mod(a: Numeric, b: Numeric): decimal {
  * @__PURE__
  */
 export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): [quotient: decimal, remainder: decimal] {
-  const [signA, significandA, exponentA, precisionA] = toRepresentation(dividend)
-  const [signB, significandB, exponentB, precisionB] = toRepresentation(divisor)
+  const [signA, significandA, exponentA, precisionA] = deconstruct(dividend)
+  const [signB, significandB, exponentB, precisionB] = deconstruct(divisor)
   rules = normalizeRules(rules, 0, ROUND_DOWN)
 
   // The resulting exponent of a division is the difference between the
@@ -436,8 +407,8 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
 
   // Determine the quotient and remainder from the resulting digits.
   let remainderSignificand = remainderDigits.join('')
-  let quotient = fromRepresentation(sign, quotientSignificand, exponent)
-  let remainder = fromRepresentation(signA, remainderSignificand, exponentA)
+  let quotient = construct(sign, quotientSignificand, exponent)
+  let remainder = construct(signA, remainderSignificand, exponentA)
 
   // If there is a remainder, consider the provided rounding rule.
   if (remainder !== '0') {
@@ -473,8 +444,8 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
       // In order to "round up" the absolute value of the quotient, add 1 to the
       // least significant digit. Then subtract one additional dividend from the
       // remainder at the same exponent.
-      quotient = add(quotient, fromRepresentation(sign, '1', exponent - place + 1))
-      remainder = sub(remainder, fromRepresentation(signA, significandB, exponentA - place + 1))
+      quotient = add(quotient, construct(sign, '1', exponent - place + 1))
+      remainder = sub(remainder, construct(signA, significandB, exponentA - place + 1))
     }
   }
 
@@ -482,7 +453,62 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
 }
 
 /**
- * Power
+ * Divide to integer
+ *
+ * Returns the integer result of dividing `dividend` by `divisor` using
+ * truncated (round 'down') division by default.
+ *
+ * Note: The remainder can be found using `rem()`, or better yet use `divRem()`.
+ *
+ * @see rem
+ * @see divRem
+ * @__PURE__
+ */
+export function divInt(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
+  const [quotient] = divRem(dividend, divisor, rules)
+  return quotient
+}
+
+/**
+ * Remainder
+ *
+ * Returns the remainder of dividing `dividend` by `divisor` using truncated
+ * (round 'down') division by default. The result always has the same sign as
+ * the first argument (or 0).
+ *
+ * Note: `rem()` and `div()` use different default division rounding rules and
+ * should not be used together. The quotient can be found using `divInt()`, or
+ * better yet use `divRem()`.
+ *
+ * @equivalent dividend % divisor
+ * @see divInt
+ * @see divRem
+ * @__PURE__
+ */
+export function rem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
+  const [, remainder] = divRem(dividend, divisor, rules)
+  return remainder
+}
+
+/**
+ * Modulo
+ *
+ * Returns the modulo of dividing a by b using floored (round 'floor') division.
+ * The result always has the same sign as the second argument (or 0).
+ *
+ * Note: this is not the same as the % (remainder) operator. Use `rem()` for an
+ * equivalent to `%`.
+ *
+ * @equivalent ((a % b) + b) % b
+ * @see rem
+ * @__PURE__
+ */
+export function mod(a: Numeric, b: Numeric): decimal {
+  return rem(a, b, { mode: ROUND_FLOOR })
+}
+
+/**
+ * Power (Exponent)
  *
  * Raises `base` to the power `exponent`, where `exponent` must be a positive
  * whole number.
@@ -527,7 +553,7 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
  * @__PURE__
  */
 export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
-  let [sign, significand, exponent, precision] = toRepresentation(value)
+  let [sign, significand, exponent, precision] = deconstruct(value)
 
   // Negative number
   if (sign < 0) {
@@ -545,15 +571,15 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
     // that the result is independent of original value's exponent as long as it
     // is the same parity.
     const estimate = Math.sqrt(+(significand + (precision + exponent & 1 ? '' : '0')))
-    significand = (estimate == 1 / 0 ? '5' : toRepresentation(estimate)[1]).slice(0, iterationPrecision)
-    result = fromRepresentation(1, significand, ((exponent + 1) / 2 | 0) - +(exponent < 0 || exponent & 1))
+    significand = (estimate == 1 / 0 ? '5' : deconstruct(estimate)[1]).slice(0, iterationPrecision)
+    result = construct(1, significand, ((exponent + 1) / 2 | 0) - +(exponent < 0 || exponent & 1))
 
     // Use Newton's method to generate and confirm additional precision.
     let prevSignificand = significand
     do {
       result = mul(0.5, add(result, div(value, result, { precision: iterationPrecision + 4 })))
       prevSignificand = significand
-      significand = toRepresentation(result)[1].slice(0, iterationPrecision)
+      significand = deconstruct(result)[1].slice(0, iterationPrecision)
     } while (prevSignificand !== significand)
   }
 
@@ -562,7 +588,7 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
 }
 
 
-// Comparisons
+// Comparison
 
 /**
  * Equals
@@ -636,8 +662,8 @@ export function lte(a: Numeric, b: Numeric): boolean {
  * @__PURE__
  */
 export function cmp(a: Numeric, b: Numeric): 1 | -1 | 0 {
-  const [signA, significandA, exponentA, precisionA] = toRepresentation(a)
-  const [signB, significandB, exponentB, precisionB] = toRepresentation(b)
+  const [signA, significandA, exponentA, precisionA] = deconstruct(a)
+  const [signB, significandB, exponentB, precisionB] = deconstruct(b)
 
   return (
     // If a is zero, return the opposite of b's sign.
@@ -663,47 +689,6 @@ export function cmp(a: Numeric, b: Numeric): 1 | -1 | 0 {
   return precisionA === precisionB ? 0 : precisionA > precisionB ? 1 : -1
 }
 
-/**
- * Maximum
- *
- * Returns the maximum of the provided values as a decimal.
- *
- * @equivalent Math.max(...values)
- * @__PURE__
- */
-export function max(...values: Numeric[]): decimal
-export function max(): decimal {
-  return extremum(arguments, 1)
-}
-
-/**
- * Minimum
- *
- * Returns the minimum of the provided values as a decimal.
- *
- * @equivalent Math.min(...values)
- * @__PURE__
- */
-export function min(...values: Numeric[]): decimal
-export function min(): decimal {
-  return extremum(arguments, -1)
-}
-
-/**
- * @internal
- * @__PURE__
- */
-function extremum(values: IArguments, direction: number): decimal {
-  let value = decimal(values[0])
-  for (let i = 1; i < values.length; i++) {
-    let arg = decimal(values[i])
-    if (cmp(arg, value) === direction) {
-      value = arg
-    }
-  }
-  return value
-}
-
 
 // Magnitude
 
@@ -716,8 +701,8 @@ function extremum(values: IArguments, direction: number): decimal {
  * @__PURE__
  */
 export function abs(value: Numeric): decimal {
-  const [, significand, exponent] = toRepresentation(value)
-  return fromRepresentation(1, significand, exponent)
+  const [, significand, exponent] = deconstruct(value)
+  return construct(1, significand, exponent)
 }
 
 /**
@@ -729,8 +714,8 @@ export function abs(value: Numeric): decimal {
  * @__PURE__
  */
 export function neg(value: Numeric): decimal {
-  const [sign, significand, exponent] = toRepresentation(value)
-  return fromRepresentation(-sign as Sign, significand, exponent)
+  const [sign, significand, exponent] = deconstruct(value)
+  return construct(-sign as Sign, significand, exponent)
 }
 
 /**
@@ -745,7 +730,7 @@ export function neg(value: Numeric): decimal {
  * @__PURE__
  */
 export function sign(value: Numeric): 1 | -1 | 0 {
-  const [sign] = toRepresentation(value)
+  const [sign] = deconstruct(value)
   return sign
 }
 
@@ -757,7 +742,7 @@ export function sign(value: Numeric): 1 | -1 | 0 {
  * @__PURE__
  */
 export function places(value: Numeric): number {
-  const [,, exponent, precision] = toRepresentation(value)
+  const [,, exponent, precision] = deconstruct(value)
   const places = precision - exponent - 1
   return places > 0 ? places : 0
 }
@@ -770,7 +755,7 @@ export function places(value: Numeric): number {
  * @__PURE__
  */
 export function precision(value: Numeric): number {
-  const [,,, precision] = toRepresentation(value)
+  const [,,, precision] = deconstruct(value)
   return precision
 }
 
@@ -783,7 +768,7 @@ export function precision(value: Numeric): number {
  * @__PURE__
  */
  export function exponent(value: Numeric): number {
-  const [,, exponent] = toRepresentation(value)
+  const [,, exponent] = deconstruct(value)
   return exponent
 }
 
@@ -799,8 +784,8 @@ export function precision(value: Numeric): number {
  * @__PURE__
  */
 export function scale(value: Numeric, power: Numeric): decimal {
-  const [sign, significand, exponent] = toRepresentation(value)
-  return fromRepresentation(sign, significand, exponent + wholeNumber('power', power))
+  const [sign, significand, exponent] = deconstruct(value)
+  return construct(sign, significand, exponent + wholeNumber('power', power))
 }
 
 
@@ -842,14 +827,14 @@ export function scale(value: Numeric, power: Numeric): decimal {
  */
 export function round(value: Numeric, rules?: RoundingRules): decimal {
   const roundingRules = normalizeRules(rules, 0, ROUND_HALF_CEIL)
-  let [sign, significand, exponent, precision] = toRepresentation(value)
+  let [sign, significand, exponent, precision] = deconstruct(value)
 
   // Determine the desired rounding mode and precision.
   let roundingMode = roundingRules[MODE]
   let roundingPrecision = getRoundingPrecision(roundingRules, exponent)
 
   // Start the rounded value as a truncated value to the desired precision.
-  let rounded = fromRepresentation(sign, roundingPrecision > 0 ? significand.slice(0, roundingPrecision) : '', exponent)
+  let rounded = construct(sign, roundingPrecision > 0 ? significand.slice(0, roundingPrecision) : '', exponent)
 
   // Only round if the rounded precision is less than the original precision.
   if (precision > roundingPrecision) {
@@ -876,57 +861,11 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
       roundingMode === ROUND_UP && sign
     ) {
       // Round up by adding one to the the least significant digit of the absolute value
-      rounded = add(rounded, fromRepresentation(sign, '1', exponent - roundingPrecision + 1))
+      rounded = add(rounded, construct(sign, '1', exponent - roundingPrecision + 1))
     }
   }
 
   return rounded
-}
-
-/**
- * Floor
- *
- * Rounds down to the nearest whole number in the direction of -Infinity.
- *
- * Note: Equivalent to `round(value, { mode: 'floor' })`
- *
- * @equivalent Math.floor(value)
- * @see round
- * @__PURE__
- */
-export function floor(value: Numeric): decimal {
-  return round(value, { mode: ROUND_FLOOR })
-}
-
-/**
- * Ceiling
- *
- * Rounds up to the nearest whole number in the direction of Infinity.
- *
- * Note: Equivalent to `round(value, { mode: 'ceil' })`
- *
- * @equivalent Math.ceil(value)
- * @see round
- * @__PURE__
- */
-export function ceil(value: Numeric): decimal {
-  return round(value, { mode: ROUND_CEIL })
-}
-
-/**
- * Truncate
- *
- * Returns the integer part of a number by rounding to the nearest whole number
- * in the direction of 0.
- *
- * Note: Equivalent to `round(value, { mode: 'down' })`
- *
- * @equivalent Math.trunc(value)
- * @see round
- * @__PURE__
- */
-export function trunc(value: Numeric): decimal {
-  return round(value, { mode: ROUND_DOWN })
 }
 
 export type RoundingRules =
@@ -1023,6 +962,105 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
     toNumber(rules[PLACES] || 0) + exponent + 1
 }
 
+/**
+ * Floor
+ *
+ * Rounds down to the nearest whole number in the direction of -Infinity.
+ *
+ * Note: Equivalent to `round(value, { mode: 'floor' })`
+ *
+ * @equivalent Math.floor(value)
+ * @see round
+ * @__PURE__
+ */
+export function floor(value: Numeric): decimal {
+  return round(value, { mode: ROUND_FLOOR })
+}
+
+/**
+ * Ceiling
+ *
+ * Rounds up to the nearest whole number in the direction of Infinity.
+ *
+ * Note: Equivalent to `round(value, { mode: 'ceil' })`
+ *
+ * @equivalent Math.ceil(value)
+ * @see round
+ * @__PURE__
+ */
+export function ceil(value: Numeric): decimal {
+  return round(value, { mode: ROUND_CEIL })
+}
+
+/**
+ * Truncate
+ *
+ * Returns the integer part of a number by rounding to the nearest whole number
+ * in the direction of 0.
+ *
+ * Note: Equivalent to `round(value, { mode: 'down' })`
+ *
+ * @equivalent Math.trunc(value)
+ * @see round
+ * @__PURE__
+ */
+export function trunc(value: Numeric): decimal {
+  return round(value, { mode: ROUND_DOWN })
+}
+
+/**
+ * Maximum
+ *
+ * Returns the maximum of the provided values as a decimal.
+ *
+ * @equivalent Math.max(...values)
+ * @__PURE__
+ */
+export function max(...values: Numeric[]): decimal
+export function max(): decimal {
+  return extremum(arguments, 1)
+}
+
+/**
+ * Minimum
+ *
+ * Returns the minimum of the provided values as a decimal.
+ *
+ * @equivalent Math.min(...values)
+ * @__PURE__
+ */
+export function min(...values: Numeric[]): decimal
+export function min(): decimal {
+  return extremum(arguments, -1)
+}
+
+/**
+ * @internal
+ * @__PURE__
+ */
+ function extremum(values: IArguments, direction: number): decimal {
+  let value = decimal(values[0])
+  for (let i = 1; i < values.length; i++) {
+    let arg = decimal(values[i])
+    if (cmp(arg, value) === direction) {
+      value = arg
+    }
+  }
+  return value
+}
+
+/**
+ * Constrain
+ *
+ * Constrains `value` between `low` and `high` values.
+ *
+ * @equivalent value < low ? low : value > high : high : value
+ * @__PURE__
+ */
+export function clamp(value: Numeric, low: Numeric, high: Numeric): decimal {
+  return min(high, max(low, value))
+}
+
 
 // Conversions
 
@@ -1037,15 +1075,13 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
  * @__PURE__
  */
 export function toNumber(value: Numeric, options?: { inexact: boolean }): number {
-  if (typeof value !== 'number') {
-    const canonical = decimal(value)
-    value = +canonical
-    // Unless `inexact` has been explicitly set, check to ensure the number
-    // conversion has not lost information by converting it back to a canonical
-    // decimal and comparing it to the original.
-    if (!(options && options.inexact) && decimal(value) !== canonical) {
-      error(`Inexact conversion from ${canonical} to ${value}`)
-    }
+  const canonical = decimal(value)
+  value = +canonical
+  // Unless `inexact` has been explicitly set, check to ensure the number
+  // conversion has not lost information by converting it back to a canonical
+  // decimal and comparing it to the original.
+  if (!(options && options.inexact) && decimal(value) !== canonical) {
+    error(`Inexact conversion from ${canonical} to ${value}`)
   }
   return value
 }
@@ -1101,7 +1137,7 @@ export function toExponential(value: Numeric, rules?: RoundingRules): NumericStr
  * @__PURE__
  */
 function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules): NumericString {
-  const [sign, significand, exponent, precision] = toRepresentation(rules ? round(value, rules) : value)
+  const [sign, significand, exponent, precision] = deconstruct(rules ? round(value, rules) : value)
   const printPrecision = rules ? getRoundingPrecision(rules, exponent) : precision
   const decimalPart = print(sign, significand, precision, printPrecision, asExponential ? 1 : exponent + 1)
   const exponentialPart = asExponential ? (exponent < 0 ? 'e' : 'e+') + exponent : ''
@@ -1143,12 +1179,12 @@ function print(
 }
 
 
-// Normalized representation
+// Internal representation
 
 const decimalRegex = /^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
 
 /**
- * Normalized Representation
+ * Deconstruct to normalized internal representation
  *
  * Given a numeric value, return a normalized representation of a decimal:
  * a [significand, exponent, sign, precision] tuple.
@@ -1162,12 +1198,14 @@ const decimalRegex = /^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
  *  - `significand`: A string of significant digits expressed in scientific
  *    notation, where the first digit is the ones place, or an empty string for 0.
  *  - `exponent`: The power of ten the significand is multiplied by, or 0 for 0.
- *  - `precision`: The number of digits found in significand (e.g. number of significant digits).
+ *  - `precision`: The number of digits found in significand (e.g. number of
+ *    significant digits). Yes this is redundant information with the length of
+ *    `significand` but it is convenient to access directly.
  *
  * @example toRepresentation('-1.23e4') returns [-1, '123', 4, 3]
  * @__PURE__
  */
-export function toRepresentation(value: unknown): DecimalRepresentation {
+export function deconstruct(value: unknown): DecimalRepresentation {
   const match = decimalRegex.exec(''+value)
   if (!match) error(`Cannot represent: ${value}`)
   let [, sign, integer, fractional, exponent] = match
@@ -1185,13 +1223,13 @@ type DecimalRepresentation = readonly [sign: Sign, significand: string, exponent
 type Sign = 1 | -1 | 0
 
 /**
- * Canonical from Representation
+ * Construct a decimal from an internal representation
  *
  * Given a decimal's decomposed representation, return a canonical decimal value.
  *
  * @__PURE__
  */
-export function fromRepresentation(sign: Sign, significand: string, exponent: number): decimal {
+export function construct(sign: Sign, significand: string, exponent: number): decimal {
   let precision
   [sign, significand, exponent, precision] = normalizeRepresentation(sign, significand, exponent)
   return print(sign, significand, precision, precision, exponent + 1) as decimal
