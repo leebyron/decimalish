@@ -18,15 +18,65 @@
       </nav>
       <div id="split-flap"></div>
     </header>
-    <section id="faq">
+    <section id="intro">
+      <div class="two-col">
+        <p>
+          <a href="#intro" class="subtle"><strong>Decimalish</strong></a> is an
+          arbitrary-precision decimal number <em>(or &ldquo;BigNumber&rdquo;)</em>
+          library for JavaScript and TypeScript. How is this different from
+          regular numbers and why would you need such a thing?
+        </p>
+        <p>
+          Consider this surprising fact about regular JavaScript numbers:
+          <code>0.1 + 0.2 != 0.3</code>. This isn&apos;t yet another JavaScript
+          quirk, but an unfortunate pitfall of nearly all numbers represented by
+          computers (floating point numbers).
+        </p>
+        <p>
+          While we read and write numbers in decimal, computers do so
+          in binary and must convert back and forth. The trouble is when doing
+          so with a fixed number of bits, information can be lost along the way
+          and yield confusing results. In some areas like finance or engineering
+          these errors are simply unacceptable.
+        </p>
+        <p>
+          Decimalish addresses exactly this concern. It removes the need to
+          convert by directly representing numbers in decimal.
+        </p>
+        <p>
+          It's also unconstrained by size so it can represent exact numbers with
+          arbitrarily high precision (significant digits or decimal places).
+        </p>
+        <p>
+          <strong>So what’s the catch?</strong> Well speed for one, computers
+          are specifically designed to make working with floating point numbers
+          fast. While nowhere close to native speed, decimalish is unlikely to
+          be your program’s bottleneck.
+        </p>
+        <p>
+          Then there's how you use them. While regular numbers can use the
+          familiar operators (<code>+</code>, <code>*</code>, <code>&equals;</code>),
+          decimalish cannot and offers equivalent functions in their place
+          (<code>add</code>, <code>mul</code>, <code>eq</code>).
+        </p>
+        <p>
+          Finally there's how they’re represented. Like regular numbers,
+          decimalish offers an <em>immutable primitive</em>. However …it’s a
+          string… hence the <strong>&ndash;ish</strong>. Decimalish decimals
+          are a specific format of <a href="#NumericString">numeric string</a>.
+          While this has its advantages, ideally decimal could be its own
+          primitive; but that’s just not JavaScript.
+        </p>
+      </div>
+    </section>
+    <section id="api" style="background:#c2ffdb;">
       <div>
-      <h2><a href="#id">API</a></h2>
+      <h2><a href="#api">API</a></h2>
 
-      <grid>
-
+      <div class="api-toc">
         <div>
           <h3>Types</h3>
-          <ul class="api">
+          <ul>
             <li><a href="#decimal">Decimal <pre>decimal</pre></a></li>
             <li><a href="#decimal()">Convert to decimal <pre>decimal()</pre></a></li>
             <li><a href="#isDecimal()">Decimal? <pre>isDecimal()</pre></a></li>
@@ -39,7 +89,7 @@
 
         <div>
           <h3>Arithmetic</h3>
-          <ul class="api">
+          <ul>
             <li><a href="#add()">Add (Plus) <pre>add()</pre></a></li>
             <li><a href="#sub()">Subtract (Minus) <pre>sub()</pre></a></li>
             <li><a href="#mul()">Multiply (Times) <pre>mul()</pre></a></li>
@@ -55,7 +105,7 @@
 
         <div>
           <h3>Comparison</h3>
-          <ul class="api">
+          <ul>
             <li><a href="#eq()">Equals (=) <pre>eq()</pre></a></li>
             <li><a href="#gt()">Greater than (>) <pre>gt()</pre></a></li>
             <li><a href="#gte()">Greater than or equals (>=) <pre>gte()</pre></a></li>
@@ -67,7 +117,7 @@
 
         <div>
           <h3>Magnitude</h3>
-          <ul class="api">
+          <ul>
             <li><a href="#abs()">Absolute value <pre>abs()</pre></a></li>
             <li><a href="#neg()">Negate <pre>neg()</pre></a></li>
             <li><a href="#sign()">Sign <pre>sign()</pre></a></li>
@@ -80,7 +130,7 @@
 
         <div>
           <h3>Rounding</h3>
-          <ul class="api">
+          <ul>
             <li><a href="#round()">Round <pre>round()</pre></a></li>
             <li><a href="#floor()">Floor <pre>floor()</pre></a></li>
             <li><a href="#ceil()">Ceiling <pre>ceil()</pre></a></li>
@@ -88,32 +138,40 @@
             <li><a href="#max()">Maximum <pre>max()</pre></a></li>
             <li><a href="#min()">Minimum <pre>min()</pre></a></li>
             <li><a href="#clamp()">Constrain <pre>clamp()</pre></a></li>
-            <li><a href="#RoundingRules">Configure rounding <pre>RoundingRules</pre></a></li>
+            <li><a href="#RoundingRules">Configuration <pre>RoundingRules</pre></a></li>
           </ul>
         </div>
 
         <div>
           <h3>Conversion</h3>
-          <ul class="api">
-            <li><a href="#toNumber()">Convert to number <pre>toNumber()</pre></a></li>
-            <li><a href="#toString()">Convert to string <pre>toString()</pre></a></li>
+          <ul>
+            <li><a href="#toNumber()">Numeric → number <pre>toNumber()</pre></a></li>
+            <li><a href="#toString()">Numeric → string <pre>toString()</pre></a></li>
             <li><a href="#toFixed()">Fixed format <pre>toFixed()</pre></a></li>
             <li><a href="#toExponential()">Scientific notation <pre>toExponential()</pre></a></li>
-            <li><a href="#deconstruct()">Decimal → elements <pre>deconstruct()</pre></a></li>
-            <li><a href="#construct()">Elements → decimal <pre>construct()</pre></a></li>
+            <li><a href="#deconstruct()">Decimal → Elements <pre>deconstruct()</pre></a></li>
+            <li><a href="#construct()">Elements → Decimal <pre>construct()</pre></a></li>
           </ul>
         </div>
+      </div>
 
-      </grid>
-
-      <h3>Add (Plus)</h3>
-
-
-      <pre>add()</pre>
-
-      <h2><a href="#id">FAQ</a></h2>
-      Who knows
-    </div>
+    </section>
+    <section>
+      <div>
+        <h3>Add (Plus)</h3>
+        <pre>add(a: <a href="#Numeric">Numeric</a>, b: <a href="#Numeric">Numeric</a>): <a href="#decimal">decimal</a></pre>
+      </div>
+    </section>
+    <section id="errors">
+      <div>
+        <h2><a href="#errors">Errors</a></h2>
+      </div>
+    </section>
+    <section id="faq">
+      <div>
+        <h2><a href="#faq">FAQ</a></h2>
+        Who knows
+      </div>
     </section>
     <footer>
       <div>

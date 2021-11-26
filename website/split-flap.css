@@ -4,7 +4,8 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
-  max-width: var(--max-width);
+  /* Overhang to align letters if space allows */
+  max-width: calc(var(--max-width)/(1 - 0.026 * 2));
 }
 
 .sf-cell {
