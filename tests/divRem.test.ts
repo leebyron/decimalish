@@ -3,11 +3,10 @@ import { divRem } from '../decimalish'
 describe('divRem', () => {
 
   it('throws for divide by zero', () => {
-    expect(() => divRem(1, 0)).toThrow('[decimalish] Divide by 0')
-    expect(() => divRem(123, 123, { places: 0.5 })).toThrow('[decimalish] places must be a whole number')
-    expect(() => divRem(123, 123, { precision: 0.5 })).toThrow('[decimalish] precision must be a whole number')
-    // @ts-expect-error
-    expect(() => divRem(123, 123, { precision: 1, places: 1 })).toThrow('[decimalish] Cannot provide both precision and places')
+    expect(() => divRem(1, 0)).toThrow('https://decimali.sh/#DIV_ZERO 1/0')
+    expect(() => divRem(123, 123, { places: 0.5 })).toThrow('https://decimali.sh/#NOT_INT places: 0.5')
+    expect(() => divRem(123, 123, { precision: 0.5 })).toThrow('https://decimali.sh/#NOT_INT precision: 0.5')
+    expect(() => divRem(123, 123, { precision: 1, places: 1 })).toThrow('https://decimali.sh/#NOT_BOTH places: 1, precision: 1')
   })
 
   it('returns 0 when 0 is divided', () => {

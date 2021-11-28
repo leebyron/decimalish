@@ -3,11 +3,11 @@ import { div } from '../decimalish'
 describe('div', () => {
 
   it('throws for divide by zero', () => {
-    expect(() => div(1, 0)).toThrow('[decimalish] Divide by 0')
+    expect(() => div(1, 0)).toThrow('https://decimali.sh/#DIV_ZERO 1/0')
   })
 
   it('throws for inexact division', () => {
-    expect(() => div(1, 3, { mode: 'exact' })).toThrow('[decimalish] Inexact division of 1 / 3')
+    expect(() => div(1, 3, { mode: 'exact' })).toThrow('https://decimali.sh/#INEXACT 1/3')
   })
 
   it('specifies places', () => {

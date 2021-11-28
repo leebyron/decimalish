@@ -13,12 +13,14 @@ html {
 pre,
 code {
   font-family: "Roboto Mono", monospace;
+  white-space: pre-wrap;
 }
 
 :root {
   --header-color: #56585b;
   --text-color: #000000e0;
   --code-color: #000000c0;
+  --code-bg-color: #00000008;
   --underline-color: #2222224d;
   --link-highlight-color: rgb(248, 203, 0);
   --nav-size: 50px;
@@ -42,11 +44,16 @@ footer {
   --underline-color: #ffffff4d;
 }
 
+header,
+footer,
+section {
+  color: var(--text-color);
+}
+
 html,
 body,
 :root {
   background: var(--header-color);
-  color: var(--text-color);
   font-size: var(--font-size);
   letter-spacing: var(--letter-spacing);
   line-height: 1.6;
@@ -62,22 +69,21 @@ h1 {
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 1.414rem;
 }
 
 h3 {
   font-size: 1rem;
 }
 
-h1,
-h2,
-h3 {
-  margin: 0  0 1em;
-  --underline-color: transparent;
+h1:not(:last-child),
+h2:not(:last-child),
+h3:not(:last-child) {
+  margin-bottom: 1em;
 }
 
-.subtle {
-  --underline-color: transparent;
+h2 {
+  margin-bottom: calc(-1/2 * var(--gutter-size));
 }
 
 header {
@@ -91,7 +97,6 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--text-color);
 }
 
 header nav {
@@ -137,22 +142,32 @@ footer {
   padding: 20px;
   display: flex;
   justify-content: center;
-  color: var(--text-color);
 }
 
 p {
   margin-bottom: 1rem;
+  max-width: 40em;
 }
 
-p code {
-  background: rgb(0, 10, 30, 0.03);
-  border-radius: 0.2em;
-  padding: 0 0.2em;
-  margin: 0 -0.2em;
+pre, code {
   color: var(--code-color);
 }
 
+p code {
+  background: var(--code-bg-color);
+  border-radius: 0.2em;
+  padding: 0 0.2em;
+  margin: 0 -0.2em;
+  white-space: pre;
+}
+
 @property --underline-offset {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --underline-thickness {
   syntax: "<length>";
   inherits: false;
   initial-value: 0;
@@ -162,26 +177,30 @@ a {
   color: inherit;
   text-decoration: underline;
   text-decoration-color: var(--underline-color);
-  text-underline-offset: var(--underline-offset, 0.1em);
-  text-decoration-thickness: 0.1em;
-  transition: --underline-offset, text-decoration-color,
-    text-decoration-thickness;
+  text-underline-offset: var(--underline-offset);
+  text-decoration-thickness: var(--underline-thickness);
+  transition: text-decoration-color, --underline-offset, --underline-thickness;
   transition-duration: 0.2s;
 }
 
+section:not(:target) > :first-child > :first-child > a:first-child {
+  text-decoration-color: transparent;
+}
+
+section:target > :first-child > :first-child > a:first-child,
 a:hover {
   --underline-offset: 0.15em;
+  --underline-thickness: 0.2em;
+}
+
+section > :first-child > :first-child > a:first-child:hover,
+a:hover {
   text-decoration-color: var(--link-highlight-color);
-  text-decoration-thickness: 0.2em;
 }
 
 @supports not (background: paint(something)) {
   a {
     transition: text-underline-offset, text-decoration-color, text-decoration-thickness;
-  }
-
-  a:hover {
-    text-underline-offset: 0.15em;
   }
 }
 
@@ -193,24 +212,76 @@ a:hover {
   }
 }
 
-.api-toc {
+/* Section specific */
+
+#intro h3 {
+  position: absolute;
+}
+
+#intro p:first-child:before {
+  content: 'Decimalish';
+  visibility: hidden;
+}
+
+.api-toc-sec {
+  background: #c2ffdb;
+}
+
+.api-toc-sec > div > div {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--small-col-width), 1fr));
   gap: var(--column-gap);
-  --underline-color: transparent;
 }
 
-.api-toc ul {
+.api-toc-sec ul {
   list-style: none;
 }
 
-.api-toc a {
+.api-toc-sec li a {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  --underline-color: transparent;
 }
 
-.api-toc pre {
-  color: var(--code-color);
+.api-toc-sec pre {
   margin-left: 1.5em;
+}
+
+.api pre {
+  margin-bottom: 1em;
+}
+
+.api.member {
+  margin-top: calc(-1 * var(--gutter-size));
+}
+
+.api.error {
+  background: #cd3b00;
+  --text-color: #fff;
+  --code-color: #ffffffc0;
+  --code-bg-color: #ffffff08;
+  --underline-color: #ffffff4d;
+}
+
+@media (min-width: 700px) {
+  .api > div {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--column-gap);
+  }
+
+  .api > div > :last-child {
+    grid-column: span 3;
+  }
+
+  .api.member > div > :first-child {
+    text-align: right;
+  }
+}
+
+@media not all and (min-width: 700px) {
+  .api.member {
+    padding-left: calc(2 * var(--gutter-size));
+  }
 }

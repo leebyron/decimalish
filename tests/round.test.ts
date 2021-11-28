@@ -4,13 +4,12 @@ describe('round', () => {
 
   it('throws on bad input', () => {
     // @ts-expect-error 'abc' is not Numeric
-    expect(() => round('abc')).toThrow('[decimalish] Cannot represent: abc')
-    expect(() => round('123', { places: 0.5 })).toThrow('[decimalish] places must be a whole number')
-    expect(() => round('123', { precision: 0.5 })).toThrow('[decimalish] precision must be a whole number')
-    // @ts-expect-error cannot provide both.
-    expect(() => round('123', { precision: 1, places: 1 })).toThrow('[decimalish] Cannot provide both precision and places')
+    expect(() => round('abc')).toThrow('https://decimali.sh/#NOT_NUM abc')
+    expect(() => round('123', { places: 0.5 })).toThrow('https://decimali.sh/#NOT_INT places: 0.5')
+    expect(() => round('123', { precision: 0.5 })).toThrow('https://decimali.sh/#NOT_INT precision: 0.5')
+    expect(() => round('123', { precision: 1, places: 1 })).toThrow('https://decimali.sh/#NOT_BOTH places: 1, precision: 1')
     // @ts-expect-error 'sideways' is not a valid mode.
-    expect(() => round('123', { mode: 'sideways' })).toThrow('[decimalish] Unknown rounding mode: sideways')
+    expect(() => round('123', { mode: 'sideways' })).toThrow('https://decimali.sh/#NOT_MODE sideways')
   })
 
   it('rounds with defaults similar to Math.round()', () => {
@@ -185,7 +184,7 @@ describe('round', () => {
 
     // exact
     expect(round(1, { mode: 'exact' })).toBe('1')
-    expect(() => round(0.5, { mode: 'exact' })).toThrow('[decimalish] Inexact rounding of 0.5')
+    expect(() => round(0.5, { mode: 'exact' })).toThrow('https://decimali.sh/#INEXACT round(0.5)')
     expect(round(0, { mode: 'exact' })).toBe('0')
   })
 

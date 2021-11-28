@@ -3,7 +3,7 @@ import { Numeric, sqrt } from '../decimalish'
 describe('sqrt', () => {
 
   it('Does not allow negative numbers', () => {
-    expect(() => sqrt(-1)).toThrow('[decimalish] Square root of negative')
+    expect(() => sqrt(-1)).toThrow('https://decimali.sh/#SQRT_NEG -1')
   })
 
   it('Supports sqrt of 0', () => {
