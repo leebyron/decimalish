@@ -3,6 +3,8 @@ on: push
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      TERM: dumb
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
