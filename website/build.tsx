@@ -1,8 +1,8 @@
 /**
  * TODO:
  *
- * Markdown in text?
- * Better highlight colors (and use css vars)
+ * Markdown links, code coloring, example coloring
+ * Dark mode?
  * share opengraph
  *
  */
@@ -11,6 +11,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import * as ts from 'typescript'
 import * as jsx from 'hyperjsx'
+import { compiler } from 'markdown-to-jsx'
 
 const ROOT_DIR = __dirname + '/'
 const OTHER_CATEGORY = 'Et cetera'
@@ -253,13 +254,18 @@ const APISection = () =>
     )}
   </>
 
+const Markdown = ({ children }: { children: string | undefined }) => {
+  if (!children) return null
+  return compiler(children, { wrapper: null, createElement: jsx.h as any })
+}
+
 const APIItemSection = ({ item }: { item: Typedef }) =>
   <section id={item.id} class={{ api: true, error: item.name === 'ErrorCode' }}>
     <div>
       <h3><a href={'#' + item.id}>{getJSDoc(item.decl)?.title}</a></h3>
       <div>
         <pre class="decl"><Source node={item.decl} /></pre>
-        <p>{getJSDoc(item.decl)?.comment}</p>
+        <Markdown>{getJSDoc(item.decl)?.comment}</Markdown>
       </div>
     </div>
     {ts.isInterfaceDeclaration(item.decl) &&
@@ -280,7 +286,7 @@ const TypeMemberSection = ({ member, id }: { member: ts.Node, id: string }) =>
       <div>
         <pre><Source node={member} /></pre>
         <h4><a href={'#' + id}>{getJSDoc(member)?.title}</a></h4>
-        <p>{getJSDoc(member)?.comment}</p>
+        <Markdown>{getJSDoc(member)?.comment}</Markdown>
       </div>
     </div>
   </section>

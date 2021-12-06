@@ -23,6 +23,13 @@ code {
   --code-bg-color: #00000008;
   --underline-color: #2222224d;
   --link-highlight-color: #ffca00;
+  --decl-color: #00000066;
+  --keyword-color: #e10028;
+  --fn-color: #9300ff;
+  --type-color: #0155f3;
+  --param-color: #d100ac;
+  --prop-color: #d95b00;
+  --literal-color: #f0a000;
   --nav-size: 50px;
   --small-col-width: 285px;
   --gutter-size: 2.5rem;
@@ -285,6 +292,9 @@ a:hover {
   --code-color: #ffffffc0;
   --code-bg-color: #ffffff08;
   --underline-color: #ffffff4d;
+  --keyword-color: #ffffffa0;
+  --type-color: #ffffff;
+  --literal-color: #ffe014;
 }
 
 section.odd {
@@ -315,41 +325,29 @@ section.odd {
 }
 
 .decl {
-  color: #00000080;
+  color: var(--decl-color);
 }
 
 .fn {
-  color: #c32474;
+  color: var(--fn-color);
 }
 
 .param {
-  color: #c34900;
+  color: var(--param-color);
 }
 
 .prop {
-  color: rgb(173, 128, 2);
+  color: var(--prop-color);
 }
 
 .type {
-  color: rgb(0, 88, 139);
+  color: var(--type-color);
 }
 
 .literal {
-  color: rgb(107, 0, 139);
+  color: var(--literal-color);
 }
 
 .keyword {
-  color: #cf012f
-}
-
-.error .keyword {
-  color: #ffffffa0;
-}
-
-.error .type {
-  color: #ffffff;
-}
-
-.error .literal {
-  color: #ffdb0f;
+  color: var(--keyword-color);
 }
