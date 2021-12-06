@@ -4,6 +4,7 @@
  * Markdown in text?
  * Better highlight colors (and use css vars)
  * interface properties
+ * favicon
  *
  */
 
@@ -129,6 +130,9 @@ const Index = () =>
       </title>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+      <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+      <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
       <style innerHTML={fs.readFileSync(ROOT_DIR + 'style.css', 'utf8')} />
       <script innerHTML={fs.readFileSync(path.resolve(ROOT_DIR, '../dist/decimalish.min.js'), 'utf8')} />
     </head>
@@ -340,3 +344,8 @@ const FAQSection = () =>
 const typeDefs = getTypedefByCategory()
 const page = <TypedefsContext value={typeDefs}><Index /></TypedefsContext>
 fs.writeFileSync(ROOT_DIR + 'dist/index.html', jsx.render(page), 'utf8')
+console.log(
+  path.relative(process.cwd(), path.resolve(ROOT_DIR, '../decimalish.tsx')) +
+  ' → ' +
+  path.relative(process.cwd(), ROOT_DIR + 'dist/index.html')
+)

@@ -32,7 +32,7 @@
     "test:typecheck": "tsc",
     "test:unit": "jest",
     "build": "npm-run-all --silent -sl build:clean -p build:files:* -s build:size-report",
-    "build:clean": "rm -vrf dist; mkdir -v dist",
+    "build:clean": "rm -vrf dist && mkdir -v dist",
     "build:files": "run-p -sl build:files:*",
     "build:files:copy": "cp -v LICENSE README.md dist/",
     "build:files:package": "node -e \"var o={},p=require('./package.json'),k;for(k in p){if(k==='private')break;o[k]=p[k]}console.log(JSON.stringify(o,null,2))\" > dist/package.json && echo 'package.json -> dist/package.json'",
@@ -45,9 +45,11 @@
     "integration": "run-p -sl integration:*",
     "integration:es3": "es-check es3 dist/decimalish.js dist/decimalish.min.js",
     "integration:webpack": "cd tests/webpack-tree-shaking && run-s -sl test:*",
-    "website:start": "npm run website:clean; npm run website:build; chokidar \"website/*\" -c \"npm run website:build\"",
-    "website:clean": "rm -rf website/dist",
-    "website:build": "mkdir -p website/dist; ts-node website/build.tsx"
+    "website:build": "run-s -sl website:build:*",
+    "website:build:clean": "rm -vrf website/dist && mkdir -v website/dist",
+    "website:build:static": "cp -v website/static/* website/dist",
+    "website:build:index": "ts-node website/build.tsx",
+    "website:dev": "npm run website:build && chokidar \"decimalish.ts\" \"website/*\" -c \"npm run website:build:index\""
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.0",
