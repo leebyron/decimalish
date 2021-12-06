@@ -3,8 +3,7 @@
  *
  * Markdown in text?
  * Better highlight colors (and use css vars)
- * interface properties
- * favicon
+ * share opengraph
  *
  */
 
@@ -31,11 +30,11 @@ declare module 'typescript' {
 
 type Typedefs = { ids: TypedefsById, categories: TypedefsByCategory }
 
-type TypedefsById = { [id: string]: TypedefMember }
+type TypedefsById = { [id: string]: Typedef }
 
-type TypedefsByCategory = { [category: string]: TypedefMember[] }
+type TypedefsByCategory = { [category: string]: Typedef[] }
 
-type TypedefMember = {
+type Typedef = {
   id: string,
   name: string,
   isFunction: boolean,
@@ -249,40 +248,42 @@ const APISection = () =>
     {Object.entries(useTypedefs().categories).map(([category, members], index) =>
       <section class={{ odd: index % 2 !== 0 }}>
         <h2>{category}</h2>
-        {members.map(member => <APIItemSection member={member} />)}
+        {members.map(member => <APIItemSection item={member} />)}
       </section>
     )}
   </>
 
-const APIItemSection = ({ member }: { member: TypedefMember }) =>
-  <section id={member.id} class={{ api: true, error: member.name === 'ErrorCode' }}>
+const APIItemSection = ({ item }: { item: Typedef }) =>
+  <section id={item.id} class={{ api: true, error: item.name === 'ErrorCode' }}>
     <div>
-      <h3><a href={'#' + member.id}>{getJSDoc(member.decl)?.title}</a></h3>
+      <h3><a href={'#' + item.id}>{getJSDoc(item.decl)?.title}</a></h3>
       <div>
-        <pre class="decl"><Source node={member.decl} /></pre>
-        <p>{getJSDoc(member.decl)?.comment}</p>
+        <pre class="decl"><Source node={item.decl} /></pre>
+        <p>{getJSDoc(item.decl)?.comment}</p>
       </div>
     </div>
-    {ts.isTypeAliasDeclaration(member.decl) &&
-      ts.isUnionTypeNode(member.decl.type) &&
-      member.decl.type.types.every(type =>
+    {ts.isInterfaceDeclaration(item.decl) &&
+      item.decl.members.map(member =>
+        <TypeMemberSection member={member} id={member.name!.getText()} />)}
+    {ts.isTypeAliasDeclaration(item.decl) &&
+      ts.isUnionTypeNode(item.decl.type) &&
+      item.decl.type.types.every(type =>
         ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal)) &&
-      <StringEnumMembers type={member.decl.type} />}
+      item.decl.type.types.map(member =>
+        <TypeMemberSection member={member} id={member.getText().slice(1, -1)} />)}
   </section>
 
-const StringEnumMembers = ({ type }: { type: ts.UnionTypeNode }) =>
-  <>{type.types.map(member =>
-    <section id={member.getText().slice(1, -1)} class="api member">
+const TypeMemberSection = ({ member, id }: { member: ts.Node, id: string }) =>
+  <section id={id} class="api member">
+    <div>
+      <div/>
       <div>
-        <div/>
-        <div>
-          <pre class="literal">{member.getText()}</pre>
-          <h4><a href={'#' + member.getText().slice(1, -1)}>{getJSDoc(member)?.title}</a></h4>
-          <p>{getJSDoc(member)?.comment}</p>
-        </div>
+        <pre><Source node={member} /></pre>
+        <h4><a href={'#' + id}>{getJSDoc(member)?.title}</a></h4>
+        <p>{getJSDoc(member)?.comment}</p>
       </div>
-    </section>
-  )}</>
+    </div>
+  </section>
 
 const Source = ({ node }: { node: ts.Node }) =>
   ts.isTypeAliasDeclaration(node) ?
@@ -327,10 +328,14 @@ const Source = ({ node }: { node: ts.Node }) =>
     )}</> :
   ts.isTypeLiteralNode(node) ?
     <>{'{ '}{node.members.map((member, index) =>
-      <>{index > 0 && ', '}<span class="prop">{member.name!.getText()}</span>
-      {member.questionToken && '?'}{':\u00A0'}
-      {<Source node={member.type} />}</>
+      <>{index > 0 && ', '}<Source node={member} /></>
     )}{' }'}</> :
+  ts.isTypeElement(node) ?
+      <>
+        <span class="prop">{node.name!.getText()}</span>
+        {node.questionToken && '?'}{':\u00A0'}
+        {<Source node={node.type} />}
+      </> :
   (() => { throw new Error(`Unexpected ${ts.SyntaxKind[node.kind]}`) })()
 
 const FAQSection = () =>
