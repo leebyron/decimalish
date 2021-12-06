@@ -6,6 +6,9 @@
     </title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <style>@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono");
 
 html {
@@ -30,7 +33,7 @@ code {
   --code-color: #000000c0;
   --code-bg-color: #00000008;
   --underline-color: #2222224d;
-  --link-highlight-color: rgb(248, 203, 0);
+  --link-highlight-color: #ffca00;
   --nav-size: 50px;
   --small-col-width: 285px;
   --gutter-size: 2.5rem;
@@ -199,29 +202,32 @@ a {
   transition-duration: 0.2s;
 }
 
-section:not(:target) > h2 > a,
-section:not(:target) > div > h2 > a,
-section:not(:target) > div > div > h2 > a,
-section:not(:target) > h3 > a,
-section:not(:target) > div > h3 > a,
-section:not(:target) > div > div > h3 > a,
-section:not(:target) > h4 > a,
-section:not(:target) > div > h4 > a,
-section:not(:target) > div > div > h4 > a {
+section:not(:target) > h2 > a:not(:hover),
+section:not(:target) > div > h2 > a:not(:hover),
+section:not(:target) > div > div > h2 > a:not(:hover),
+section:not(:target) > h3 > a:not(:hover),
+section:not(:target) > div > h3 > a:not(:hover),
+section:not(:target) > div > div > h3 > a:not(:hover),
+section:not(:target) > h4 > a:not(:hover),
+section:not(:target) > div > h4 > a:not(:hover),
+section:not(:target) > div > div > h4 > a:not(:hover) {
   text-decoration-color: transparent;
 }
 
-section:target h2 > a,
-section:target h3 > a,
-section:target h4 > a,
+section:target > h2 > a,
+section:target > div > h2 > a,
+section:target > div > div > h2 > a,
+section:target > h3 > a,
+section:target > div > h3 > a,
+section:target > div > div > h3 > a,
+section:target > h4 > a,
+section:target > div > h4 > a,
+section:target > div > div > h4 > a,
 a:hover {
   --underline-offset: 0.15em;
   --underline-thickness: 0.2em;
 }
 
-section h2 > a:hover,
-section h3 > a:hover,
-section h4 > a:hover,
 a:hover {
   text-decoration-color: var(--link-highlight-color);
 }
