@@ -1,147 +1,125 @@
 /**
  * TODO:
  *
- * Color code and link signature
  * Markdown in text?
- * Thread down reflection as data?
- * Watch mode
+ * Better highlight colors (and use css vars)
+ * interface properties
  *
  */
 
 import * as path from 'path'
 import * as fs from 'fs'
-import * as TypeDoc from 'typedoc'
-import * as util from 'util'
+import * as ts from 'typescript'
+import * as jsx from 'hyperjsx'
 
-// Simple JSX to HTML
+const ROOT_DIR = __dirname + '/'
+const OTHER_CATEGORY = 'Et cetera'
 
-declare global {
-  namespace JSX {
-    type Component<P=null> = (props: P) => Element
-    type Element<P=any> = { name: string | Component<P>, props?: P, children: Child[] }
-    type Child = Child[] | Element | string | number | false | null | undefined
-    type HTMLTags = HTMLElementTagNameMap & Omit<SVGElementTagNameMap, 'a'>
-    type IntrinsicElements = { [K in keyof HTMLTags]: Partial<Omit<HTMLTags[K], 'children' | 'className' | 'style'> & { children: Child[], class: string, style: string }> }
+// Everything private or otherwise missing from typescript's typedefs.
+declare module 'typescript' {
+  export interface TypeElement {
+    type: TypeNode
   }
+  export interface Declaration {
+    jsDoc?: ts.JSDoc[]
+    name?: ts.Identifier
+  }
+  export function findPrecedingToken(position: number, sourceFile: ts.SourceFile): ts.Token<ts.SyntaxKind>
+  export function parseIsolatedJSDocComment(content: string, start: number, length: number): { jsDoc: ts.JSDoc } | undefined
 }
 
-function jsx<P>(name: string | JSX.Component<P>, props: P, ...children: JSX.Child[]): JSX.Element<P> {
-  return { name, props, children }
+type Typedefs = { ids: TypedefsById, categories: TypedefsByCategory }
+
+type TypedefsById = { [id: string]: TypedefMember }
+
+type TypedefsByCategory = { [category: string]: TypedefMember[] }
+
+type TypedefMember = {
+  id: string,
+  name: string,
+  isFunction: boolean,
+  decl: ts.Declaration
 }
 
-// prettier-ignore
-const SINGLETONS: {[tag: string]: boolean} = { area: true, base: true, br: true, col: true, embed: true, hr: true, img: true, input: true, keygen: true, link: true, meta: true, param: true, source: true, track: true, wbr: true };
+type JSDoc = {
+  title?: string
+  comment: string
+  tags: { [name: string]: string | undefined }
+}
 
-function renderJSX(element: JSX.Element) {
-  let html = ''
-  const stack: { children: JSX.Child[], index: number, close?: string }[] = [
-    { children: [element], index: 0 }
-  ]
-  while (stack.length) {
-    const frame = stack[stack.length - 1]
-    const child = frame.children[frame.index++];
-    if (frame.index > frame.children.length) {
-      stack.pop()
-      if (frame.close) {
-        html += frame.close
-      }
-    } else if (typeof child !== 'object' || !child) {
-      if (typeof child === 'string' || typeof child === 'number') {
-        html += String(child).replace(/</g, '&lt;')
-      }
-    } else if (Array.isArray(child)) {
-      stack.push({ children: child, index: 0 })
-    } else if (child.name === jsx) {
-      stack.push({ children: child.children, index: 0 })
-    } else if (typeof child.name === 'function') {
-      stack.push({ children: [child.name({...child.props, children: child.children})], index: 0 })
-    } else if (child.props?.outerHTML) {
-      html += child.props?.outerHTML
-    } else {
-      if (child.name === 'html') html += '<!DOCTYPE html>\n'
-      html += '<' + child.name
-      for (const [key, value] of Object.entries(child.props || {})) {
-        if (value != null && key !== 'innerHTML') {
-          html += ' ' + key + '="' + String(value).replace(/"/g, '&quot;') + '"'
-        }
-      }
-      html += '>'
-      if (!SINGLETONS[child.name]) {
-        if (child.props?.innerHTML) html += child.props?.innerHTML
-        stack.push({ children: child.children, index: 0, close: '</' + child.name + '>' })
+function getTypedefByCategory(): Typedefs {
+  const file = path.resolve(ROOT_DIR, '../decimalish.ts')
+  const sourceFile = ts.createSourceFile(
+    file,
+    fs.readFileSync(file, 'utf8'),
+    ts.ScriptTarget.ES2015,
+    /* parentReferences */ true
+  );
+
+  const ids: TypedefsById = {}
+  const categories: TypedefsByCategory = {}
+
+  for (const decl of sourceFile.statements) {
+    if (isExportedDeclaration(decl)) {
+      const name = decl.name!.text
+      const isFunction = ts.isFunctionDeclaration(decl)
+      const id = name + (isFunction ? '()' : '')
+      const category = getJSDoc(decl)?.tags.category || OTHER_CATEGORY
+      if (!ids[id]) {
+        (categories[category] || (categories[category] = [])).push(
+          ids[id] = { id, name, isFunction, decl }
+        )
       }
     }
   }
-  return html
+
+  return { ids, categories }
 }
 
-function cx(obj: {[className: string]: boolean}): string | undefined {
-  return Object.entries(obj)
-    .filter(([, value]) => value)
-    .map(([className]) => className)
-    .join(' ') || undefined
+function isExportedDeclaration(node: ts.Node): node is ts.Declaration {
+  return !!(ts.getCombinedModifierFlags(node as ts.Declaration) & ts.ModifierFlags.Export)
 }
 
-// Reflection over typedefs
-
-const rootDir = __dirname + '/'
-
-type ProjectReflection = Omit<TypeDoc.JSONOutput.ProjectReflection, 'children' | 'categories'> & {
-  children?: DeclarationReflection[]
-  categories?: ReflectionCategory[]
-}
-type DeclarationReflection = TypeDoc.JSONOutput.DeclarationReflection & {
-  ref?: string
-  link?: string
-  title?: string
-}
-type ReflectionCategory = TypeDoc.JSONOutput.ReflectionCategory & {
-  childrenRefs?: DeclarationReflection[]
+function last<T>(arr: T[] | undefined): T | undefined {
+  return arr?.[arr?.length - 1]
 }
 
-function getTypedocData(): ProjectReflection {
-  const app = new TypeDoc.Application();
-  app.options.addReader(new TypeDoc.TSConfigReader());
-  app.bootstrap({
-    entryPoints: [path.resolve(rootDir, '../decimalish.ts')],
-    intentionallyNotExported: ['$decimal'],
-    sort: ['source-order'],
-    categorizeByGroup: false
-  });
+const jsDocCache = new WeakMap<ts.Node, JSDoc | undefined>()
 
-  // NOTE: convertAndWatch
-  const project = app.convert()!;
-  app.validate(project)
-  if (app.logger.hasErrors() || app.logger.hasWarnings()) {
-    process.exit(1);
+function getJSDoc(node: ts.Node): JSDoc | undefined {
+  const source = node.getSourceFile()
+  if (jsDocCache.has(node)) return jsDocCache.get(node)
+  let rawJsDoc: ts.JSDoc | undefined = last((node as any).jsDoc)
+  if (!rawJsDoc) {
+    const comment = last(
+      ts.getLeadingCommentRanges(source.text, node.pos) ||
+      ts.getLeadingCommentRanges(source.text, ts.findPrecedingToken(node.pos, source).pos)
+    )
+    if (comment) {
+      rawJsDoc = ts.parseIsolatedJSDocComment(source.text, comment.pos, comment.end - comment.pos)?.jsDoc
+    }
   }
-
-  const reflection: ProjectReflection = app.serializer.projectToObject(project)
-
-  // Create frequently accessed derived data as properties.
-  for (const child of reflection.children!) {
-    child.ref = child.name + (child.kindString === 'Function' ? '()' : '')
-    child.link = '#' + child.ref
-    child.comment = child.signatures?.[0].comment ?? child.comment
-    child.title = child.comment?.shortText
+  let jsDoc
+  if (rawJsDoc) {
+    let title;
+    let comment = ts.getTextOfJSDocComment(rawJsDoc.comment) || ''
+    const titleMatch = /^(?:([^\n]+)(?:\n*$|\n{2,}))?/.exec(comment)
+    if (titleMatch) {
+      title = titleMatch[1]
+      comment = comment.slice(titleMatch[0].length)
+    }
+    const tags = Object.fromEntries(rawJsDoc.tags?.map(tag => [tag.tagName.getText(source), ts.getTextOfJSDocComment(tag.comment)]) || [])
+    jsDoc = { title, comment, tags }
   }
-
-  // Sort categories by the same as children.
-  reflection.categories!.sort((a, b) =>
-    reflection.children!.findIndex(c => c.id === a.children![0]) -
-    reflection.children!.findIndex(c => c.id === b.children![0])
-  )
-
-  // Reconnect references
-  for (const category of reflection.categories!) {
-    category.childrenRefs = category.children?.map(id => reflection.children!.find(c => c.id === id)!)
-  }
-
-  return reflection
+  jsDocCache.set(node, jsDoc)
+  return jsDoc
 }
 
+const TypedefsContext = jsx.createContext<Typedefs | null>(null)
 
-const reflection = getTypedocData()
+function useTypedefs(): Typedefs {
+  return jsx.useContext(TypedefsContext)!
+}
 
 const Index = () =>
   <html lang="en">
@@ -149,10 +127,10 @@ const Index = () =>
       <title>
         Decimalish — arbitrary-precision decimal primitives for JavaScript.
       </title>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style innerHTML={fs.readFileSync(rootDir + 'style.css', 'utf8')} />
-      <script innerHTML={fs.readFileSync(path.resolve(rootDir, '../dist/decimalish.min.js'), 'utf8')} />
+      <style innerHTML={fs.readFileSync(ROOT_DIR + 'style.css', 'utf8')} />
+      <script innerHTML={fs.readFileSync(path.resolve(ROOT_DIR, '../dist/decimalish.min.js'), 'utf8')} />
     </head>
     <body>
       <Header />
@@ -183,9 +161,9 @@ const Footer = () =>
 
 const SplitFlap = () =>
   <div id="split-flap">
-    <style innerHTML={fs.readFileSync(rootDir + 'split-flap.css', 'utf8')} />
-    <svg outerHTML={fs.readFileSync(rootDir + 'split-flap.svg', 'utf8')} />
-    <script innerHTML={fs.readFileSync(rootDir + 'split-flap.js', 'utf8')} />
+    <style innerHTML={fs.readFileSync(ROOT_DIR + 'split-flap.css', 'utf8')} />
+    <svg outerHTML={fs.readFileSync(ROOT_DIR + 'split-flap.svg', 'utf8')} />
+    <script innerHTML={fs.readFileSync(ROOT_DIR + 'split-flap.js', 'utf8')} />
   </div>
 
 const IntroSection = () =>
@@ -245,57 +223,110 @@ const IntroSection = () =>
 const APISection = () =>
   <>
     <section id="api" class="api-toc-sec">
+      <h2><a href="#api">API</a></h2>
       <div>
-        <h2><a href="#api">API</a></h2>
-        <div>
-          {reflection.categories?.map(category =>
-            <div>
-              <h3>{category.title}</h3>
-              <ul>
-                {category.childrenRefs?.map(child =>
-                  child && <li>
-                    <a href={child.link}>{child.title} <pre>{child.ref}</pre></a>
-                  </li>
-                )}
-              </ul>
-            </div>
-          )}
-        </div>
+        {Object.entries(useTypedefs().categories).map(([category, members]) =>
+          <div>
+            <h3>{category}</h3>
+            <ul>
+              {members.map(member =>
+                <li>
+                  <a href={'#' + member.id}>
+                    {getJSDoc(member.decl)?.title} <pre class={member.isFunction ? 'fn' : 'type'}>{member.id}</pre>
+                  </a>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
       </div>
     </section>
-    {reflection.categories?.map(category =>
-      <>
-        <section><h2>{category.title}</h2></section>
-        {category.childrenRefs?.map(child => <APIItemSection child={child} />)}
-      </>
+    {Object.entries(useTypedefs().categories).map(([category, members], index) =>
+      <section class={{ odd: index % 2 !== 0 }}>
+        <h2>{category}</h2>
+        {members.map(member => <APIItemSection member={member} />)}
+      </section>
     )}
   </>
 
-const APIItemSection = ({ child }: { child: DeclarationReflection }) =>
-  <>
-    <section id={child.ref} class={cx({ api: true, error: child.name === 'ErrorCode' })}>
+const APIItemSection = ({ member }: { member: TypedefMember }) =>
+  <section id={member.id} class={{ api: true, error: member.name === 'ErrorCode' }}>
+    <div>
+      <h3><a href={'#' + member.id}>{getJSDoc(member.decl)?.title}</a></h3>
       <div>
-        <h3><a href={child.link}>{child.title}</a></h3>
+        <pre class="decl"><Source node={member.decl} /></pre>
+        <p>{getJSDoc(member.decl)?.comment}</p>
+      </div>
+    </div>
+    {ts.isTypeAliasDeclaration(member.decl) &&
+      ts.isUnionTypeNode(member.decl.type) &&
+      member.decl.type.types.every(type =>
+        ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal)) &&
+      <StringEnumMembers type={member.decl.type} />}
+  </section>
+
+const StringEnumMembers = ({ type }: { type: ts.UnionTypeNode }) =>
+  <>{type.types.map(member =>
+    <section id={member.getText().slice(1, -1)} class="api member">
+      <div>
+        <div/>
         <div>
-          <pre>add(a: <a href="#Numeric">Numeric</a>, b: <a href="#Numeric">Numeric</a>): <a href="#decimal">decimal</a></pre>
-          <p>{child.comment?.text}</p>
+          <pre class="literal">{member.getText()}</pre>
+          <h4><a href={'#' + member.getText().slice(1, -1)}>{getJSDoc(member)?.title}</a></h4>
+          <p>{getJSDoc(member)?.comment}</p>
         </div>
       </div>
     </section>
-    {child.kindString === 'Enumeration' && (
-      child.children?.map(member =>
-        <section id={member.name} class={cx({ api: true, member: true, error: child.name === 'ErrorCode' })}>
-          <div>
-            <h3><a href={'#' + member.name}>{member.comment?.shortText}</a></h3>
-            <div>
-              <pre>{member.defaultValue}</pre>
-              <p>{member.comment?.text}</p>
-            </div>
-          </div>
-        </section>
-      )
-    )}
-  </>
+  )}</>
+
+const Source = ({ node }: { node: ts.Node }) =>
+  ts.isTypeAliasDeclaration(node) ?
+    <><span class="keyword">type</span> <span class="type">{node.name.text}</span></> :
+  ts.isInterfaceDeclaration(node) ?
+    <><span class="keyword">interface</span> <span class="type">{node.name.text}</span></> :
+  ts.isFunctionDeclaration(node) ?
+    <>
+      <span class="fn">{node.name!.text}</span>
+      {'('}<wbr/>{node.parameters.map((param, index) =>
+        <>
+          {index > 0 && ', '}{param.dotDotDotToken && '...'}
+          <span class="param">{param.name.getText()}</span>
+          {param.questionToken && '?'}{':\u00A0'}
+          <Source node={param.type!} />
+        </>
+      )}<wbr/>{'):\u00A0'}<Source node={node.type!} />
+    </> :
+  ts.isToken(node) ?
+    <span class="type">{node.getText()}</span> :
+  ts.isLiteralTypeNode(node) ?
+    <span class="literal">{node.literal.getText()}</span> :
+  ts.isTypeReferenceNode(node) ?
+    <a href={'#' + node.typeName.getText()} class="type">{node.typeName.getText()}</a> :
+  ts.isTypePredicateNode(node) ?
+    <>
+      <span class="param">{node.parameterName.getText()}</span>
+      {'\u00A0'}<span class="keyword">is</span>{'\u00A0'}
+      <Source node={node.type!} />
+    </> :
+  ts.isArrayTypeNode(node) ?
+    <><Source node={node.elementType} />{'[]'}</> :
+  ts.isTupleTypeNode(node) ?
+    <>{'['}<wbr/>{node.elements.map((elem, index) =>
+      <>{index > 0 && ', '}<Source node={elem} /></>
+    )}<wbr/>{']'}</> :
+  ts.isNamedTupleMember(node) ?
+    <><span class="prop">{node.name.text}</span>{':\u00A0'}<Source node={node.type} /></> :
+  ts.isUnionTypeNode(node) ?
+    <>{node.types.map((member, index) =>
+      <>{index > 0 && '\u00A0|\u00A0'}<Source node={member} /></>
+    )}</> :
+  ts.isTypeLiteralNode(node) ?
+    <>{'{ '}{node.members.map((member, index) =>
+      <>{index > 0 && ', '}<span class="prop">{member.name!.getText()}</span>
+      {member.questionToken && '?'}{':\u00A0'}
+      {<Source node={member.type} />}</>
+    )}{' }'}</> :
+  (() => { throw new Error(`Unexpected ${ts.SyntaxKind[node.kind]}`) })()
 
 const FAQSection = () =>
   <section id="faq">
@@ -305,5 +336,7 @@ const FAQSection = () =>
     </div>
   </section>
 
-fs.writeFileSync(rootDir + 'dist/index.html', renderJSX(<Index />), 'utf8')
-fs.writeFileSync(rootDir + 'dist/api.json', JSON.stringify(reflection, null, 2), 'utf8')
+// Run
+const typeDefs = getTypedefByCategory()
+const page = <TypedefsContext value={typeDefs}><Index /></TypedefsContext>
+fs.writeFileSync(ROOT_DIR + 'dist/index.html', jsx.render(page), 'utf8')

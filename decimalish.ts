@@ -300,7 +300,7 @@ export function mul(a: Numeric, b: Numeric): decimal {
  * @__PURE__
  */
 export function div(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
-  const [quotient] = divRem(dividend, divisor, normalizeRules(rules, 20, RoundingMode.HALF_EVEN))
+  const [quotient] = divRem(dividend, divisor, normalizeRules(rules, 20, HALF_EVEN))
   return quotient
 }
 
@@ -342,7 +342,7 @@ export function div(dividend: Numeric, divisor: Numeric, rules?: RoundingRules):
 export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): [quotient: decimal, remainder: decimal] {
   const [signA, significandA, exponentA, precisionA] = deconstruct(dividend)
   const [signB, significandB, exponentB, precisionB] = deconstruct(divisor)
-  rules = normalizeRules(rules, 0, RoundingMode.DOWN)
+  rules = normalizeRules(rules, 0, DOWN)
 
   // The resulting exponent of a division is the difference between the
   // exponents of the dividend and divisor.
@@ -353,7 +353,7 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
   let roundingMode = rules[MODE]
   let roundingPrecision = getRoundingPrecision(rules, exponent)
 
-  if (!significandB) error(ErrorCode.DIV_ZERO, `${dividend}/${divisor}`)
+  if (!significandB) error('DIV_ZERO', `${dividend}/${divisor}`)
 
   // Collect the digits of the quotient.
   let quotientSignificand = ''
@@ -434,8 +434,8 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
 
   // If there is a remainder, consider the provided rounding rule.
   if (remainder !== '0') {
-    if (roundingMode === RoundingMode.EXACT) {
-      error(ErrorCode.INEXACT, `${dividend}/${divisor}`)
+    if (roundingMode === EXACT) {
+      error('INEXACT', `${dividend}/${divisor}`)
     }
 
     // Normalize the rounding mode based on sign and other context; reducing the
@@ -443,23 +443,23 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
     // which apply to the absolute value of quotient.
     // TODO: can this be shared with round()?
     roundingMode =
-      roundingMode === RoundingMode.CEIL ? sign < 0 ? RoundingMode.DOWN : RoundingMode.UP :
-      roundingMode === RoundingMode.FLOOR ? sign < 0 ? RoundingMode.UP : RoundingMode.DOWN :
-      roundingMode === RoundingMode.EUCLIDEAN ? sign === signB ? RoundingMode.DOWN : RoundingMode.UP :
-      roundingMode === RoundingMode.HALF_CEIL ? sign < 0 ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP :
-      roundingMode === RoundingMode.HALF_FLOOR ? sign < 0 ? RoundingMode.HALF_UP : RoundingMode.HALF_DOWN :
-      roundingMode === RoundingMode.HALF_EVEN ? digit % 2 ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP :
+      roundingMode === CEIL ? sign < 0 ? DOWN : UP :
+      roundingMode === FLOOR ? sign < 0 ? UP : DOWN :
+      roundingMode === EUCLIDEAN ? sign === signB ? DOWN : UP :
+      roundingMode === HALF_CEIL ? sign < 0 ? HALF_DOWN : HALF_UP :
+      roundingMode === HALF_FLOOR ? sign < 0 ? HALF_UP : HALF_DOWN :
+      roundingMode === HALF_EVEN ? digit % 2 ? HALF_DOWN : HALF_UP :
       roundingMode
 
     // Determine whether to round up the quotient. This is trivial for whole
     // rounding modes, however half rounding modes need to compare the remainder
     // to the midpoint of the divisor, treating exactly the midpoint specially.
     let shouldRoundUp
-    if (roundingMode === RoundingMode.UP || roundingMode === RoundingMode.DOWN) {
-      shouldRoundUp = roundingMode === RoundingMode.UP
+    if (roundingMode === UP || roundingMode === DOWN) {
+      shouldRoundUp = roundingMode === UP
     } else {
       const midpointCmp = cmp(mul(2, remainderSignificand as decimal), significandB as decimal)
-      shouldRoundUp = roundingMode === RoundingMode.HALF_UP ? midpointCmp >= 0 : midpointCmp > 0
+      shouldRoundUp = roundingMode === HALF_UP ? midpointCmp >= 0 : midpointCmp > 0
     }
 
     if (shouldRoundUp) {
@@ -529,7 +529,7 @@ export function rem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules):
  * @__PURE__
  */
 export function mod(a: Numeric, b: Numeric): decimal {
-  return rem(a, b, { mode: RoundingMode.FLOOR })
+  return rem(a, b, { mode: FLOOR })
 }
 
 /**
@@ -548,7 +548,7 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
 
   exponent = wholeNumber('exponent', exponent)
   if (exponent < 0) {
-    error(ErrorCode.NOT_POS, `exponent: ${exponent}`)
+    error('NOT_POS', `exponent: ${exponent}`)
   }
 
   // Iterate through the bits of exponent
@@ -584,10 +584,10 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
 
   // Negative number
   if (sign < 0) {
-    error(ErrorCode.SQRT_NEG, value)
+    error('SQRT_NEG', value)
   }
 
-  rules = normalizeRules(rules, 20, RoundingMode.HALF_EVEN)
+  rules = normalizeRules(rules, 20, HALF_EVEN)
   const iterationPrecision = getRoundingPrecision(rules, exponent)
 
   // Sqrt 0 -> 0
@@ -868,7 +868,7 @@ export function scale(value: Numeric, power: Numeric): decimal {
  * @__PURE__
  */
 export function round(value: Numeric, rules?: RoundingRules): decimal {
-  const roundingRules = normalizeRules(rules, 0, RoundingMode.HALF_CEIL)
+  const roundingRules = normalizeRules(rules, 0, HALF_CEIL)
   let [sign, significand, exponent, precision] = deconstruct(value)
 
   // Determine the desired rounding mode and precision.
@@ -880,27 +880,27 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
 
   // Only round if the rounded precision is less than the original precision.
   if (precision > roundingPrecision) {
-    if (roundingMode === RoundingMode.EXACT) {
-      error(ErrorCode.INEXACT, `round(${value})`)
+    if (roundingMode === EXACT) {
+      error('INEXACT', `round(${value})`)
     }
 
     // Normalize the rounding mode to either: up, down, half up, or half down.
     roundingMode =
-      roundingMode === RoundingMode.CEIL ? sign < 0 ? RoundingMode.DOWN : RoundingMode.UP :
-      roundingMode === RoundingMode.FLOOR || roundingMode === RoundingMode.EUCLIDEAN ? sign < 0 ? RoundingMode.UP : RoundingMode.DOWN :
-      roundingMode === RoundingMode.HALF_CEIL ? sign < 0 ? RoundingMode.HALF_DOWN : RoundingMode.HALF_UP :
-      roundingMode === RoundingMode.HALF_FLOOR ? sign < 0 ? RoundingMode.HALF_UP : RoundingMode.HALF_DOWN :
-      roundingMode === RoundingMode.HALF_EVEN ? +(significand[roundingPrecision - 1] || 0) % 2 ? RoundingMode.HALF_UP : RoundingMode.HALF_DOWN :
+      roundingMode === CEIL ? sign < 0 ? DOWN : UP :
+      roundingMode === FLOOR || roundingMode === EUCLIDEAN ? sign < 0 ? UP : DOWN :
+      roundingMode === HALF_CEIL ? sign < 0 ? HALF_DOWN : HALF_UP :
+      roundingMode === HALF_FLOOR ? sign < 0 ? HALF_UP : HALF_DOWN :
+      roundingMode === HALF_EVEN ? +(significand[roundingPrecision - 1] || 0) % 2 ? HALF_UP : HALF_DOWN :
       roundingMode
 
     const roundingDigit = +(significand[roundingPrecision] || 0)
     if (
       // A half up mode found the subsequent digit to be 5 or greater
-      roundingMode === RoundingMode.HALF_UP ? roundingDigit > 4 :
+      roundingMode === HALF_UP ? roundingDigit > 4 :
       // A half down mode found the subsequent digit to be greater than 5, or 5 with additional digits
-      roundingMode === RoundingMode.HALF_DOWN ? roundingDigit > 5 || roundingDigit === 5 && precision > roundingPrecision + 1 :
+      roundingMode === HALF_DOWN ? roundingDigit > 5 || roundingDigit === 5 && precision > roundingPrecision + 1 :
       // The rounding mode is up and the value is non-zero
-      roundingMode === RoundingMode.UP && sign
+      roundingMode === UP && sign
     ) {
       // Round up by adding one to the the least significant digit of the absolute value
       rounded = add(rounded, construct(sign, '1', exponent - roundingPrecision + 1))
@@ -923,7 +923,7 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
  * @__PURE__
  */
 export function floor(value: Numeric): decimal {
-  return round(value, { mode: RoundingMode.FLOOR })
+  return round(value, { mode: FLOOR })
 }
 
 /**
@@ -939,7 +939,7 @@ export function floor(value: Numeric): decimal {
  * @__PURE__
  */
 export function ceil(value: Numeric): decimal {
-  return round(value, { mode: RoundingMode.CEIL })
+  return round(value, { mode: CEIL })
 }
 
 /**
@@ -956,7 +956,7 @@ export function ceil(value: Numeric): decimal {
  * @__PURE__
  */
 export function trunc(value: Numeric): decimal {
-  return round(value, { mode: RoundingMode.DOWN })
+  return round(value, { mode: DOWN })
 }
 
 /**
@@ -1032,34 +1032,59 @@ export interface RoundingRules {
   /**
    * Rounding mode
    */
-  mode?: `${RoundingMode}`
+  mode?: RoundingMode
 }
-
-const PLACES = 'places'
-const PRECISION = 'precision'
-const MODE = 'mode'
 
 /**
  * Round method
  *
  * @category Rounding
  */
-export const enum RoundingMode {
+export type RoundingMode =
   /**
    * Round up
    */
-  UP = 'up',
-  DOWN = 'down',
-  CEIL = 'ceil',
-  FLOOR = 'floor',
-  EUCLIDEAN = 'euclidean',
-  HALF_UP = 'half up',
-  HALF_DOWN = 'half down',
-  HALF_CEIL = 'half ceil',
-  HALF_FLOOR = 'half floor',
-  HALF_EVEN = 'half even',
-  EXACT = 'exact',
-}
+  | 'up'
+  /**
+   * Round down
+   */
+  | 'down'
+  /**
+   * Ceiling (towards Infinity)
+   */
+  | 'ceil'
+  /**
+   * Floor (truncate towards 0)
+   */
+  | 'floor'
+  /**
+   * Euclidean division
+   */
+  | 'euclidean'
+  /**
+   * Round half up
+   */
+  | 'half up'
+  /**
+   * Round half down
+   */
+  | 'half down'
+  /**
+   * Round half ceiling
+   */
+  | 'half ceil'
+  /**
+   * Round half floor
+   */
+  | 'half floor'
+  /**
+   * Round half towards even
+   */
+  | 'half even'
+  /**
+   * Assert exact result
+   */
+  | 'exact'
 
 /**
  * Given rounding rules, a number's exponent, and a default, produce a rounding
@@ -1072,35 +1097,35 @@ function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number,
   let precision = rules && rules[PRECISION]
   let places = rules && rules[PLACES]
   let mode = rules && rules[MODE] || defaultMode
-  let knownModes = [
-    RoundingMode.UP,
-    RoundingMode.DOWN,
-    RoundingMode.CEIL,
-    RoundingMode.FLOOR,
-    RoundingMode.EUCLIDEAN,
-    RoundingMode.HALF_UP,
-    RoundingMode.HALF_DOWN,
-    RoundingMode.HALF_CEIL,
-    RoundingMode.HALF_FLOOR,
-    RoundingMode.HALF_EVEN,
-    RoundingMode.EXACT,
+  let isValidMode;
+  let validModes = [
+    UP,
+    DOWN,
+    CEIL,
+    FLOOR,
+    EUCLIDEAN,
+    HALF_UP,
+    HALF_DOWN,
+    HALF_CEIL,
+    HALF_FLOOR,
+    HALF_EVEN,
+    EXACT,
   ]
-  let isKnownMode;
 
   if (precision != null) {
-    if (places != null) error(ErrorCode.NOT_BOTH, `${PLACES}: ${places}, ${PRECISION}: ${precision}`)
+    if (places != null) error('NOT_BOTH', `${PLACES}: ${places}, ${PRECISION}: ${precision}`)
     precision = wholeNumber(PRECISION, precision)
   } else {
     places = places != null ? wholeNumber(PLACES, places) : defaultPlaces
   }
 
   // Note: indexOf() or find() would work, however neither are available in ES3.
-  for (const i in knownModes) {
+  for (const i in validModes) {
     // @ts-ignore
-    isKnownMode |= knownModes[i] == mode
+    isValidMode |= validModes[i] == mode
   }
-  if (!isKnownMode) {
-    error(ErrorCode.NOT_MODE, mode)
+  if (!isValidMode) {
+    error('NOT_MODE', mode)
   }
 
   return { precision, places, mode }
@@ -1132,7 +1157,7 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
  * @category Et cetera
  * @__PURE__
  */
-export function toNumber(value: Numeric, options?: { exact: boolean }): number {
+export function toNumber(value: Numeric, options?: { exact?: boolean }): number {
   const canonical = decimal(value)
   value = +canonical
   // Unless `exact` has been explicitly set to false, check to ensure the number
@@ -1140,7 +1165,7 @@ export function toNumber(value: Numeric, options?: { exact: boolean }): number {
   // decimal and comparing it to the original.
   const exact = options && options.exact
   if ((exact || exact == null) && decimal(value) !== canonical) {
-    error(ErrorCode.INEXACT, `${canonical} toNumber ${value}`)
+    error('INEXACT', `${canonical} toNumber ${value}`)
   }
   return value
 }
@@ -1269,7 +1294,7 @@ type Sign = 1 | -1 | 0
  */
 export function deconstruct(value: unknown): [sign: 1 | -1 | 0, significand: string, exponent: number, precision: number] {
   const match = decimalRegex.exec(''+value)
-  if (!match) error(ErrorCode.NOT_NUM, value)
+  if (!match) error('NOT_NUM', value)
   let [, sign, integer, fractional, exponent] = match
   if (!integer) {
     integer = ''
@@ -1342,7 +1367,7 @@ function normalizeRepresentation(sign: Sign, significand: string, exponent: numb
 function wholeNumber(name: string, value: Numeric): number {
   value = toNumber(value)
   if (~~value !== value) {
-    error(ErrorCode.NOT_INT, `${name}: ${value}`)
+    error('NOT_INT', `${name}: ${value}`)
   }
   return value
 }
@@ -1383,7 +1408,7 @@ function error(code: ErrorCode, message: unknown): never {
  *
  * @category Et cetera
  */
-export const enum ErrorCode {
+export type ErrorCode =
 
   /**
    * Not a number
@@ -1391,7 +1416,7 @@ export const enum ErrorCode {
    * Thrown by any function when a value provided to a `Numeric` argument is not
    * numeric or finite; providing `Infinity` or `NaN` will throw this error.
    */
-  NOT_NUM = 'NOT_NUM',
+  | 'NOT_NUM'
 
   /**
    * Not an integer
@@ -1400,7 +1425,7 @@ export const enum ErrorCode {
    * received. For instance, the `places` and `precision` fields of
    * `RoundingRules` require integers.
    */
-  NOT_INT = 'NOT_INT',
+  | 'NOT_INT'
 
   /**
    * Not positive
@@ -1409,7 +1434,7 @@ export const enum ErrorCode {
    * not received. For instance, the `exponent` in `pow()` must be a positive
    * integer.
    */
-  NOT_POS = 'NOT_POS',
+  | 'NOT_POS'
 
   /**
    * Unknown rounding mode
@@ -1417,7 +1442,7 @@ export const enum ErrorCode {
    * Thrown when a value provided to `mode` of `RoundingRules` is not one of the
    * expected options of `RoundingMode`.
    */
-  NOT_MODE = 'NOT_MODE',
+  | 'NOT_MODE'
 
   /**
    * Cannot provide both
@@ -1425,7 +1450,7 @@ export const enum ErrorCode {
    * Thrown when both `places` and `precision` fields of `RoundingRules` are
    * simutaneously provided. Only one of these fields may be provided per use.
    */
-  NOT_BOTH = 'NOT_BOTH',
+  | 'NOT_BOTH'
 
   /**
    * Inexact result
@@ -1438,7 +1463,7 @@ export const enum ErrorCode {
    *
    * @example div(1, 3, { mode: 'exact' })
    */
-  INEXACT = 'INEXACT',
+  | 'INEXACT'
 
   /**
    * Divide by zero
@@ -1448,7 +1473,7 @@ export const enum ErrorCode {
    * `Infinity` or `NaN`, however Decimalish does not support these non-finite
    * special values.
    */
-  DIV_ZERO = 'DIV_ZERO',
+  | 'DIV_ZERO'
 
   /**
    * Square root of negative
@@ -1457,5 +1482,22 @@ export const enum ErrorCode {
    * there is no real number result. This behavior is different from JavaScript
    * which returns `NaN`, however Decimalish does not support this special value.
    */
-  SQRT_NEG = 'SQRT_NEG',
-}
+  | 'SQRT_NEG'
+
+// Constant keywords
+
+// TODO: code golf whether inlining these is better for bytes
+const PLACES = 'places'
+const PRECISION = 'precision'
+const MODE = 'mode'
+const UP = 'up'
+const DOWN = 'down'
+const CEIL = 'ceil'
+const FLOOR = 'floor'
+const EUCLIDEAN = 'euclidean'
+const HALF_UP = 'half up'
+const HALF_DOWN = 'half down'
+const HALF_CEIL = 'half ceil'
+const HALF_FLOOR = 'half floor'
+const HALF_EVEN = 'half even'
+const EXACT = 'exact'

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto+Mono");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono");
 
 html {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
@@ -32,7 +32,7 @@ code {
   --max-width: calc(3 * var(--small-col-width) + 2 * var(--column-gap));
 }
 
-@media (max-width: 699px) {
+@media not all and (min-width: 700px) {
   :root {
     --gutter-size: 1.5rem;
   }
@@ -66,24 +66,23 @@ body,
 
 h1 {
   font-size: 2rem;
-}
-
-h2 {
-  font-size: 1.414rem;
-}
-
-h3 {
-  font-size: 1rem;
-}
-
-h1:not(:last-child),
-h2:not(:last-child),
-h3:not(:last-child) {
   margin-bottom: 1em;
 }
 
 h2 {
-  margin-bottom: calc(-1/2 * var(--gutter-size));
+  font-size: 1.414rem;
+  margin-bottom: 1em;
+}
+
+h3 {
+  font-size: 1rem;
+  margin-bottom: 1em;
+}
+
+h4 {
+  font-size: 1rem;
+  margin-bottom: 1em;
+  font-weight: 500;
 }
 
 header {
@@ -126,16 +125,22 @@ header nav a:last-child {
 }
 
 section {
-  background: white;
-  padding: var(--gutter-size);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+body > section {
+  background: white;
 }
 
 section > * {
   width: 100%;
-  max-width: var(--max-width);
-  flex: 1 0 100%;
+}
+
+section > :not(section) {
+  margin: var(--gutter-size);
+  max-width: calc(min(var(--max-width), 100vw - 2 * var(--gutter-size)));
 }
 
 footer {
@@ -145,8 +150,11 @@ footer {
 }
 
 p {
-  margin-bottom: 1rem;
   max-width: 40em;
+}
+
+p:not(:last-child) {
+  margin-bottom: 1rem;
 }
 
 pre, code {
@@ -183,17 +191,29 @@ a {
   transition-duration: 0.2s;
 }
 
-section:not(:target) > :first-child > :first-child > a:first-child {
+section:not(:target) > h2 > a,
+section:not(:target) > div > h2 > a,
+section:not(:target) > div > div > h2 > a,
+section:not(:target) > h3 > a,
+section:not(:target) > div > h3 > a,
+section:not(:target) > div > div > h3 > a,
+section:not(:target) > h4 > a,
+section:not(:target) > div > h4 > a,
+section:not(:target) > div > div > h4 > a {
   text-decoration-color: transparent;
 }
 
-section:target > :first-child > :first-child > a:first-child,
+section:target h2 > a,
+section:target h3 > a,
+section:target h4 > a,
 a:hover {
   --underline-offset: 0.15em;
   --underline-thickness: 0.2em;
 }
 
-section > :first-child > :first-child > a:first-child:hover,
+section h2 > a:hover,
+section h3 > a:hover,
+section h4 > a:hover,
 a:hover {
   text-decoration-color: var(--link-highlight-color);
 }
@@ -227,7 +247,7 @@ a:hover {
   background: #c2ffdb;
 }
 
-.api-toc-sec > div > div {
+.api-toc-sec > div {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--small-col-width), 1fr));
   gap: var(--column-gap);
@@ -249,11 +269,11 @@ a:hover {
 }
 
 .api pre {
+  text-indent: -4ch;
+  padding-left: 4ch;
   margin-bottom: 1em;
-}
-
-.api.member {
-  margin-top: calc(-1 * var(--gutter-size));
+  overflow: scroll;
+  white-space: pre-wrap;
 }
 
 .api.error {
@@ -262,6 +282,10 @@ a:hover {
   --code-color: #ffffffc0;
   --code-bg-color: #ffffff08;
   --underline-color: #ffffff4d;
+}
+
+section.odd {
+  background: #f6f6f6;
 }
 
 @media (min-width: 700px) {
@@ -281,7 +305,48 @@ a:hover {
 }
 
 @media not all and (min-width: 700px) {
-  .api.member {
-    padding-left: calc(2 * var(--gutter-size));
+  .api.member > * {
+    margin-left: calc(2 * var(--gutter-size));
+    width: calc(100% - 3 * var(--gutter-size));
   }
+}
+
+.decl {
+  color: #00000080;
+}
+
+.fn {
+  color: #c32474;
+}
+
+.param {
+  color: #c34900;
+}
+
+.prop {
+  color: rgb(173, 128, 2);
+}
+
+.type {
+  color: rgb(0, 88, 139);
+}
+
+.literal {
+  color: rgb(107, 0, 139);
+}
+
+.keyword {
+  color: #cf012f
+}
+
+.error .keyword {
+  color: #ffffffa0;
+}
+
+.error .type {
+  color: #ffffff;
+}
+
+.error .literal {
+  color: #ffdb0f;
 }
