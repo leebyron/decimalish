@@ -364,7 +364,7 @@ section.odd {
   color: var(--keyword-color);
 }
 </style>
-    <script>!function(n,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((n="undefined"!=typeof globalThis?globalThis:n||self).decimalish={})}(this,(function(n){"use strict";function r(n){var r=b(n);return E(r[0],r[1],r[2])}function e(n){return O.test(""+n)}function t(n){return n===""+n&&e(n)}function u(n,r){var e=b(n),t=e[0],u=e[1],o=e[2],i=e[3],f=b(r),c=f[0],a=f[1],l=f[2],s=f[3];if(!t)return E(c,a,l);if(!c)return E(t,u,o);var d,p=t,m=o>l?o:l,h=i-o>s-l?i-o:s-l,N=new Array(h+m),T=0;if(t===c){for(;h-- >-m;)T+=+(u[h+o]||0)+ +(a[h+l]||0),N[h+m]=T%10,T=T>9?1:0;d=N.join(""),T&&(d=T+d,m++)}else{var x=v(u,o,i,a,l,s);if(x)for(p*=x;h-- >-m;)T+=10+x*(+(u[h+o]||0)-+(a[h+l]||0)),N[h+m]=T%10,T=T>9?0:-1;d=N.join("")}return E(p,d,m)}function o(n,r){return u(n,s(r))}function i(n,r){for(var e=b(n),t=e[0],u=e[1],o=e[2],i=e[3],f=b(r),c=f[0],a=f[1],l=f[2],v=f[3],s=new Array(i+v),d=0,p=i;p--;){d=0;for(var m=v;m--;)d+=(s[p+m+1]||0)+ +(u[p]||0)*+(a[m]||0),s[p+m+1]=d%10,d=d/10|0;s[p]=d}return E(t*c,s.join(""),o+l+1)}function f(n,r,e){return c(n,r,N(e,20,G))[0]}function c(n,r,e){var t=b(n),f=t[0],c=t[1],a=t[2],v=t[3],s=b(r),d=s[0],p=s[1],m=s[2],h=s[3],x=f*d,g=a-m,w=(e=N(e,0,C))[S],O=T(e,g);p||I("DIV_ZERO",n+"/"+r);for(var _="",y=h>v?h:v,j=[],P=y;P--;)j[P]=+(c[P]||0);for(var Q=0,U=0,V=0;U<O&&(U<=v-h||Q<U+h-1);U++){y<U+h&&(j[y++]=0),V=-1;n:for(;V++<9;){if(Q>=U)for(var Z=-1,$=0;!$&&++Z<h;)if(($=j[U+Z]-+p[Z])<0)break n;for(var z=U+h;z-- >U;)j[z]-=+(p[z-U]||0),j[z]<0&&(j[z]+=10,j[z-1]-=1);for(;0===j[Q];)Q++}0===U&&0===V&&null!=e[A]&&O++,_+=V}var J=j.join(""),K=E(x,_,g),L=E(f,J,a);if("0"!==L){var W;if(w===H&&I("INEXACT",n+"/"+r),(w=w===D?x<0?C:q:w===M?x<0?q:C:w===R?x===d?C:q:w===B?x<0?k:X:w===F?x<0?X:k:w===G?V%2?k:X:w)===q||w===C)W=w===q;else{var Y=l(i(2,J),p);W=w===X?Y>=0:Y>0}W&&(K=u(K,E(x,"1",g-U+1)),L=o(L,E(f,p,a-U+1)))}return[K,L]}function a(n,r,e){return c(n,r,e)[1]}function l(n,r){var e=b(n),t=e[0],u=e[1],o=e[2],i=e[3],f=b(r),c=f[0],a=f[1],l=f[2],s=f[3];return t?c&&t===c?v(u,o,i,a,l,s)*t|0:t:0|-c}function v(n,r,e,t,u,o){if(r!==u)return r>u?1:-1;for(var i=-1,f=e<o?e:o;++i<f;)if(n[i]!==t[i])return n[i]>t[i]?1:-1;return e===o?0:e>o?1:-1}function s(n){var r=b(n);return E(-r[0],r[1],r[2])}function d(n,r){var e=N(r,0,B),t=b(n),o=t[0],i=t[1],f=t[2],c=t[3],a=e[S],l=T(e,f),v=E(o,l>0?i.slice(0,l):"",f);if(c>l){a===H&&I("INEXACT","round("+n+")"),a=a===D?o<0?C:q:a===M||a===R?o<0?q:C:a===B?o<0?k:X:a===F?o<0?X:k:a===G?+(i[l-1]||0)%2?X:k:a;var s=+(i[l]||0);(a===X?s>4:a===k?s>5||5===s&&c>l+1:a===q&&o)&&(v=u(v,E(o,"1",f-l+1)))}return v}function p(){return h(arguments,1)}function m(){return h(arguments,-1)}function h(n,e){for(var t=r(n[0]),u=1;u<n.length;u++){var o=r(n[u]);l(o,t)===e&&(t=o)}return t}function N(n,r,e){var t,u=n&&n[A],o=n&&n[j],i=n&&n[S]||e,f=[q,C,D,M,R,X,k,B,F,G,H];for(var c in null!=u?(null!=o&&I("NOT_BOTH",j+": "+o+", "+A+": "+u),u=y(A,u)):o=null!=o?y(j,o):r,f)t|=f[c]==i;return t||I("NOT_MODE",i),{precision:u,places:o,mode:i}}function T(n,r){return null!=n[A]?x(n[A]):x(n[j]||0)+r+1}function x(n,e){var t=r(n);n=+t;var u=e&&e.exact;return!u&&null!=u||r(n)===t||I("INEXACT",t+" toNumber "+n),n}function g(n,r,e){var t=b(e?d(r,e):r),u=t[0],o=t[1],i=t[2],f=t[3];return w(u,o,f,e?T(e,i):f,n?1:i+1)+(n?(i<0?"e":"e+")+i:"")}function w(n,r,e,t,u){for(var o=n<0?"-":"";e<t;)r+="0",e++;if(u<1){for(o+="0.";u++;)o+="0";o+=r}else if(u<t)o+=r.slice(0,u)+"."+r.slice(u);else for(o+=r;u-- >e;)o+="0";return o}var O=/^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i;function b(n){var r=O.exec(""+n);r||I("NOT_NUM",n);var e=r[1],t=r[2],u=r[3];return t||(t=""),_("-"===e?-1:1,u?t+u:t,+(r[4]||0)+t.length-1)}function E(n,r,e){var t,u;return n=(t=_(n,r,e))[0],r=t[1],e=t[2],w(n,r,u=t[3],u,e+1)}function _(n,r,e){for(var t=r.length,u=0,o=0;"0"===r[u];)u++,e--;if(u===t)return[0,"",0,0];for(;"0"===r[t-1-o];)o++;return(u||o)&&(r=r.slice(u,t-o)),[n,r,e,t-u-o]}function y(n,r){return~~(r=x(r))!==r&&I("NOT_INT",n+": "+r),r}function I(n,r){var e=new Error("https://decimali.sh/#"+n+" "+r);throw e.code=n,e}var j="places",A="precision",S="mode",q="up",C="down",D="ceil",M="floor",R="euclidean",X="half up",k="half down",B="half ceil",F="half floor",G="half even",H="exact";n.abs=function(n){var r=b(n);return E(1,r[1],r[2])},n.add=u,n.ceil=function(n){return d(n,{mode:D})},n.clamp=function(n,r,e){return m(e,p(r,n))},n.cmp=l,n.construct=E,n.decimal=r,n.deconstruct=b,n.div=f,n.divInt=function(n,r,e){return c(n,r,e)[0]},n.divRem=c,n.eq=function(n,r){return 0===l(n,r)},n.exponent=function(n){return b(n)[2]},n.floor=function(n){return d(n,{mode:M})},n.gt=function(n,r){return 1===l(n,r)},n.gte=function(n,r){return-1!==l(n,r)},n.isDecimal=function(n){return t(n)&&r(n)===n},n.isNumeric=e,n.isNumericString=t,n.lt=function(n,r){return-1===l(n,r)},n.lte=function(n,r){return 1!==l(n,r)},n.max=p,n.min=m,n.mod=function(n,r){return a(n,r,{mode:M})},n.mul=i,n.neg=s,n.places=function(n){var r=b(n),e=r[2],t=r[3]-e-1;return t>0?t:0},n.pow=function(n,e){var t=r(n),u="1";for((e=y("exponent",e))<0&&I("NOT_POS","exponent: "+e);e;)1&e&&(u=i(u,t)),(e>>=1)&&(t=i(t,t));return u},n.precision=function(n){return b(n)[3]},n.rem=a,n.round=d,n.scale=function(n,r){var e=b(n);return E(e[0],e[1],e[2]+y("power",r))},n.sign=function(n){return b(n)[0]},n.sqrt=function(n,r){var e=b(n),t=e[0],o=e[1],c=e[2],a=e[3];t<0&&I("SQRT_NEG",n);var l=T(r=N(r,20,G),c),v="0";if(t){var s=Math.sqrt(+(o+(a+c&1?"":"0")));v=E(1,o=(s==1/0?"5":b(s)[1]).slice(0,l),((c+1)/2|0)-+(c<0||1&c));var p=o;do{p=o,o=b(v=i(.5,u(v,f(n,v,{precision:l+4}))))[1].slice(0,l)}while(p!==o)}return d(v,r)},n.sub=o,n.toExponential=function(n,r){return g(!0,n,r&&null!=r[j]?{precision:x(r[j])+1,mode:r[S]}:r)},n.toFixed=function(n,r){return g(!1,n,r)},n.toNumber=x,n.toString=function(n){return r(n)},n.trunc=function(n){return d(n,{mode:C})}}));</script>
+    <script>!function(n,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((n="undefined"!=typeof globalThis?globalThis:n||self).decimalish={})}(this,(function(n){"use strict";function r(n){var r=b(n);return E(r[0],r[1],r[2])}function e(n){return O.test(""+n)}function t(n){return n===""+n&&e(n)}function u(n,r){var e=b(n),t=e[0],u=e[1],o=e[2],i=e[3],f=b(r),c=f[0],a=f[1],l=f[2],s=f[3];if(!t)return E(c,a,l);if(!c)return E(t,u,o);var d,p=t,m=o>l?o:l,h=i-o>s-l?i-o:s-l,N=new Array(h+m),T=0;if(t===c){for(;h-- >-m;)T+=+(u[h+o]||0)+ +(a[h+l]||0),N[h+m]=T%10,T=T>9?1:0;d=N.join(""),T&&(d=T+d,m++)}else{var x=v(u,o,i,a,l,s);if(x)for(p*=x;h-- >-m;)T+=10+x*(+(u[h+o]||0)-+(a[h+l]||0)),N[h+m]=T%10,T=T>9?0:-1;d=N.join("")}return E(p,d,m)}function o(n,r){return u(n,s(r))}function i(n,r){for(var e=b(n),t=e[0],u=e[1],o=e[2],i=e[3],f=b(r),c=f[0],a=f[1],l=f[2],v=f[3],s=new Array(i+v),d=0,p=i;p--;){d=0;for(var m=v;m--;)d+=(s[p+m+1]||0)+ +(u[p]||0)*+(a[m]||0),s[p+m+1]=d%10,d=d/10|0;s[p]=d}return E(t*c,s.join(""),o+l+1)}function f(n,r,e){return c(n,r,N(e,20,F))[0]}function c(n,r,e){var t=b(n),f=t[0],c=t[1],a=t[2],v=t[3],s=b(r),d=s[0],p=s[1],m=s[2],h=s[3],x=f*d,g=a-m,w=(e=N(e,0,C))[S],O=T(e,g);p||I("DIV_ZERO",n+"/"+r);for(var _="",y=h>v?h:v,j=[],P=y;P--;)j[P]=+(c[P]||0);for(var Q=0,U=0,V=0;U<O&&(U<=v-h||Q<U+h-1);U++){y<U+h&&(j[y++]=0),V=-1;n:for(;V++<9;){if(Q>=U)for(var Z=-1,$=0;!$&&++Z<h;)if(($=j[U+Z]-+p[Z])<0)break n;for(var z=U+h;z-- >U;)j[z]-=+(p[z-U]||0),j[z]<0&&(j[z]+=10,j[z-1]-=1);for(;0===j[Q];)Q++}0===U&&0===V&&null!=e[A]&&O++,_+=V}var J=j.join(""),K=E(x,_,g),L=E(f,J,a);if("0"!==L){var W;if(w===H&&I("INEXACT",n+"/"+r),(w=w===D?x<0?C:q:w===M?x<0?q:C:w===G?x===d?C:q:w===k?x<0?X:R:w===B?x<0?R:X:w===F?V%2?X:R:w)===q||w===C)W=w===q;else{var Y=l(i(2,J),p);W=w===R?Y>=0:Y>0}W&&(K=u(K,E(x,"1",g-U+1)),L=o(L,E(f,p,a-U+1)))}return[K,L]}function a(n,r,e){return c(n,r,e)[1]}function l(n,r){var e=b(n),t=e[0],u=e[1],o=e[2],i=e[3],f=b(r),c=f[0],a=f[1],l=f[2],s=f[3];return t?c&&t===c?v(u,o,i,a,l,s)*t|0:t:0|-c}function v(n,r,e,t,u,o){if(r!==u)return r>u?1:-1;for(var i=-1,f=e<o?e:o;++i<f;)if(n[i]!==t[i])return n[i]>t[i]?1:-1;return e===o?0:e>o?1:-1}function s(n){var r=b(n);return E(-r[0],r[1],r[2])}function d(n,r){var e=N(r,0,k),t=b(n),o=t[0],i=t[1],f=t[2],c=t[3],a=e[S],l=T(e,f),v=E(o,l>0?i.slice(0,l):"",f);if(c>l){a===H&&I("INEXACT","round("+n+")"),a=a===D?o<0?C:q:a===M||a===G?o<0?q:C:a===k?o<0?X:R:a===B?o<0?R:X:a===F?+(i[l-1]||0)%2?R:X:a;var s=+(i[l]||0);(a===R?s>4:a===X?s>5||5===s&&c>l+1:a===q&&o)&&(v=u(v,E(o,"1",f-l+1)))}return v}function p(){return h(arguments,1)}function m(){return h(arguments,-1)}function h(n,e){for(var t=r(n[0]),u=1;u<n.length;u++){var o=r(n[u]);l(o,t)===e&&(t=o)}return t}function N(n,r,e){var t,u=n&&n[A],o=n&&n[j],i=n&&n[S]||e,f=[q,C,D,M,G,R,X,k,B,F,H];for(var c in null!=u?(null!=o&&I("NOT_BOTH",j+": "+o+", "+A+": "+u),u=y(A,u)):o=null!=o?y(j,o):r,f)t|=f[c]==i;return t||I("NOT_MODE",i),{precision:u,places:o,mode:i}}function T(n,r){return null!=n[A]?x(n[A]):x(n[j]||0)+r+1}function x(n,e){var t=r(n);n=+t;var u=e&&e.exact;return!u&&null!=u||r(n)===t||I("INEXACT",t+" toNumber "+n),n}function g(n,r,e){var t=b(e?d(r,e):r),u=t[0],o=t[1],i=t[2],f=t[3];return w(u,o,f,e?T(e,i):f,n?1:i+1)+(n?(i<0?"e":"e+")+i:"")}function w(n,r,e,t,u){for(var o=n<0?"-":"";e<t;)r+="0",e++;if(u<1){for(o+="0.";u++;)o+="0";o+=r}else if(u<t)o+=r.slice(0,u)+"."+r.slice(u);else for(o+=r;u-- >e;)o+="0";return o}var O=/^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i;function b(n){var r=O.exec(""+n);r||I("NOT_NUM",n);var e=r[1],t=r[2],u=r[3];return t||(t=""),_("-"===e?-1:1,u?t+u:t,+(r[4]||0)+t.length-1)}function E(n,r,e){var t,u;return n=(t=_(n,r,e))[0],r=t[1],e=t[2],w(n,r,u=t[3],u,e+1)}function _(n,r,e){for(var t=r.length,u=0,o=0;"0"===r[u];)u++,e--;if(u===t)return[0,"",0,0];for(;"0"===r[t-1-o];)o++;return(u||o)&&(r=r.slice(u,t-o)),[n,r,e,t-u-o]}function y(n,r){return~~(r=x(r))!==r&&I("NOT_INT",n+": "+r),r}function I(n,r){var e=new Error("https://decimali.sh/#"+n+" "+r);throw e.code=n,e}var j="places",A="precision",S="mode",q="up",C="down",D="ceil",M="floor",R="half up",X="half down",k="half ceil",B="half floor",F="half even",G="euclidean",H="exact";n.abs=function(n){var r=b(n);return E(1,r[1],r[2])},n.add=u,n.ceil=function(n){return d(n,{mode:D})},n.clamp=function(n,r,e){return m(e,p(r,n))},n.cmp=l,n.construct=E,n.decimal=r,n.deconstruct=b,n.div=f,n.divInt=function(n,r,e){return c(n,r,e)[0]},n.divRem=c,n.eq=function(n,r){return 0===l(n,r)},n.exponent=function(n){return b(n)[2]},n.floor=function(n){return d(n,{mode:M})},n.gt=function(n,r){return 1===l(n,r)},n.gte=function(n,r){return-1!==l(n,r)},n.isDecimal=function(n){return t(n)&&r(n)===n},n.isNumeric=e,n.isNumericString=t,n.lt=function(n,r){return-1===l(n,r)},n.lte=function(n,r){return 1!==l(n,r)},n.max=p,n.min=m,n.mod=function(n,r){return a(n,r,{mode:M})},n.mul=i,n.neg=s,n.places=function(n){var r=b(n),e=r[2],t=r[3]-e-1;return t>0?t:0},n.pow=function(n,e){var t=r(n),u="1";for((e=y("exponent",e))<0&&I("NOT_POS","exponent: "+e);e;)1&e&&(u=i(u,t)),(e>>=1)&&(t=i(t,t));return u},n.precision=function(n){return b(n)[3]},n.rem=a,n.round=d,n.scale=function(n,r){var e=b(n);return E(e[0],e[1],e[2]+y("power",r))},n.sign=function(n){return b(n)[0]},n.sqrt=function(n,r){var e=b(n),t=e[0],o=e[1],c=e[2],a=e[3];t<0&&I("SQRT_NEG",n);var l=T(r=N(r,20,F),c),v="0";if(t){var s=Math.sqrt(+(o+(a+c&1?"":"0")));v=E(1,o=(s==1/0?"5":b(s)[1]).slice(0,l),((c+1)/2|0)-+(c<0||1&c));var p=o;do{p=o,o=b(v=i(.5,u(v,f(n,v,{precision:l+4}))))[1].slice(0,l)}while(p!==o)}return d(v,r)},n.sub=o,n.toExponential=function(n,r){return g(!0,n,r&&null!=r[j]?{precision:x(r[j])+1,mode:r[S]}:r)},n.toFixed=function(n,r){return g(!1,n,r)},n.toNumber=x,n.toString=function(n){return r(n)},n.trunc=function(n){return d(n,{mode:C})}}));</script>
   </head>
   <body>
     <header>
@@ -2142,60 +2142,14 @@ words, this moves the decimal point to the right <code key="6">power</code> plac
           <div>
             <pre class="decl"><span class="fn">round</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
             <p key="0">
-              Rounds a numeric value according to the provided rules.
+              Rounds a numeric value according to the provided [[RoundingRules]],
+defaulting to <code key="6">{ places: 0, mode: &quot;half ceil&quot; }</code>.
             </p>
             <p key="1">
-              places: The number of decimal places to round to. Negative places rounds
-        integer places. Ignored if precision is provided. If neither places
-        or precision is provided, a default value of 0 is used, rounding to
-        an whole number.
-            </p>
-            <p key="2">
-              precision: The number of significant digits to round to. Overrides places.
-            </p>
-            <p key="3">
-              mode: Determines how a rounded value should be determined.
-      If not provided, the default mode &quot;half ceil&quot; is used.
-            </p>
-            <ul key="4">
-              <li key="0">
-                <code key="0">&quot;up&quot;</code>: Rounds up away from zero.
-              </li>
-              <li key="1">
-                <code key="0">&quot;down&quot;</code>: Rounds down towards zero.
-              </li>
-              <li key="2">
-                <code key="0">&quot;ceil&quot;</code>: Rounds up towards +Infinity.
-              </li>
-              <li key="3">
-                <code key="0">&quot;floor&quot;</code>: Rounds down towards -Infinity.
-              </li>
-              <li key="4">
-                <code key="0">&quot;euclidean&quot;</code>: Same as floor, but with specific behavior for division.
-              </li>
-              <li key="5">
-                <code key="0">&quot;half up&quot;</code>: Rounds towards the nearest neighbor, otherwise up away from zero.
-              </li>
-              <li key="6">
-                <code key="0">&quot;half down&quot;</code>: Rounds towards the nearest neighbor, otherwise down towards zero.
-              </li>
-              <li key="7">
-                <code key="0">&quot;half ceil&quot;</code>: Rounds towards the nearest neighbor, otherwise up towards +Infinity.
-              </li>
-              <li key="8">
-                <code key="0">&quot;half floor&quot;</code>: Rounds towards the nearest neighbor, otherwise down towards -Infinity.
-              </li>
-              <li key="9">
-                <code key="0">&quot;half even&quot;</code>: Rounds towards the nearest neighbor, otherwise towards the even neighbor. Useful to avoid aggregated bias.
-              </li>
-              <li key="10">
-                <code key="0">&quot;exact&quot;</code>: Throws an error if rounding is necessary.
-              </li>
-            </ul>
-            <p key="5">
-              Note: the default &quot;half ceil&quot; rounding mode is different from the behavior
-of round() in many other libraries and programming languages, but matches the
-behavior of JavaScript&quot;s Math.round(). Other languages default to &quot;half up&quot;.
+              Note: The default <code key="2">&quot;half ceil&quot;</code> rounding mode is different from the behavior
+of round() in many other libraries and programming languages (many of which
+use <code key="4">&quot;half up&quot;</code> or <code key="6">&quot;half even&quot;</code>), but this matches the behavior of
+JavaScript's Math.round().
             </p>
           </div>
         </div>
@@ -2296,6 +2250,13 @@ in the direction of 0.
               <h4>
                 <a href="#places">Decimal places</a>
               </h4>
+              <p key="0">
+                The number of decimal places to round to. Negative places rounds to higher
+integer places. Only one of [[places]] or [[precision]] can be provided.
+              </p>
+              <p key="1">
+                For most functions, the default is <code key="2">0</code>, rounding to an integer whole number.
+              </p>
             </div>
           </div>
         </section>
@@ -2307,6 +2268,10 @@ in the direction of 0.
               <h4>
                 <a href="#precision">Significant figures</a>
               </h4>
+              <p key="0">
+                Rounds a result to contain this number of significant digits. Only one of
+[[places]] or [[precision]] can be provided.
+              </p>
             </div>
           </div>
         </section>
@@ -2318,6 +2283,15 @@ in the direction of 0.
               <h4>
                 <a href="#mode">Rounding mode</a>
               </h4>
+              <p key="0">
+                If a result needs to be rounded to meet the expected number of decimal
+places or significant digits, the rounding mode determines which direction
+to round towards.
+              </p>
+              <p key="1">
+                The default value depends on the function called. [[round()]] defaults to
+[[&quot;half ceil&quot;]] while [[div()]] and [[sqrt()]] defaults to [[&quot;half even&quot;]].
+              </p>
             </div>
           </div>
         </section>
@@ -2339,6 +2313,10 @@ in the direction of 0.
               <h4>
                 <a href="#up">Round up</a>
               </h4>
+              <p key="0">
+                Rounds a result up, away from zero, to the value with a larger
+absolute value.
+              </p>
             </div>
           </div>
         </section>
@@ -2350,6 +2328,10 @@ in the direction of 0.
               <h4>
                 <a href="#down">Round down</a>
               </h4>
+              <p key="0">
+                Rounds a result down, towards zero, to the value with a smaller
+absolute value.
+              </p>
             </div>
           </div>
         </section>
@@ -2359,8 +2341,12 @@ in the direction of 0.
             <div>
               <pre><span class="literal">&quot;ceil&quot;</span></pre>
               <h4>
-                <a href="#ceil">Ceiling (towards Infinity)</a>
+                <a href="#ceil">Ceiling</a>
               </h4>
+              <p key="0">
+                Rounds a result up, towards <code key="2">+Infinity</code>, to the value with the larger
+signed value.
+              </p>
             </div>
           </div>
         </section>
@@ -2370,19 +2356,12 @@ in the direction of 0.
             <div>
               <pre><span class="literal">&quot;floor&quot;</span></pre>
               <h4>
-                <a href="#floor">Floor (truncate towards 0)</a>
+                <a href="#floor">Floor (Truncate)</a>
               </h4>
-            </div>
-          </div>
-        </section>
-        <section id="euclidean" class="api member">
-          <div>
-            <div></div>
-            <div>
-              <pre><span class="literal">&quot;euclidean&quot;</span></pre>
-              <h4>
-                <a href="#euclidean">Euclidean division</a>
-              </h4>
+              <p key="0">
+                Rounds a result down, towards <code key="2">-Infinity</code>, to the value with the smaller
+signed value.
+              </p>
             </div>
           </div>
         </section>
@@ -2394,6 +2373,10 @@ in the direction of 0.
               <h4>
                 <a href="#half up">Round half up</a>
               </h4>
+              <p key="0">
+                Rounds a result towards the nearest neighboring value, otherwise &quot;up&quot; if
+exactly between the two.
+              </p>
             </div>
           </div>
         </section>
@@ -2405,6 +2388,10 @@ in the direction of 0.
               <h4>
                 <a href="#half down">Round half down</a>
               </h4>
+              <p key="0">
+                Rounds a result towards the nearest neighboring value, otherwise &quot;down&quot; if
+exactly between the two.
+              </p>
             </div>
           </div>
         </section>
@@ -2416,6 +2403,10 @@ in the direction of 0.
               <h4>
                 <a href="#half ceil">Round half ceiling</a>
               </h4>
+              <p key="0">
+                Rounds a result towards the nearest neighboring value, otherwise &quot;ceil&quot; if
+exactly between the two.
+              </p>
             </div>
           </div>
         </section>
@@ -2427,6 +2418,10 @@ in the direction of 0.
               <h4>
                 <a href="#half floor">Round half floor</a>
               </h4>
+              <p key="0">
+                Rounds a result towards the nearest neighboring value, otherwise &quot;floor&quot; if
+exactly between the two.
+              </p>
             </div>
           </div>
         </section>
@@ -2438,6 +2433,38 @@ in the direction of 0.
               <h4>
                 <a href="#half even">Round half towards even</a>
               </h4>
+              <p key="0">
+                Rounds a result towards the nearest neighboring value, otherwise towards
+the value with an even least significant digit if exactly between the two.
+              </p>
+              <p key="1">
+                This is particularly useful to avoid aggregated bias when adding together
+multiple rounded values as there is an equal chance of rounding up or down.
+              </p>
+            </div>
+          </div>
+        </section>
+        <section id="euclidean" class="api member">
+          <div>
+            <div></div>
+            <div>
+              <pre><span class="literal">&quot;euclidean&quot;</span></pre>
+              <h4>
+                <a href="#euclidean">Euclidean division</a>
+              </h4>
+              <p key="0">
+                When used with division, produces a result where the remainder is always a
+positive value, regardless of the signs of the dividend or divisor.
+              </p>
+              <p key="1">
+                This is particularly useful when provided to [[rem()]] to create a version
+of modulo which always results in a positive number, which is the
+<a key="6" href="https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition">typical mathematical definition</a>
+even though most programming languages offer different definitions.
+              </p>
+              <p key="2">
+                When used with rounding, this is an alias for [[floor]].
+              </p>
             </div>
           </div>
         </section>
@@ -2449,6 +2476,15 @@ in the direction of 0.
               <h4>
                 <a href="#exact">Assert exact result</a>
               </h4>
+              <p key="0">
+                Asserts that applying the provided rounding rules would not result in a
+rounded value.
+              </p>
+              <p key="1">
+                This is particularly useful to ensure a set of operations remains within
+an expected precision or decimal places, or that division does not result
+in a non-terminating repeating decimal.
+              </p>
             </div>
           </div>
         </section>
@@ -2568,7 +2604,7 @@ significant digits). Yes this is redundant information with the length of
               Construct a decimal from an internal representation
             </p>
             <p key="1">
-              Given a decimal&quot;s decomposed representation, return a canonical decimal value.
+              Given a decimal's decomposed representation, return a canonical decimal value.
             </p>
           </div>
         </div>
