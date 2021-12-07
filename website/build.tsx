@@ -2,8 +2,18 @@
  * TODO:
  *
  * Markdown links, code coloring, example coloring
+ * Markdown external links should be target _blank
+ * Format in-doc links in markdown
  * Dark mode?
  * share opengraph
+ *
+ * Docs:
+ *
+ * Getting started section
+ * Compare to other libraries section
+ * Give examples of rounding modes? Perhaps via a details/summary exposure
+ * FAQ: using alongside Big.js
+ *
  *
  */
 

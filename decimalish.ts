@@ -213,7 +213,7 @@ export function add(a: Numeric, b: Numeric): decimal {
     }
     significand = digits.join("")
 
-    // Prepend the final sum"s carried-over result.
+    // Prepend the final sum's carried-over result.
     if (result) {
       significand = result + significand
       exponent++
@@ -595,13 +595,13 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
   if (sign) {
 
     // Start with an estimated result using floating point sqrt based on the idea
-    // that the result is independent of original value"s exponent as long as it
+    // that the result is independent of original value's exponent as long as it
     // is the same parity.
     const estimate = Math.sqrt(+(significand + (precision + exponent & 1 ? "" : "0")))
     significand = (estimate == 1 / 0 ? "5" : deconstruct(estimate)[1]).slice(0, iterationPrecision)
     result = construct(1, significand, ((exponent + 1) / 2 | 0) - +(exponent < 0 || exponent & 1))
 
-    // Use Newton"s method to generate and confirm additional precision.
+    // Use Newton's method to generate and confirm additional precision.
     let prevSignificand = significand
     do {
       result = mul(0.5, add(result, div(value, result, { precision: iterationPrecision + 4 })))
@@ -699,9 +699,9 @@ export function cmp(a: Numeric, b: Numeric): 1 | -1 | 0 {
   const [signB, significandB, exponentB, precisionB] = deconstruct(b)
 
   return (
-    // If a is zero, return the opposite of b"s sign.
+    // If a is zero, return the opposite of b's sign.
     !signA ? (-signB | 0) :
-    // If b is zero, or the signs differ, return a"s sign.
+    // If b is zero, or the signs differ, return a's sign.
     !signB || signA !== signB ? signA :
     // Otherwise they are the same sign, so compare absolute values and flip if negative.
     cmpAbs(significandA, exponentA, precisionA, significandB, exponentB, precisionB) * signA | 0
@@ -835,33 +835,13 @@ export function scale(value: Numeric, power: Numeric): decimal {
 /**
  * Round
  *
- * Rounds a numeric value according to the provided rules.
+ * Rounds a numeric value according to the provided [[RoundingRules]],
+ * defaulting to `{ places: 0, mode: "half ceil" }`.
  *
- * places: The number of decimal places to round to. Negative places rounds
- *         integer places. Ignored if precision is provided. If neither places
- *         or precision is provided, a default value of 0 is used, rounding to
- *         an whole number.
- *
- * precision: The number of significant digits to round to. Overrides places.
- *
- * mode: Determines how a rounded value should be determined.
- *       If not provided, the default mode "half ceil" is used.
- *
- *  - `"up"`: Rounds up away from zero.
- *  - `"down"`: Rounds down towards zero.
- *  - `"ceil"`: Rounds up towards +Infinity.
- *  - `"floor"`: Rounds down towards -Infinity.
- *  - `"euclidean"`: Same as floor, but with specific behavior for division.
- *  - `"half up"`: Rounds towards the nearest neighbor, otherwise up away from zero.
- *  - `"half down"`: Rounds towards the nearest neighbor, otherwise down towards zero.
- *  - `"half ceil"`: Rounds towards the nearest neighbor, otherwise up towards +Infinity.
- *  - `"half floor"`: Rounds towards the nearest neighbor, otherwise down towards -Infinity.
- *  - `"half even"`: Rounds towards the nearest neighbor, otherwise towards the even neighbor. Useful to avoid aggregated bias.
- *  - `"exact"`: Throws an error if rounding is necessary.
- *
- * Note: the default "half ceil" rounding mode is different from the behavior
- * of round() in many other libraries and programming languages, but matches the
- * behavior of JavaScript"s Math.round(). Other languages default to "half up".
+ * Note: The default `"half ceil"` rounding mode is different from the behavior
+ * of round() in many other libraries and programming languages (many of which
+ * use `"half up"` or `"half even"`), but this matches the behavior of
+ * JavaScript's Math.round().
  *
  * @equivalent Math.round(value)
  * @category Rounding
@@ -1021,16 +1001,34 @@ export function clamp(value: Numeric, low: Numeric, high: Numeric): decimal {
  * @category Rounding
  */
 export interface RoundingRules {
+
   /**
    * Decimal places
+   *
+   * The number of decimal places to round to. Negative places rounds to higher
+   * integer places. Only one of [[places]] or [[precision]] can be provided.
+   *
+   * For most functions, the default is `0`, rounding to an integer whole number.
    */
   places?: Numeric
+
   /**
    * Significant figures
+   *
+   * Rounds a result to contain this number of significant digits. Only one of
+   * [[places]] or [[precision]] can be provided.
    */
   precision?: Numeric
+
   /**
    * Rounding mode
+   *
+   * If a result needs to be rounded to meet the expected number of decimal
+   * places or significant digits, the rounding mode determines which direction
+   * to round towards.
+   *
+   * The default value depends on the function called. [[round()]] defaults to
+   * [["half ceil"]] while [[div()]] and [[sqrt()]] defaults to [["half even"]].
    */
   mode?: RoundingMode
 }
@@ -1041,53 +1039,111 @@ export interface RoundingRules {
  * @category Rounding
  */
 export type RoundingMode =
+
   /**
    * Round up
+   *
+   * Rounds a result up, away from zero, to the value with a larger
+   * absolute value.
    */
   | "up"
+
   /**
    * Round down
+   *
+   * Rounds a result down, towards zero, to the value with a smaller
+   * absolute value.
    */
   | "down"
+
   /**
-   * Ceiling (towards Infinity)
+   * Ceiling
+   *
+   * Rounds a result up, towards `+Infinity`, to the value with the larger
+   * signed value.
    */
   | "ceil"
+
   /**
-   * Floor (truncate towards 0)
+   * Floor (Truncate)
+   *
+   * Rounds a result down, towards `-Infinity`, to the value with the smaller
+   * signed value.
    */
   | "floor"
-  /**
-   * Euclidean division
-   */
-  | "euclidean"
+
   /**
    * Round half up
+   *
+   * Rounds a result towards the nearest neighboring value, otherwise "up" if
+   * exactly between the two.
    */
   | "half up"
+
   /**
    * Round half down
+   *
+   * Rounds a result towards the nearest neighboring value, otherwise "down" if
+   * exactly between the two.
    */
   | "half down"
+
   /**
    * Round half ceiling
+   *
+   * Rounds a result towards the nearest neighboring value, otherwise "ceil" if
+   * exactly between the two.
    */
   | "half ceil"
+
   /**
    * Round half floor
+   *
+   * Rounds a result towards the nearest neighboring value, otherwise "floor" if
+   * exactly between the two.
    */
   | "half floor"
+
   /**
    * Round half towards even
+   *
+   * Rounds a result towards the nearest neighboring value, otherwise towards
+   * the value with an even least significant digit if exactly between the two.
+   *
+   * This is particularly useful to avoid aggregated bias when adding together
+   * multiple rounded values as there is an equal chance of rounding up or down.
    */
   | "half even"
+
+  /**
+   * Euclidean division
+   *
+   * When used with division, produces a result where the remainder is always a
+   * positive value, regardless of the signs of the dividend or divisor.
+   *
+   * This is particularly useful when provided to [[rem()]] to create a version
+   * of modulo which always results in a positive number, which is the
+   * [typical mathematical definition](https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition)
+   * even though most programming languages offer different definitions.
+   *
+   * When used with rounding, this is an alias for [[floor]].
+   */
+  | "euclidean"
+
   /**
    * Assert exact result
+   *
+   * Asserts that applying the provided rounding rules would not result in a
+   * rounded value.
+   *
+   * This is particularly useful to ensure a set of operations remains within
+   * an expected precision or decimal places, or that division does not result
+   * in a non-terminating repeating decimal.
    */
   | "exact"
 
 /**
- * Given rounding rules, a number"s exponent, and a default, produce a rounding
+ * Given rounding rules, a number's exponent, and a default, produce a rounding
  * precision and mode. If there are problems with rounding rules, throw an Error.
  *
  * @internal
@@ -1311,7 +1367,7 @@ export function deconstruct(value: unknown): [sign: 1 | -1 | 0, significand: str
  *
  * Construct a decimal from an internal representation
  *
- * Given a decimal"s decomposed representation, return a canonical decimal value.
+ * Given a decimal's decomposed representation, return a canonical decimal value.
  *
  * @category Et cetera
  * @__PURE__
@@ -1494,10 +1550,10 @@ const UP = "up"
 const DOWN = "down"
 const CEIL = "ceil"
 const FLOOR = "floor"
-const EUCLIDEAN = "euclidean"
 const HALF_UP = "half up"
 const HALF_DOWN = "half down"
 const HALF_CEIL = "half ceil"
 const HALF_FLOOR = "half floor"
 const HALF_EVEN = "half even"
+const EUCLIDEAN = "euclidean"
 const EXACT = "exact"
