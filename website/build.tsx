@@ -1,9 +1,8 @@
 /**
  * TODO:
  *
- * Markdown links, code coloring, example coloring
- * Markdown external links should be target _blank
- * Format in-doc links in markdown
+ * Fix link underlines
+ * Examples & syntax highlight coloring
  * Dark mode?
  * share opengraph
  *
@@ -41,15 +40,15 @@ declare module 'typescript' {
 
 type Typedefs = { ids: TypedefsById, categories: TypedefsByCategory }
 
-type TypedefsById = { [id: string]: Typedef }
+type TypedefsById = { [id: string]: Typedef | undefined }
 
 type TypedefsByCategory = { [category: string]: Typedef[] }
 
 type Typedef = {
   id: string,
   name: string,
-  isFunction: boolean,
-  decl: ts.Declaration
+  kind: string,
+  node: ts.Node
 }
 
 type JSDoc = {
@@ -70,16 +69,36 @@ function getTypedefByCategory(): Typedefs {
   const ids: TypedefsById = {}
   const categories: TypedefsByCategory = {}
 
-  for (const decl of sourceFile.statements) {
-    if (isExportedDeclaration(decl)) {
-      const name = decl.name!.text
-      const isFunction = ts.isFunctionDeclaration(decl)
-      const id = name + (isFunction ? '()' : '')
-      const category = getJSDoc(decl)?.tags.category || OTHER_CATEGORY
+  for (const node of sourceFile.statements) {
+    if (isExportedDeclaration(node)) {
+      const name = node.name!.text
+      const kind = ts.isFunctionDeclaration(node) ? 'fn' : 'type'
+      const id = name + (kind === 'fn' ? '()' : '')
+      const category = getJSDoc(node)?.tags.category || OTHER_CATEGORY
       if (!ids[id]) {
         (categories[category] || (categories[category] = [])).push(
-          ids[id] = { id, name, isFunction, decl }
+          ids[id] = { id, name, kind, node }
         )
+
+        // Interface field ids
+        if (ts.isInterfaceDeclaration(node)) {
+          for (const member of node.members) {
+            const id = member.name!.getText()
+            ids[id] = { id, name: id, kind: 'prop', node: member }
+          }
+        }
+
+        // String union enum ids
+        if (ts.isTypeAliasDeclaration(node) &&
+              ts.isUnionTypeNode(node.type) &&
+              node.type.types.every(type =>
+                ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal))
+        ) {
+          for (const member of node.type.types) {
+            const id = member.getText().slice(1, -1)
+            ids[id] = { id, name: id, kind: 'literal', node: member }
+          }
+        }
       }
     }
   }
@@ -247,7 +266,7 @@ const APISection = () =>
               {members.map(member =>
                 <li>
                   <a href={'#' + member.id}>
-                    {getJSDoc(member.decl)?.title} <pre class={member.isFunction ? 'fn' : 'type'}>{member.id}</pre>
+                    {getJSDoc(member.node)?.title} <pre class={member.kind}>{member.id}</pre>
                   </a>
                 </li>
               )}
@@ -264,28 +283,53 @@ const APISection = () =>
     )}
   </>
 
-const Markdown = ({ children }: { children: string | undefined }) => {
+const Markdown = ({ scope, children }: { scope?: ts.Node, children?: string }) => {
   if (!children) return null
-  return compiler(children, { wrapper: null, createElement: jsx.h as any })
+  const ids = useTypedefs().ids
+
+  const Link = ({ children, ...props }: any) =>
+    <a target={props.href?.startsWith('http') && '_blank'} {...props}>{children}</a>
+
+  const Code = ({ children }: { children: string }) => {
+    // Convert inline code blocks into relative links.
+    const typeDef = children.startsWith('"') ? ids[children.slice(1, -1)] : ids[children]
+    if (typeDef) {
+      return <code class={typeDef.kind}><a href={'#' + typeDef.id}>{children}</a></code>
+    }
+
+    // Detect params from the current scope, otherwise treat numeric strings as literals.
+    const kind =
+      scope && ts.isFunctionDeclaration(scope) &&
+        scope.parameters.some(param => param.name.getText() === children) ? 'param' :
+      String(Number(children)) === children || /[+-]?[0-9]+/.test(children) || children.startsWith('"') && children.endsWith('"') ? 'literal' :
+    null
+
+    return <code class={kind}>{children}</code>
+  }
+
+  return compiler(children, { wrapper: null, createElement: jsx.h as any, overrides: {
+    code: Code,
+    a: Link
+  } })
 }
 
 const APIItemSection = ({ item }: { item: Typedef }) =>
   <section id={item.id} class={{ api: true, error: item.name === 'ErrorCode' }}>
     <div>
-      <h3><a href={'#' + item.id}>{getJSDoc(item.decl)?.title}</a></h3>
+      <h3><a href={'#' + item.id}>{getJSDoc(item.node)?.title}</a></h3>
       <div>
-        <pre class="decl"><Source node={item.decl} /></pre>
-        <Markdown>{getJSDoc(item.decl)?.comment}</Markdown>
+        <pre class="decl"><Source node={item.node} /></pre>
+        <Markdown scope={item.node}>{getJSDoc(item.node)?.comment}</Markdown>
       </div>
     </div>
-    {ts.isInterfaceDeclaration(item.decl) &&
-      item.decl.members.map(member =>
+    {ts.isInterfaceDeclaration(item.node) &&
+      item.node.members.map(member =>
         <TypeMemberSection member={member} id={member.name!.getText()} />)}
-    {ts.isTypeAliasDeclaration(item.decl) &&
-      ts.isUnionTypeNode(item.decl.type) &&
-      item.decl.type.types.every(type =>
+    {ts.isTypeAliasDeclaration(item.node) &&
+      ts.isUnionTypeNode(item.node.type) &&
+      item.node.type.types.every(type =>
         ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal)) &&
-      item.decl.type.types.map(member =>
+      item.node.type.types.map(member =>
         <TypeMemberSection member={member} id={member.getText().slice(1, -1)} />)}
   </section>
 

@@ -42,8 +42,6 @@
  *  - prettier
  *  - eslint
  *  - optimized for build size?
- *  - test tree shaking
- *  - doc generator
  *  - build size testing
  *  - performance testing
  *  - compare to other libraries and standards? http://speleotrove.com/decimal/
@@ -89,22 +87,20 @@
  *
  * @category Types
  * @see isDecimal
- * @__PURE__
  */
-export type decimal = NumericString & { [$decimal]: typeof $decimal }
-declare const $decimal: unique symbol
+export type decimal = NumericString & { [$$decimal]: true }
+declare const $$decimal: unique symbol
 
 /**
  * Convert to decimal
  *
- * Converts any numeric value to a decimal.
+ * Converts any numeric value to a `decimal`.
  *
  * Throws an Error if the provided value cannot be translated to decimal.
  *
- * Note: unlike number, decimal cannot represent Infinity, NaN, or -0.
+ * Note: unlike number, decimal cannot represent `Infinity`, `NaN`, or `-0`.
  *
  * @category Types
- * @__PURE__
  */
 export function decimal(value: unknown): decimal {
   const [sign, significand, exponent] = deconstruct(value)
@@ -116,10 +112,9 @@ export function decimal(value: unknown): decimal {
  *
  * Returns true if the provided value is a decimal value.
  *
- * A value is [[decimal]] if it is a numeric string in a canonical decimal form.
+ * A value is `decimal` if it is a numeric string in a canonical decimal form.
  *
  * @category Types
- * @__PURE__
  */
 export function isDecimal(value: unknown): value is decimal {
   return isNumericString(value) && decimal(value) === value
@@ -143,7 +138,6 @@ export type Numeric = NumericString | number | bigint
  * A value is considered numeric if it can be coerced to a numeric string.
  *
  * @category Types
- * @__PURE__
  */
 export function isNumeric(value: unknown): value is Numeric {
   return decimalRegex.test(""+value)
@@ -167,7 +161,6 @@ export type NumericString = `${number}`
  * notation, and leading or trailing zeros or decimal points.
  *
  * @category Types
- * @__PURE__
  */
 export function isNumericString(value: unknown): value is NumericString {
   return value === ("" + value) && isNumeric(value)
@@ -183,7 +176,6 @@ export function isNumericString(value: unknown): value is NumericString {
  *
  * @equivalent a + b
  * @category Arithmetic
- * @__PURE__
  */
 export function add(a: Numeric, b: Numeric): decimal {
   const [signA, significandA, exponentA, precisionA] = deconstruct(a)
@@ -251,7 +243,6 @@ export function add(a: Numeric, b: Numeric): decimal {
  *
  * @equivalent a - b
  * @category Arithmetic
- * @__PURE__
  */
 export function sub(a: Numeric, b: Numeric): decimal {
   // a - b is equivalent to a + -b
@@ -265,7 +256,6 @@ export function sub(a: Numeric, b: Numeric): decimal {
  *
  * @equivalent a * b
  * @category Arithmetic
- * @__PURE__
  */
 export function mul(a: Numeric, b: Numeric): decimal {
   const [signA, significandA, exponentA, precisionA] = deconstruct(a)
@@ -297,7 +287,6 @@ export function mul(a: Numeric, b: Numeric): decimal {
  *
  * @equivalent a / b
  * @category Arithmetic
- * @__PURE__
  */
 export function div(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
   const [quotient] = divRem(dividend, divisor, normalizeRules(rules, 20, HALF_EVEN))
@@ -337,7 +326,6 @@ export function div(dividend: Numeric, divisor: Numeric, rules?: RoundingRules):
  * All rounding modes may be used and these conditions will be satisfied.
  *
  * @category Arithmetic
- * @__PURE__
  */
 export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): [quotient: decimal, remainder: decimal] {
   const [signA, significandA, exponentA, precisionA] = deconstruct(dividend)
@@ -478,14 +466,13 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
  * Divide to integer
  *
  * Returns the integer result of dividing `dividend` by `divisor` using
- * truncated (round "down") division by default.
+ * truncated (round `"down"`) division by default.
  *
  * Note: The remainder can be found using `rem()`, or better yet use `divRem()`.
  *
  * @see rem
  * @see divRem
  * @category Arithmetic
- * @__PURE__
  */
 export function divInt(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
   const [quotient] = divRem(dividend, divisor, rules)
@@ -507,7 +494,6 @@ export function divInt(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
  * @see divInt
  * @see divRem
  * @category Arithmetic
- * @__PURE__
  */
 export function rem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules): decimal {
   const [, remainder] = divRem(dividend, divisor, rules)
@@ -526,7 +512,6 @@ export function rem(dividend: Numeric, divisor: Numeric, rules?: RoundingRules):
  * @equivalent ((a % b) + b) % b
  * @see rem
  * @category Arithmetic
- * @__PURE__
  */
 export function mod(a: Numeric, b: Numeric): decimal {
   return rem(a, b, { mode: FLOOR })
@@ -540,7 +525,6 @@ export function mod(a: Numeric, b: Numeric): decimal {
  *
  * @equivalent Math.pow(base, exponent)
  * @category Arithmetic
- * @__PURE__
  */
 export function pow(base: Numeric, exponent: Numeric): decimal {
   let baseToPowerOf2 = decimal(base)
@@ -577,7 +561,6 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
  *
  * @equivalent Math.sqrt(value)
  * @category Arithmetic
- * @__PURE__
  */
 export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
   let [sign, significand, exponent, precision] = deconstruct(value)
@@ -624,7 +607,6 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
  *
  * @equivalent a == b
  * @category Comparison
- * @__PURE__
  */
 export function eq(a: Numeric, b: Numeric): boolean {
   return cmp(a, b) === 0
@@ -637,7 +619,6 @@ export function eq(a: Numeric, b: Numeric): boolean {
  *
  * @equivalent a > b
  * @category Comparison
- * @__PURE__
  */
 export function gt(a: Numeric, b: Numeric): boolean {
   return cmp(a, b) === 1
@@ -650,7 +631,6 @@ export function gt(a: Numeric, b: Numeric): boolean {
  *
  * @equivalent a >= b
  * @category Comparison
- * @__PURE__
  */
 export function gte(a: Numeric, b: Numeric): boolean {
   return cmp(a, b) !== -1
@@ -663,7 +643,6 @@ export function gte(a: Numeric, b: Numeric): boolean {
  *
  * @equivalent a < b
  * @category Comparison
- * @__PURE__
  */
 export function lt(a: Numeric, b: Numeric): boolean {
   return cmp(a, b) === -1
@@ -676,7 +655,6 @@ export function lt(a: Numeric, b: Numeric): boolean {
  *
  * @equivalent a <= b
  * @category Comparison
- * @__PURE__
  */
 export function lte(a: Numeric, b: Numeric): boolean {
   return cmp(a, b) !== 1
@@ -692,7 +670,6 @@ export function lte(a: Numeric, b: Numeric): boolean {
  *
  * @equivalant a > b ? 1 : a < b ? -1 : 0
  * @category Comparison
- * @__PURE__
  */
 export function cmp(a: Numeric, b: Numeric): 1 | -1 | 0 {
   const [signA, significandA, exponentA, precisionA] = deconstruct(a)
@@ -713,7 +690,6 @@ export function cmp(a: Numeric, b: Numeric): 1 | -1 | 0 {
  *
  * @internal
  * @category Comparison
- * @__PURE__
  */
  function cmpAbs(significandA: string, exponentA: number, precisionA: number, significandB: string, exponentB: number, precisionB: number): Sign {
   if (exponentA !== exponentB) return exponentA > exponentB ? 1 : -1
@@ -733,7 +709,6 @@ export function cmp(a: Numeric, b: Numeric): 1 | -1 | 0 {
  *
  * @equivalent Math.abs(value)
  * @category Magnitude
- * @__PURE__
  */
 export function abs(value: Numeric): decimal {
   const [, significand, exponent] = deconstruct(value)
@@ -747,7 +722,6 @@ export function abs(value: Numeric): decimal {
  *
  * @equivalent -value
  * @category Magnitude
- * @__PURE__
  */
 export function neg(value: Numeric): decimal {
   const [sign, significand, exponent] = deconstruct(value)
@@ -764,7 +738,6 @@ export function neg(value: Numeric): decimal {
  *
  * @equivalent Math.sign(value)
  * @category Magnitude
- * @__PURE__
  */
 export function sign(value: Numeric): 1 | -1 | 0 {
   const [sign] = deconstruct(value)
@@ -777,7 +750,6 @@ export function sign(value: Numeric): 1 | -1 | 0 {
  * Returns the number of significant digits after the decimal point.
  *
  * @category Magnitude
- * @__PURE__
  */
 export function places(value: Numeric): number {
   const [,, exponent, precision] = deconstruct(value)
@@ -791,7 +763,6 @@ export function places(value: Numeric): number {
  * Returns the number of significant digits of the provided value.
  *
  * @category Magnitude
- * @__PURE__
  */
 export function precision(value: Numeric): number {
   const [,,, precision] = deconstruct(value)
@@ -805,7 +776,6 @@ export function precision(value: Numeric): number {
  * the most significant digit.
  *
  * @category Magnitude
- * @__PURE__
  */
  export function exponent(value: Numeric): number {
   const [,, exponent] = deconstruct(value)
@@ -822,7 +792,6 @@ export function precision(value: Numeric): number {
  *
  * @equivalent value * Math.pow(10, power)
  * @category Magnitude
- * @__PURE__
  */
 export function scale(value: Numeric, power: Numeric): decimal {
   const [sign, significand, exponent] = deconstruct(value)
@@ -835,8 +804,8 @@ export function scale(value: Numeric, power: Numeric): decimal {
 /**
  * Round
  *
- * Rounds a numeric value according to the provided [[RoundingRules]],
- * defaulting to `{ places: 0, mode: "half ceil" }`.
+ * Rounds a numeric value according to the provided `RoundingRules`, defaulting
+ * to `{ places: 0, mode: "half ceil" }`.
  *
  * Note: The default `"half ceil"` rounding mode is different from the behavior
  * of round() in many other libraries and programming languages (many of which
@@ -845,7 +814,6 @@ export function scale(value: Numeric, power: Numeric): decimal {
  *
  * @equivalent Math.round(value)
  * @category Rounding
- * @__PURE__
  */
 export function round(value: Numeric, rules?: RoundingRules): decimal {
   const roundingRules = normalizeRules(rules, 0, HALF_CEIL)
@@ -893,14 +861,13 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
 /**
  * Floor
  *
- * Rounds down to the nearest whole number in the direction of -Infinity.
+ * Rounds down to the nearest whole number in the direction of `-Infinity`.
  *
  * Note: Equivalent to `round(value, { mode: "floor" })`
  *
  * @equivalent Math.floor(value)
  * @see round
  * @category Rounding
- * @__PURE__
  */
 export function floor(value: Numeric): decimal {
   return round(value, { mode: FLOOR })
@@ -909,14 +876,13 @@ export function floor(value: Numeric): decimal {
 /**
  * Ceiling
  *
- * Rounds up to the nearest whole number in the direction of Infinity.
+ * Rounds up to the nearest whole number in the direction of `Infinity`.
  *
  * Note: Equivalent to `round(value, { mode: "ceil" })`
  *
  * @equivalent Math.ceil(value)
  * @see round
  * @category Rounding
- * @__PURE__
  */
 export function ceil(value: Numeric): decimal {
   return round(value, { mode: CEIL })
@@ -933,7 +899,6 @@ export function ceil(value: Numeric): decimal {
  * @equivalent Math.trunc(value)
  * @see round
  * @category Rounding
- * @__PURE__
  */
 export function trunc(value: Numeric): decimal {
   return round(value, { mode: DOWN })
@@ -946,7 +911,6 @@ export function trunc(value: Numeric): decimal {
  *
  * @equivalent Math.max(...values)
  * @category Rounding
- * @__PURE__
  */
 export function max(...values: Numeric[]): decimal
 export function max(): decimal {
@@ -960,7 +924,6 @@ export function max(): decimal {
  *
  * @equivalent Math.min(...values)
  * @category Rounding
- * @__PURE__
  */
 export function min(...values: Numeric[]): decimal
 export function min(): decimal {
@@ -969,7 +932,6 @@ export function min(): decimal {
 
 /**
  * @internal
- * @__PURE__
  */
  function extremum(values: IArguments, direction: number): decimal {
   let value = decimal(values[0])
@@ -989,7 +951,6 @@ export function min(): decimal {
  *
  * @equivalent value < low ? low : value > high : high : value
  * @category Rounding
- * @__PURE__
  */
 export function clamp(value: Numeric, low: Numeric, high: Numeric): decimal {
   return min(high, max(low, value))
@@ -1006,7 +967,7 @@ export interface RoundingRules {
    * Decimal places
    *
    * The number of decimal places to round to. Negative places rounds to higher
-   * integer places. Only one of [[places]] or [[precision]] can be provided.
+   * integer places. Only one of `places` or `precision` can be provided.
    *
    * For most functions, the default is `0`, rounding to an integer whole number.
    */
@@ -1016,7 +977,7 @@ export interface RoundingRules {
    * Significant figures
    *
    * Rounds a result to contain this number of significant digits. Only one of
-   * [[places]] or [[precision]] can be provided.
+   * `places` or `precision` can be provided.
    */
   precision?: Numeric
 
@@ -1027,8 +988,8 @@ export interface RoundingRules {
    * places or significant digits, the rounding mode determines which direction
    * to round towards.
    *
-   * The default value depends on the function called. [[round()]] defaults to
-   * [["half ceil"]] while [[div()]] and [[sqrt()]] defaults to [["half even"]].
+   * The default value depends on the function called. `round()` defaults to
+   * `"half ceil"` while `div()` and `sqrt()` defaults to `"half even"`.
    */
   mode?: RoundingMode
 }
@@ -1059,7 +1020,7 @@ export type RoundingMode =
   /**
    * Ceiling
    *
-   * Rounds a result up, towards `+Infinity`, to the value with the larger
+   * Rounds a result up, towards `Infinity`, to the value with the larger
    * signed value.
    */
   | "ceil"
@@ -1075,7 +1036,7 @@ export type RoundingMode =
   /**
    * Round half up
    *
-   * Rounds a result towards the nearest neighboring value, otherwise "up" if
+   * Rounds a result towards the nearest neighboring value, otherwise `"up"` if
    * exactly between the two.
    */
   | "half up"
@@ -1083,24 +1044,24 @@ export type RoundingMode =
   /**
    * Round half down
    *
-   * Rounds a result towards the nearest neighboring value, otherwise "down" if
-   * exactly between the two.
+   * Rounds a result towards the nearest neighboring value, otherwise `"down"`
+   * if exactly between the two.
    */
   | "half down"
 
   /**
    * Round half ceiling
    *
-   * Rounds a result towards the nearest neighboring value, otherwise "ceil" if
-   * exactly between the two.
+   * Rounds a result towards the nearest neighboring value, otherwise `"ceil"`
+   * if exactly between the two.
    */
   | "half ceil"
 
   /**
    * Round half floor
    *
-   * Rounds a result towards the nearest neighboring value, otherwise "floor" if
-   * exactly between the two.
+   * Rounds a result towards the nearest neighboring value, otherwise `"floor"`
+   * if exactly between the two.
    */
   | "half floor"
 
@@ -1121,12 +1082,12 @@ export type RoundingMode =
    * When used with division, produces a result where the remainder is always a
    * positive value, regardless of the signs of the dividend or divisor.
    *
-   * This is particularly useful when provided to [[rem()]] to create a version
+   * This is particularly useful when provided to `rem()` to create a version
    * of modulo which always results in a positive number, which is the
    * [typical mathematical definition](https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition)
    * even though most programming languages offer different definitions.
    *
-   * When used with rounding, this is an alias for [[floor]].
+   * When used with rounding, this is an alias for `"floor"`.
    */
   | "euclidean"
 
@@ -1134,7 +1095,7 @@ export type RoundingMode =
    * Assert exact result
    *
    * Asserts that applying the provided rounding rules would not result in a
-   * rounded value.
+   * rounded value, otherwise throws a `"INEXACT"` error.
    *
    * This is particularly useful to ensure a set of operations remains within
    * an expected precision or decimal places, or that division does not result
@@ -1147,7 +1108,6 @@ export type RoundingMode =
  * precision and mode. If there are problems with rounding rules, throw an Error.
  *
  * @internal
- * @__PURE__
  */
 function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number, defaultMode: RoundingMode): RoundingRules {
   let precision = rules && rules[PRECISION]
@@ -1191,7 +1151,6 @@ function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number,
  * Given rounding rules an a normalized exponent, return the desired precision.
  *
  * @internal
- * @__PURE__
  */
 function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
   return rules[PRECISION] != null ?
@@ -1211,7 +1170,6 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
  * unless `{ exact: false }` is provided to the `options` argument.
  *
  * @category Et cetera
- * @__PURE__
  */
 export function toNumber(value: Numeric, options?: { exact?: boolean }): number {
   const canonical = decimal(value)
@@ -1236,7 +1194,6 @@ export function toNumber(value: Numeric, options?: { exact?: boolean }): number 
  *
  * @see decimal
  * @category Et cetera
- * @__PURE__
  */
 export function toString(value: Numeric): NumericString {
   return decimal(value)
@@ -1250,7 +1207,6 @@ export function toString(value: Numeric): NumericString {
  * that result in fewer digits.
  *
  * @category Et cetera
- * @__PURE__
  */
 export function toFixed(value: Numeric, rules?: RoundingRules): NumericString {
   return toFormat(false, value, rules)
@@ -1264,7 +1220,6 @@ export function toFixed(value: Numeric, rules?: RoundingRules): NumericString {
  * rounding `mode` should that result in fewer digits.
  *
  * @category Et cetera
- * @__PURE__
  */
 export function toExponential(value: Numeric, rules?: RoundingRules): NumericString {
   // Interpret "places" relative to the final exponential notation rather than
@@ -1277,7 +1232,6 @@ export function toExponential(value: Numeric, rules?: RoundingRules): NumericStr
  * Prints a formatted string as either fixed or exponential mode according to rules.
  *
  * @internal
- * @__PURE__
  */
 function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules): NumericString {
   const [sign, significand, exponent, precision] = deconstruct(rules ? round(value, rules) : value)
@@ -1291,7 +1245,6 @@ function toFormat(asExponential: boolean, value: Numeric, rules?: RoundingRules)
  * Print a numeric string given a decomposed decimal representation.
  *
  * @internal
- * @__PURE__
  */
 function print(
   sign: Sign,
@@ -1346,7 +1299,6 @@ type Sign = 1 | -1 | 0
  *
  * @example deconstruct("-1.23e4") returns [-1, "123", 4, 3]
  * @category Et cetera
- * @__PURE__
  */
 export function deconstruct(value: unknown): [sign: 1 | -1 | 0, significand: string, exponent: number, precision: number] {
   const match = decimalRegex.exec(""+value)
@@ -1370,7 +1322,6 @@ export function deconstruct(value: unknown): [sign: 1 | -1 | 0, significand: str
  * Given a decimal's decomposed representation, return a canonical decimal value.
  *
  * @category Et cetera
- * @__PURE__
  */
 export function construct(sign: 1 | -1 | 0, significand: string, exponent: number): decimal {
   let precision
@@ -1383,7 +1334,6 @@ export function construct(sign: 1 | -1 | 0, significand: string, exponent: numbe
  * the exponent and sign if necessary.
  *
  * @internal
- * @__PURE__
  */
 function normalizeRepresentation(sign: Sign, significand: string, exponent: number): [sign: Sign, significand: string, exponent: number, precision: number] {
   let precision = significand.length
@@ -1418,7 +1368,6 @@ function normalizeRepresentation(sign: Sign, significand: string, exponent: numb
  * Converts and validates a Numeric as a whole number (integer).
  *
  * @internal
- * @__PURE__
  */
 function wholeNumber(name: string, value: Numeric): number {
   value = toNumber(value)
@@ -1432,7 +1381,6 @@ function wholeNumber(name: string, value: Numeric): number {
  * Throws an error with a `code` property set to `ErrorCode`.
  *
  * @internal
- * @__PURE__
  */
 function error(code: ErrorCode, message: unknown): never {
   const inst: any = new Error(`https://decimali.sh/#${code} ${message}`)

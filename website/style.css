@@ -169,11 +169,14 @@ pre, code {
 }
 
 p code {
+  white-space: pre;
+}
+
+p code:not([class]) {
   background: var(--code-bg-color);
   border-radius: 0.2em;
   padding: 0 0.2em;
   margin: 0 -0.2em;
-  white-space: pre;
 }
 
 @property --underline-offset {
@@ -293,7 +296,10 @@ a:hover {
   --code-bg-color: #ffffff08;
   --underline-color: #ffffff4d;
   --keyword-color: #ffffffa0;
+  --fn-color: #ffffff;
   --type-color: #ffffff;
+  --param-color: #ffffff;
+  --prop-color: #ffffff;
   --literal-color: #ffe014;
 }
 
