@@ -181,11 +181,14 @@ pre, code {
 }
 
 p code {
+  white-space: pre;
+}
+
+p code:not([class]) {
   background: var(--code-bg-color);
   border-radius: 0.2em;
   padding: 0 0.2em;
   margin: 0 -0.2em;
-  white-space: pre;
 }
 
 @property --underline-offset {
@@ -305,7 +308,10 @@ a:hover {
   --code-bg-color: #ffffff08;
   --underline-color: #ffffff4d;
   --keyword-color: #ffffffa0;
+  --fn-color: #ffffff;
   --type-color: #ffffff;
+  --param-color: #ffffff;
+  --prop-color: #ffffff;
   --literal-color: #ffe014;
 }
 
@@ -1615,7 +1621,7 @@ function sleep(ms) {
           </h3>
           <div>
             <pre class="decl"><span class="keyword">type</span> <span class="type">decimal</span></pre>
-            <p key="0">
+            <p>
               A decimal is represented as a numeric string, allowing arbitrary precision.
 It is a subtype of numeric string, that is all decimal types are numeric
 strings, but not all numeric strings are decimals.
@@ -1630,14 +1636,14 @@ strings, but not all numeric strings are decimals.
           </h3>
           <div>
             <pre class="decl"><span class="fn">decimal</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Converts any numeric value to a decimal.
+            <p>
+              Converts any numeric value to a <code class="type"><a href="#decimal">decimal</a></code>.
             </p>
-            <p key="1">
+            <p>
               Throws an Error if the provided value cannot be translated to decimal.
             </p>
-            <p key="2">
-              Note: unlike number, decimal cannot represent Infinity, NaN, or -0.
+            <p>
+              Note: unlike number, decimal cannot represent <code class="literal">Infinity</code>, <code class="literal">NaN</code>, or <code class="literal">-0</code>.
             </p>
           </div>
         </div>
@@ -1649,11 +1655,11 @@ strings, but not all numeric strings are decimals.
           </h3>
           <div>
             <pre class="decl"><span class="fn">isDecimal</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
+            <p>
               Returns true if the provided value is a decimal value.
             </p>
-            <p key="1">
-              A value is [[decimal]] if it is a numeric string in a canonical decimal form.
+            <p>
+              A value is <code class="type"><a href="#decimal">decimal</a></code> if it is a numeric string in a canonical decimal form.
             </p>
           </div>
         </div>
@@ -1665,9 +1671,9 @@ strings, but not all numeric strings are decimals.
           </h3>
           <div>
             <pre class="decl"><span class="keyword">type</span> <span class="type">Numeric</span></pre>
-            <p key="0">
+            <p>
               The Numeric type represents all numeric values: numbers, bigint, and
-numeric strings (including <code key="4">decimal</code>).
+numeric strings (including <code class="type"><a href="#decimal">decimal</a></code>).
             </p>
           </div>
         </div>
@@ -1679,10 +1685,10 @@ numeric strings (including <code key="4">decimal</code>).
           </h3>
           <div>
             <pre class="decl"><span class="fn">isNumeric</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#Numeric" class="type">Numeric</a></pre>
-            <p key="0">
+            <p>
               Returns true if the provided value is a (finite) numeric value.
             </p>
-            <p key="1">
+            <p>
               A value is considered numeric if it can be coerced to a numeric string.
             </p>
           </div>
@@ -1705,11 +1711,11 @@ numeric strings (including <code key="4">decimal</code>).
           </h3>
           <div>
             <pre class="decl"><span class="fn">isNumericString</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#NumericString" class="type">NumericString</a></pre>
-            <p key="0">
+            <p>
               Returns true if the provided value is a (finite) numeric string.
             </p>
-            <p key="1">
-              A numeric string allows more variation than <code key="1">decimal</code>, such as scientific
+            <p>
+              A numeric string allows more variation than <code class="type"><a href="#decimal">decimal</a></code>, such as scientific
 notation, and leading or trailing zeros or decimal points.
             </p>
           </div>
@@ -1755,12 +1761,12 @@ notation, and leading or trailing zeros or decimal points.
           </h3>
           <div>
             <pre class="decl"><span class="fn">div</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Returns the result of dividing <code key="1">dividend</code> by <code key="3">divisor</code>.
+            <p>
+              Returns the result of dividing <code class="param">dividend</code> by <code class="param">divisor</code>.
             </p>
-            <p key="1">
-              Defaults to 20 decimal places of precision and the <code key="1">&quot;half even&quot;</code> rounding
-mode, configurable by providing rounding <code key="4">rules</code>.
+            <p>
+              Defaults to 20 decimal places of precision and the <code class="literal"><a href="#half even">&quot;half even&quot;</a></code> rounding
+mode, configurable by providing rounding <code class="param">rules</code>.
             </p>
           </div>
         </div>
@@ -1772,113 +1778,113 @@ mode, configurable by providing rounding <code key="4">rules</code>.
           </h3>
           <div>
             <pre class="decl"><span class="fn">divRem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): [<wbr><span class="prop">quotient</span>: <a href="#decimal" class="type">decimal</a>, <span class="prop">remainder</span>: <a href="#decimal" class="type">decimal</a><wbr>]</pre>
-            <p key="0">
+            <p>
               Divides two numeric values to a given places or precision returning both the
 quotient and the remainder while satisfying the two conditions:
             </p>
-            <ul key="1">
-              <li key="0">
-                <code key="0">dividend = divisor * quotient + remainder</code>
+            <ul>
+              <li>
+                <code>dividend = divisor * quotient + remainder</code>
               </li>
-              <li key="1">
-                <code key="0">abs(remainder) &lt; abs(divisor)</code>.
+              <li>
+                <code>abs(remainder) &lt; abs(divisor)</code>.
               </li>
             </ul>
-            <p key="2">
+            <p>
               However there is not only one quotient and remainder which satisfies these
 conditions. A choice of the sign of the remainder (via rounding mode) and
-precision of the quotient can be provided via <code key="1">rules</code>.
+precision of the quotient can be provided via <code class="param">rules</code>.
             </p>
-            <p key="3">
+            <p>
               Result of dividing 10 by 3 with different signs and rounding modes:
             </p>
-            <table key="4">
+            <table>
               <thead>
                 <tr>
-                  <th key="0">
+                  <th>
                     Example
                   </th>
-                  <th key="1">
+                  <th>
                     Note
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr key="0">
-                  <td key="0">
-                    <code key="0">divRem(10, 3, { mode: &quot;down&quot; }) === [ &quot;3&quot;, &quot;1&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(10, 3, { mode: &quot;down&quot; }) === [ &quot;3&quot;, &quot;1&quot; ]</code>
                   </td>
-                  <td key="1">
+                  <td>
                     The remainder has the same sign as the dividend
                   </td>
                 </tr>
-                <tr key="1">
-                  <td key="0">
-                    <code key="0">divRem(10, -3, { mode: &quot;down&quot; }) === [ &quot;-3&quot;, &quot;1&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(10, -3, { mode: &quot;down&quot; }) === [ &quot;-3&quot;, &quot;1&quot; ]</code>
                   </td>
-                  <td key="1">
+                  <td>
                     &quot;down&quot; is the default rounding mode
                   </td>
                 </tr>
-                <tr key="2">
-                  <td key="0">
-                    <code key="0">divRem(-10, 3, { mode: &quot;down&quot; }) === [ &quot;-3&quot;, &quot;-1&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(-10, 3, { mode: &quot;down&quot; }) === [ &quot;-3&quot;, &quot;-1&quot; ]</code>
                   </td>
                 </tr>
-                <tr key="3">
-                  <td key="0">
-                    <code key="0">divRem(-10, -3, { mode: &quot;down&quot; }) === [ &quot;3&quot;, &quot;-1&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(-10, -3, { mode: &quot;down&quot; }) === [ &quot;3&quot;, &quot;-1&quot; ]</code>
                   </td>
                 </tr>
-                <tr key="4">
-                  <td key="0">
-                    <code key="0">divRem(10, 3, { mode: &quot;floor&quot; }) === [ &quot;3&quot;, &quot;1&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(10, 3, { mode: &quot;floor&quot; }) === [ &quot;3&quot;, &quot;1&quot; ]</code>
                   </td>
-                  <td key="1">
+                  <td>
                     The remainder has the same sign as the divisor
                   </td>
                 </tr>
-                <tr key="5">
-                  <td key="0">
-                    <code key="0">divRem(10, -3, { mode: &quot;floor&quot; }) === [ &quot;-4&quot;, &quot;-2&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(10, -3, { mode: &quot;floor&quot; }) === [ &quot;-4&quot;, &quot;-2&quot; ]</code>
                   </td>
                 </tr>
-                <tr key="6">
-                  <td key="0">
-                    <code key="0">divRem(-10, 3, { mode: &quot;floor&quot; }) === [ &quot;-4&quot;, &quot;2&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(-10, 3, { mode: &quot;floor&quot; }) === [ &quot;-4&quot;, &quot;2&quot; ]</code>
                   </td>
                 </tr>
-                <tr key="7">
-                  <td key="0">
-                    <code key="0">divRem(-10, -3, { mode: &quot;floor&quot; }) === [ &quot;3&quot;, &quot;-1&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(-10, -3, { mode: &quot;floor&quot; }) === [ &quot;3&quot;, &quot;-1&quot; ]</code>
                   </td>
                 </tr>
-                <tr key="8">
-                  <td key="0">
-                    <code key="0">divRem(10, 3, { mode: &quot;euclidean&quot; }) === [ &quot;3&quot;, &quot;1&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(10, 3, { mode: &quot;euclidean&quot; }) === [ &quot;3&quot;, &quot;1&quot; ]</code>
                   </td>
-                  <td key="1">
+                  <td>
                     The remainder is always positive
                   </td>
                 </tr>
-                <tr key="9">
-                  <td key="0">
-                    <code key="0">divRem(10, -3, { mode: &quot;euclidean&quot; }) === [ &quot;-3&quot;, &quot;1&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(10, -3, { mode: &quot;euclidean&quot; }) === [ &quot;-3&quot;, &quot;1&quot; ]</code>
                   </td>
                 </tr>
-                <tr key="10">
-                  <td key="0">
-                    <code key="0">divRem(-10, 3, { mode: &quot;euclidean&quot; }) === [ &quot;-4&quot;, &quot;2&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(-10, 3, { mode: &quot;euclidean&quot; }) === [ &quot;-4&quot;, &quot;2&quot; ]</code>
                   </td>
                 </tr>
-                <tr key="11">
-                  <td key="0">
-                    <code key="0">divRem(-10, -3, { mode: &quot;euclidean&quot; }) === [ &quot;4&quot;, &quot;2&quot; ]</code>
+                <tr>
+                  <td>
+                    <code class="literal">divRem(-10, -3, { mode: &quot;euclidean&quot; }) === [ &quot;4&quot;, &quot;2&quot; ]</code>
                   </td>
                 </tr>
               </tbody>
             </table>
-            <p key="5">
+            <p>
               All rounding modes may be used and these conditions will be satisfied.
             </p>
           </div>
@@ -1891,12 +1897,12 @@ precision of the quotient can be provided via <code key="1">rules</code>.
           </h3>
           <div>
             <pre class="decl"><span class="fn">divInt</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Returns the integer result of dividing <code key="1">dividend</code> by <code key="3">divisor</code> using
-truncated (round &quot;down&quot;) division by default.
+            <p>
+              Returns the integer result of dividing <code class="param">dividend</code> by <code class="param">divisor</code> using
+truncated (round <code class="literal"><a href="#down">&quot;down&quot;</a></code>) division by default.
             </p>
-            <p key="1">
-              Note: The remainder can be found using <code key="2">rem()</code>, or better yet use <code key="4">divRem()</code>.
+            <p>
+              Note: The remainder can be found using <code class="fn"><a href="#rem()">rem()</a></code>, or better yet use <code class="fn"><a href="#divRem()">divRem()</a></code>.
             </p>
           </div>
         </div>
@@ -1908,15 +1914,15 @@ truncated (round &quot;down&quot;) division by default.
           </h3>
           <div>
             <pre class="decl"><span class="fn">rem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Returns the remainder of dividing <code key="1">dividend</code> by <code key="3">divisor</code> using truncated
+            <p>
+              Returns the remainder of dividing <code class="param">dividend</code> by <code class="param">divisor</code> using truncated
 (round &quot;down&quot;) division by default. The result always has the same sign as
 the first argument (or 0).
             </p>
-            <p key="1">
-              Note: <code key="2">rem()</code> and <code key="4">div()</code> use different default division rounding rules and
-should not be used together. The quotient can be found using <code key="6">divInt()</code>, or
-better yet use <code key="8">divRem()</code>.
+            <p>
+              Note: <code class="fn"><a href="#rem()">rem()</a></code> and <code class="fn"><a href="#div()">div()</a></code> use different default division rounding rules and
+should not be used together. The quotient can be found using <code class="fn"><a href="#divInt()">divInt()</a></code>, or
+better yet use <code class="fn"><a href="#divRem()">divRem()</a></code>.
             </p>
           </div>
         </div>
@@ -1928,13 +1934,13 @@ better yet use <code key="8">divRem()</code>.
           </h3>
           <div>
             <pre class="decl"><span class="fn">mod</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
+            <p>
               Returns the modulo of dividing a by b using floored (round &quot;floor&quot;) division.
 The result always has the same sign as the second argument (or 0).
             </p>
-            <p key="1">
-              Note: this is not the same as the % (remainder) operator. Use <code key="3">rem()</code> for an
-equivalent to <code key="5">%</code>.
+            <p>
+              Note: this is not the same as the % (remainder) operator. Use <code class="fn"><a href="#rem()">rem()</a></code> for an
+equivalent to <code>%</code>.
             </p>
           </div>
         </div>
@@ -1946,8 +1952,8 @@ equivalent to <code key="5">%</code>.
           </h3>
           <div>
             <pre class="decl"><span class="fn">pow</span>(<wbr><span class="param">base</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">exponent</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Raises <code key="1">base</code> to the power <code key="3">exponent</code>, where <code key="5">exponent</code> must be a positive
+            <p>
+              Raises <code class="param">base</code> to the power <code class="param">exponent</code>, where <code class="param">exponent</code> must be a positive
 whole number.
             </p>
           </div>
@@ -1960,12 +1966,12 @@ whole number.
           </h3>
           <div>
             <pre class="decl"><span class="fn">sqrt</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Returns the square root of <code key="1">value</code>.
+            <p>
+              Returns the square root of <code class="param">value</code>.
             </p>
-            <p key="1">
-              Defaults to 20 decimal places of precision using the <code key="1">&quot;half even&quot;</code> rounding
-mode, configurable by providing rounding <code key="4">rules</code>.
+            <p>
+              Defaults to 20 decimal places of precision using the <code class="literal"><a href="#half even">&quot;half even&quot;</a></code> rounding
+mode, configurable by providing rounding <code class="param">rules</code>.
             </p>
           </div>
         </div>
@@ -2030,12 +2036,12 @@ mode, configurable by providing rounding <code key="4">rules</code>.
           </h3>
           <div>
             <pre class="decl"><span class="fn">cmp</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="literal">1</span> | <span class="literal">-1</span> | <span class="literal">0</span></pre>
-            <p key="0">
-              Compares two numeric values and returns <code key="1">1</code> if a is greater than b, <code key="4">-1</code> if b
-is greater than a, and <code key="7">0</code> if a and b are equivalent.
+            <p>
+              Compares two numeric values and returns <code class="literal">1</code> if a is greater than b, <code class="literal">-1</code> if b
+is greater than a, and <code class="literal">0</code> if a and b are equivalent.
             </p>
-            <p key="1">
-              Note: This is equivalent to, but much faster than, <code key="4">sign(sub(a, b))</code>.
+            <p>
+              Note: This is equivalent to, but much faster than, <code>sign(sub(a, b))</code>.
             </p>
           </div>
         </div>
@@ -2070,11 +2076,11 @@ is greater than a, and <code key="7">0</code> if a and b are equivalent.
           </h3>
           <div>
             <pre class="decl"><span class="fn">sign</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="literal">1</span> | <span class="literal">-1</span> | <span class="literal">0</span></pre>
-            <p key="0">
-              Returns a number indicating the sign of the provided value. A <code key="1">1</code> for
-positive values, <code key="4">-1</code> for negative, or <code key="7">0</code> for zero.
+            <p>
+              Returns a number indicating the sign of the provided value. A <code class="literal">1</code> for
+positive values, <code class="literal">-1</code> for negative, or <code class="literal">0</code> for zero.
             </p>
-            <p key="1">
+            <p>
               Note: decimal does not represent negative zero.
             </p>
           </div>
@@ -2107,7 +2113,7 @@ positive values, <code key="4">-1</code> for negative, or <code key="7">0</code>
           </h3>
           <div>
             <pre class="decl"><span class="fn">exponent</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></pre>
-            <p key="0">
+            <p>
               Returns a number indicating the exponent of the provided value, which is also
 the most significant digit.
             </p>
@@ -2121,12 +2127,12 @@ the most significant digit.
           </h3>
           <div>
             <pre class="decl"><span class="fn">scale</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">power</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Returns the <code key="1">value</code> with the exponent scaled up or down by <code key="3">power</code>. In other
-words, this moves the decimal point to the right <code key="6">power</code> places.
+            <p>
+              Returns the <code class="param">value</code> with the exponent scaled up or down by <code class="param">power</code>. In other
+words, this moves the decimal point to the right <code class="param">power</code> places.
             </p>
-            <p key="1">
-              Note: This is equivalent to, but much faster than, <code key="4">mul(value, pow(10, power))</code>.
+            <p>
+              Note: This is equivalent to, but much faster than, <code class="literal">mul(value, pow(10, power))</code>.
             </p>
           </div>
         </div>
@@ -2141,14 +2147,14 @@ words, this moves the decimal point to the right <code key="6">power</code> plac
           </h3>
           <div>
             <pre class="decl"><span class="fn">round</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Rounds a numeric value according to the provided [[RoundingRules]],
-defaulting to <code key="6">{ places: 0, mode: &quot;half ceil&quot; }</code>.
+            <p>
+              Rounds a numeric value according to the provided <code class="type"><a href="#RoundingRules">RoundingRules</a></code>, defaulting
+to <code class="literal">{ places: 0, mode: &quot;half ceil&quot; }</code>.
             </p>
-            <p key="1">
-              Note: The default <code key="2">&quot;half ceil&quot;</code> rounding mode is different from the behavior
+            <p>
+              Note: The default <code class="literal"><a href="#half ceil">&quot;half ceil&quot;</a></code> rounding mode is different from the behavior
 of round() in many other libraries and programming languages (many of which
-use <code key="4">&quot;half up&quot;</code> or <code key="6">&quot;half even&quot;</code>), but this matches the behavior of
+use <code class="literal"><a href="#half up">&quot;half up&quot;</a></code> or <code class="literal"><a href="#half even">&quot;half even&quot;</a></code>), but this matches the behavior of
 JavaScript's Math.round().
             </p>
           </div>
@@ -2161,11 +2167,11 @@ JavaScript's Math.round().
           </h3>
           <div>
             <pre class="decl"><span class="fn">floor</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Rounds down to the nearest whole number in the direction of -Infinity.
+            <p>
+              Rounds down to the nearest whole number in the direction of <code class="literal">-Infinity</code>.
             </p>
-            <p key="1">
-              Note: Equivalent to <code key="2">round(value, { mode: &quot;floor&quot; })</code>
+            <p>
+              Note: Equivalent to <code>round(value, { mode: &quot;floor&quot; })</code>
             </p>
           </div>
         </div>
@@ -2177,11 +2183,11 @@ JavaScript's Math.round().
           </h3>
           <div>
             <pre class="decl"><span class="fn">ceil</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
-              Rounds up to the nearest whole number in the direction of Infinity.
+            <p>
+              Rounds up to the nearest whole number in the direction of <code class="literal">Infinity</code>.
             </p>
-            <p key="1">
-              Note: Equivalent to <code key="2">round(value, { mode: &quot;ceil&quot; })</code>
+            <p>
+              Note: Equivalent to <code>round(value, { mode: &quot;ceil&quot; })</code>
             </p>
           </div>
         </div>
@@ -2193,12 +2199,12 @@ JavaScript's Math.round().
           </h3>
           <div>
             <pre class="decl"><span class="fn">trunc</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
+            <p>
               Returns the integer part of a number by rounding to the nearest whole number
 in the direction of 0.
             </p>
-            <p key="1">
-              Note: Equivalent to <code key="2">round(value, { mode: &quot;down&quot; })</code>
+            <p>
+              Note: Equivalent to <code>round(value, { mode: &quot;down&quot; })</code>
             </p>
           </div>
         </div>
@@ -2229,7 +2235,7 @@ in the direction of 0.
             <a href="#clamp()">Constrain</a>
           </h3>
           <div>
-            <pre class="decl"><span class="fn">clamp</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">low</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">high</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>Constrains <code key="1">value</code> between <code key="3">low</code> and <code key="5">high</code> values.
+            <pre class="decl"><span class="fn">clamp</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">low</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">high</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></pre>Constrains <code class="param">value</code> between <code class="param">low</code> and <code class="param">high</code> values.
           </div>
         </div>
       </section>
@@ -2250,12 +2256,12 @@ in the direction of 0.
               <h4>
                 <a href="#places">Decimal places</a>
               </h4>
-              <p key="0">
+              <p>
                 The number of decimal places to round to. Negative places rounds to higher
-integer places. Only one of [[places]] or [[precision]] can be provided.
+integer places. Only one of <code class="prop"><a href="#places">places</a></code> or <code class="prop"><a href="#precision">precision</a></code> can be provided.
               </p>
-              <p key="1">
-                For most functions, the default is <code key="2">0</code>, rounding to an integer whole number.
+              <p>
+                For most functions, the default is <code class="literal">0</code>, rounding to an integer whole number.
               </p>
             </div>
           </div>
@@ -2268,9 +2274,9 @@ integer places. Only one of [[places]] or [[precision]] can be provided.
               <h4>
                 <a href="#precision">Significant figures</a>
               </h4>
-              <p key="0">
+              <p>
                 Rounds a result to contain this number of significant digits. Only one of
-[[places]] or [[precision]] can be provided.
+<code class="prop"><a href="#places">places</a></code> or <code class="prop"><a href="#precision">precision</a></code> can be provided.
               </p>
             </div>
           </div>
@@ -2283,14 +2289,14 @@ integer places. Only one of [[places]] or [[precision]] can be provided.
               <h4>
                 <a href="#mode">Rounding mode</a>
               </h4>
-              <p key="0">
+              <p>
                 If a result needs to be rounded to meet the expected number of decimal
 places or significant digits, the rounding mode determines which direction
 to round towards.
               </p>
-              <p key="1">
-                The default value depends on the function called. [[round()]] defaults to
-[[&quot;half ceil&quot;]] while [[div()]] and [[sqrt()]] defaults to [[&quot;half even&quot;]].
+              <p>
+                The default value depends on the function called. <code class="fn"><a href="#round()">round()</a></code> defaults to
+<code class="literal"><a href="#half ceil">&quot;half ceil&quot;</a></code> while <code class="fn"><a href="#div()">div()</a></code> and <code class="fn"><a href="#sqrt()">sqrt()</a></code> defaults to <code class="literal"><a href="#half even">&quot;half even&quot;</a></code>.
               </p>
             </div>
           </div>
@@ -2313,7 +2319,7 @@ to round towards.
               <h4>
                 <a href="#up">Round up</a>
               </h4>
-              <p key="0">
+              <p>
                 Rounds a result up, away from zero, to the value with a larger
 absolute value.
               </p>
@@ -2328,7 +2334,7 @@ absolute value.
               <h4>
                 <a href="#down">Round down</a>
               </h4>
-              <p key="0">
+              <p>
                 Rounds a result down, towards zero, to the value with a smaller
 absolute value.
               </p>
@@ -2343,8 +2349,8 @@ absolute value.
               <h4>
                 <a href="#ceil">Ceiling</a>
               </h4>
-              <p key="0">
-                Rounds a result up, towards <code key="2">+Infinity</code>, to the value with the larger
+              <p>
+                Rounds a result up, towards <code class="literal">Infinity</code>, to the value with the larger
 signed value.
               </p>
             </div>
@@ -2358,8 +2364,8 @@ signed value.
               <h4>
                 <a href="#floor">Floor (Truncate)</a>
               </h4>
-              <p key="0">
-                Rounds a result down, towards <code key="2">-Infinity</code>, to the value with the smaller
+              <p>
+                Rounds a result down, towards <code class="literal">-Infinity</code>, to the value with the smaller
 signed value.
               </p>
             </div>
@@ -2373,8 +2379,8 @@ signed value.
               <h4>
                 <a href="#half up">Round half up</a>
               </h4>
-              <p key="0">
-                Rounds a result towards the nearest neighboring value, otherwise &quot;up&quot; if
+              <p>
+                Rounds a result towards the nearest neighboring value, otherwise <code class="literal"><a href="#up">&quot;up&quot;</a></code> if
 exactly between the two.
               </p>
             </div>
@@ -2388,9 +2394,9 @@ exactly between the two.
               <h4>
                 <a href="#half down">Round half down</a>
               </h4>
-              <p key="0">
-                Rounds a result towards the nearest neighboring value, otherwise &quot;down&quot; if
-exactly between the two.
+              <p>
+                Rounds a result towards the nearest neighboring value, otherwise <code class="literal"><a href="#down">&quot;down&quot;</a></code>
+if exactly between the two.
               </p>
             </div>
           </div>
@@ -2403,9 +2409,9 @@ exactly between the two.
               <h4>
                 <a href="#half ceil">Round half ceiling</a>
               </h4>
-              <p key="0">
-                Rounds a result towards the nearest neighboring value, otherwise &quot;ceil&quot; if
-exactly between the two.
+              <p>
+                Rounds a result towards the nearest neighboring value, otherwise <code class="literal"><a href="#ceil">&quot;ceil&quot;</a></code>
+if exactly between the two.
               </p>
             </div>
           </div>
@@ -2418,9 +2424,9 @@ exactly between the two.
               <h4>
                 <a href="#half floor">Round half floor</a>
               </h4>
-              <p key="0">
-                Rounds a result towards the nearest neighboring value, otherwise &quot;floor&quot; if
-exactly between the two.
+              <p>
+                Rounds a result towards the nearest neighboring value, otherwise <code class="literal"><a href="#floor">&quot;floor&quot;</a></code>
+if exactly between the two.
               </p>
             </div>
           </div>
@@ -2433,11 +2439,11 @@ exactly between the two.
               <h4>
                 <a href="#half even">Round half towards even</a>
               </h4>
-              <p key="0">
+              <p>
                 Rounds a result towards the nearest neighboring value, otherwise towards
 the value with an even least significant digit if exactly between the two.
               </p>
-              <p key="1">
+              <p>
                 This is particularly useful to avoid aggregated bias when adding together
 multiple rounded values as there is an equal chance of rounding up or down.
               </p>
@@ -2452,18 +2458,18 @@ multiple rounded values as there is an equal chance of rounding up or down.
               <h4>
                 <a href="#euclidean">Euclidean division</a>
               </h4>
-              <p key="0">
+              <p>
                 When used with division, produces a result where the remainder is always a
 positive value, regardless of the signs of the dividend or divisor.
               </p>
-              <p key="1">
-                This is particularly useful when provided to [[rem()]] to create a version
+              <p>
+                This is particularly useful when provided to <code class="fn"><a href="#rem()">rem()</a></code> to create a version
 of modulo which always results in a positive number, which is the
-<a key="6" href="https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition">typical mathematical definition</a>
+<a target="_blank" href="https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition">typical mathematical definition</a>
 even though most programming languages offer different definitions.
               </p>
-              <p key="2">
-                When used with rounding, this is an alias for [[floor]].
+              <p>
+                When used with rounding, this is an alias for <code class="literal"><a href="#floor">&quot;floor&quot;</a></code>.
               </p>
             </div>
           </div>
@@ -2476,11 +2482,11 @@ even though most programming languages offer different definitions.
               <h4>
                 <a href="#exact">Assert exact result</a>
               </h4>
-              <p key="0">
+              <p>
                 Asserts that applying the provided rounding rules would not result in a
-rounded value.
+rounded value, otherwise throws a <code class="literal"><a href="#INEXACT">&quot;INEXACT&quot;</a></code> error.
               </p>
-              <p key="1">
+              <p>
                 This is particularly useful to ensure a set of operations remains within
 an expected precision or decimal places, or that division does not result
 in a non-terminating repeating decimal.
@@ -2499,12 +2505,12 @@ in a non-terminating repeating decimal.
           </h3>
           <div>
             <pre class="decl"><span class="fn">toNumber</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">options</span>?: { <span class="prop">exact</span>?: <span class="type">boolean</span> }<wbr>): <span class="type">number</span></pre>
-            <p key="0">
-              Converts a <code key="1">Numeric</code> value (including <code key="3">decimal</code>) to a JavaScript number.
+            <p>
+              Converts a <code class="type"><a href="#Numeric">Numeric</a></code> value (including <code class="type"><a href="#decimal">decimal</a></code>) to a JavaScript number.
             </p>
-            <p key="1">
+            <p>
               Throws an Error if the converting the value would lead to a loss of precision
-unless <code key="1">{ exact: false }</code> is provided to the <code key="3">options</code> argument.
+unless <code>{ exact: false }</code> is provided to the <code class="param">options</code> argument.
             </p>
           </div>
         </div>
@@ -2516,12 +2522,12 @@ unless <code key="1">{ exact: false }</code> is provided to the <code key="3">op
           </h3>
           <div>
             <pre class="decl"><span class="fn">toString</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#NumericString" class="type">NumericString</a></pre>
-            <p key="0">
-              A string representation of the provided Numeric <code key="1">value</code> using canonical
+            <p>
+              A string representation of the provided Numeric <code class="param">value</code> using canonical
 decimal format.
             </p>
-            <p key="1">
-              This is equivalent to the <code key="1">decimal()</code> function.
+            <p>
+              This is equivalent to the <code class="fn"><a href="#decimal()">decimal()</a></code> function.
             </p>
           </div>
         </div>
@@ -2533,9 +2539,9 @@ decimal format.
           </h3>
           <div>
             <pre class="decl"><span class="fn">toFixed</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></pre>
-            <p key="0">
-              A string representation of the provided Numeric <code key="1">value</code> using fixed notation.
-Uses rules to specify <code key="3">precision</code> or <code key="5">places</code> and the rounding <code key="7">mode</code> should
+            <p>
+              A string representation of the provided Numeric <code class="param">value</code> using fixed notation.
+Uses rules to specify <code class="prop"><a href="#precision">precision</a></code> or <code class="prop"><a href="#places">places</a></code> and the rounding <code class="prop"><a href="#mode">mode</a></code> should
 that result in fewer digits.
             </p>
           </div>
@@ -2548,10 +2554,10 @@ that result in fewer digits.
           </h3>
           <div>
             <pre class="decl"><span class="fn">toExponential</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></pre>
-            <p key="0">
-              A string representation of the provided Numeric <code key="1">value</code> using exponential
-scientific notation. Uses rules to specify <code key="3">precision</code> or <code key="5">places</code> and the
-rounding <code key="7">mode</code> should that result in fewer digits.
+            <p>
+              A string representation of the provided Numeric <code class="param">value</code> using exponential
+scientific notation. Uses rules to specify <code class="prop"><a href="#precision">precision</a></code> or <code class="prop"><a href="#places">places</a></code> and the
+rounding <code class="prop"><a href="#mode">mode</a></code> should that result in fewer digits.
             </p>
           </div>
         </div>
@@ -2563,31 +2569,31 @@ rounding <code key="7">mode</code> should that result in fewer digits.
           </h3>
           <div>
             <pre class="decl"><span class="fn">deconstruct</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): [<wbr><span class="prop">sign</span>: <span class="literal">1</span> | <span class="literal">-1</span> | <span class="literal">0</span>, <span class="prop">significand</span>: <span class="type">string</span>, <span class="prop">exponent</span>: <span class="type">number</span>, <span class="prop">precision</span>: <span class="type">number</span><wbr>]</pre>
-            <p key="0">
+            <p>
               Given a numeric value, deconstruct to normalized representation of a decimal:
 a [significand, exponent, sign, precision] tuple.
             </p>
-            <p key="1">
+            <p>
               Functions within this library internally operate on the normalized
 representation before converting back to a canonical decimal via
-<code key="1">fromRepresentation()</code>. These functions are exported to enable user-defined
+<code>fromRepresentation()</code>. These functions are exported to enable user-defined
 mathematical functions on the decimal type.
             </p>
-            <ul key="2">
-              <li key="0">
-                <code key="0">sign</code>: Either 1 for a positive number, -1 for a negative number, or 0 for 0.
+            <ul>
+              <li>
+                <code>sign</code>: Either 1 for a positive number, -1 for a negative number, or 0 for 0.
               </li>
-              <li key="1">
-                <code key="0">significand</code>: A string of significant digits expressed in scientific
+              <li>
+                <code>significand</code>: A string of significant digits expressed in scientific
 notation, where the first digit is the ones place, or an empty string for 0.
               </li>
-              <li key="2">
-                <code key="0">exponent</code>: The power of ten the significand is multiplied by, or 0 for 0.
+              <li>
+                <code>exponent</code>: The power of ten the significand is multiplied by, or 0 for 0.
               </li>
-              <li key="3">
-                <code key="0">precision</code>: The number of digits found in significand (e.g. number of
+              <li>
+                <code class="prop"><a href="#precision">precision</a></code>: The number of digits found in significand (e.g. number of
 significant digits). Yes this is redundant information with the length of
-<code key="2">significand</code> but it is convenient to access directly.
+<code>significand</code> but it is convenient to access directly.
               </li>
             </ul>
           </div>
@@ -2600,10 +2606,10 @@ significant digits). Yes this is redundant information with the length of
           </h3>
           <div>
             <pre class="decl"><span class="fn">construct</span>(<wbr><span class="param">sign</span>: <span class="literal">1</span> | <span class="literal">-1</span> | <span class="literal">0</span>, <span class="param">significand</span>: <span class="type">string</span>, <span class="param">exponent</span>: <span class="type">number</span><wbr>): <a href="#decimal" class="type">decimal</a></pre>
-            <p key="0">
+            <p>
               Construct a decimal from an internal representation
             </p>
-            <p key="1">
+            <p>
               Given a decimal's decomposed representation, return a canonical decimal value.
             </p>
           </div>
@@ -2616,15 +2622,15 @@ significant digits). Yes this is redundant information with the length of
           </h3>
           <div>
             <pre class="decl"><span class="keyword">type</span> <span class="type">ErrorCode</span></pre>
-            <p key="0">
-              All errors thrown will include a <code key="1">.code</code> property set to one of the possible
+            <p>
+              All errors thrown will include a <code>.code</code> property set to one of the possible
 values of ErrorCode as well as a link to documentation describing the error.
             </p>
-            <p key="1">
+            <p>
               Detect this property in a catch clause to provide customized error handling
-behavior. For example, to re-introduce <code key="3">Infinity</code> as a result of division:
+behavior. For example, to re-introduce <code class="literal">Infinity</code> as a result of division:
             </p>
-            <pre key="2"><code class="lang-js">function customDivide(a, b) {
+            <pre><code>function customDivide(a, b) {
   try {
     div(a, b)
   } catch (error) {
@@ -2644,9 +2650,9 @@ behavior. For example, to re-introduce <code key="3">Infinity</code> as a result
               <h4>
                 <a href="#NOT_NUM">Not a number</a>
               </h4>
-              <p key="0">
-                Thrown by any function when a value provided to a <code key="1">Numeric</code> argument is not
-numeric or finite; providing <code key="3">Infinity</code> or <code key="5">NaN</code> will throw this error.
+              <p>
+                Thrown by any function when a value provided to a <code class="type"><a href="#Numeric">Numeric</a></code> argument is not
+numeric or finite; providing <code class="literal">Infinity</code> or <code class="literal">NaN</code> will throw this error.
               </p>
             </div>
           </div>
@@ -2659,10 +2665,10 @@ numeric or finite; providing <code key="3">Infinity</code> or <code key="5">NaN<
               <h4>
                 <a href="#NOT_INT">Not an integer</a>
               </h4>
-              <p key="0">
+              <p>
                 Thrown when an integer was expected in an argument or property but not
-received. For instance, the <code key="2">places</code> and <code key="4">precision</code> fields of
-<code key="6">RoundingRules</code> require integers.
+received. For instance, the <code class="prop"><a href="#places">places</a></code> and <code class="prop"><a href="#precision">precision</a></code> fields of
+<code class="type"><a href="#RoundingRules">RoundingRules</a></code> require integers.
               </p>
             </div>
           </div>
@@ -2675,9 +2681,9 @@ received. For instance, the <code key="2">places</code> and <code key="4">precis
               <h4>
                 <a href="#NOT_POS">Not positive</a>
               </h4>
-              <p key="0">
+              <p>
                 Thrown when a positive number was expected in an argument or property but
-not received. For instance, the <code key="2">exponent</code> in <code key="4">pow()</code> must be a positive
+not received. For instance, the <code>exponent</code> in <code class="fn"><a href="#pow()">pow()</a></code> must be a positive
 integer.
               </p>
             </div>
@@ -2691,9 +2697,9 @@ integer.
               <h4>
                 <a href="#NOT_MODE">Unknown rounding mode</a>
               </h4>
-              <p key="0">
-                Thrown when a value provided to <code key="1">mode</code> of <code key="3">RoundingRules</code> is not one of the
-expected options of <code key="5">RoundingMode</code>.
+              <p>
+                Thrown when a value provided to <code class="prop"><a href="#mode">mode</a></code> of <code class="type"><a href="#RoundingRules">RoundingRules</a></code> is not one of the
+expected options of <code class="type"><a href="#RoundingMode">RoundingMode</a></code>.
               </p>
             </div>
           </div>
@@ -2706,8 +2712,8 @@ expected options of <code key="5">RoundingMode</code>.
               <h4>
                 <a href="#NOT_BOTH">Cannot provide both</a>
               </h4>
-              <p key="0">
-                Thrown when both <code key="1">places</code> and <code key="3">precision</code> fields of <code key="5">RoundingRules</code> are
+              <p>
+                Thrown when both <code class="prop"><a href="#places">places</a></code> and <code class="prop"><a href="#precision">precision</a></code> fields of <code class="type"><a href="#RoundingRules">RoundingRules</a></code> are
 simutaneously provided. Only one of these fields may be provided per use.
               </p>
             </div>
@@ -2721,13 +2727,13 @@ simutaneously provided. Only one of these fields may be provided per use.
               <h4>
                 <a href="#INEXACT">Inexact result</a>
               </h4>
-              <p key="0">
+              <p>
                 Thrown when an operation would return an inexact result and the provided
-<code key="1">RoundingMode</code> was <code key="3">&quot;exact&quot;</code>.
+<code class="type"><a href="#RoundingMode">RoundingMode</a></code> was <code class="literal"><a href="#exact">&quot;exact&quot;</a></code>.
               </p>
-              <p key="1">
-                Also thrown by <code key="1">toNumber()</code> when converting a <code key="3">Numeric</code> would result in
-loss of precision. Provide <code key="5">{ exact: false }</code> to allow the inexact result.
+              <p>
+                Also thrown by <code class="fn"><a href="#toNumber()">toNumber()</a></code> when converting a <code class="type"><a href="#Numeric">Numeric</a></code> would result in
+loss of precision. Provide <code>{ exact: false }</code> to allow the inexact result.
               </p>
             </div>
           </div>
@@ -2740,10 +2746,10 @@ loss of precision. Provide <code key="5">{ exact: false }</code> to allow the in
               <h4>
                 <a href="#DIV_ZERO">Divide by zero</a>
               </h4>
-              <p key="0">
+              <p>
                 Thrown when attempting to divide by zero, in which case there is no well
 defined result. This behavior is different from JavaScript which may return
-<code key="2">Infinity</code> or <code key="4">NaN</code>, however Decimalish does not support these non-finite
+<code class="literal">Infinity</code> or <code class="literal">NaN</code>, however Decimalish does not support these non-finite
 special values.
               </p>
             </div>
@@ -2757,10 +2763,10 @@ special values.
               <h4>
                 <a href="#SQRT_NEG">Square root of negative</a>
               </h4>
-              <p key="0">
+              <p>
                 Thrown when attempting to square root a negative number, in which case
 there is no real number result. This behavior is different from JavaScript
-which returns <code key="2">NaN</code>, however Decimalish does not support this special value.
+which returns <code class="literal">NaN</code>, however Decimalish does not support this special value.
               </p>
             </div>
           </div>
