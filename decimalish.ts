@@ -27,6 +27,7 @@
  *  - build outputs
  *
  * Todo:
+ *  - should rounding from a negative result in -0? Reintroduce -0?
  *  - unit tests
  *  - toEngineering ? (or argument to toExponential?)
  *  - cbrt?
@@ -1282,11 +1283,11 @@ type Sign = 1 | -1 | 0
  * Numeric elements
  *
  * Given a numeric value, deconstruct to normalized representation of a decimal:
- * a [significand, exponent, sign, precision] tuple.
+ * a `[significand, exponent, sign, precision]` tuple.
  *
  * Functions within this library internally operate on the normalized
  * representation before converting back to a canonical decimal via
- * `fromRepresentation()`. These functions are exported to enable user-defined
+ * `construct()`. These functions are exported to enable user-defined
  * mathematical functions on the decimal type.
  *
  *  - `sign`: Either 1 for a positive number, -1 for a negative number, or 0 for 0.
@@ -1398,9 +1399,9 @@ function error(code: ErrorCode, message: unknown): never {
  * behavior. For example, to re-introduce `Infinity` as a result of division:
  *
  * ```js
- * function customDivide(a, b) {
+ * function customDivide(a: Numeric, b: Numeric): decimal {
  *   try {
- *     div(a, b)
+ *     return div(a, b)
  *   } catch (error) {
  *     if (error.code === "DIV_ZERO") {
  *       return sign(a) * Infinity

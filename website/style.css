@@ -1,35 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono");
 
-html {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  font-kerning: normal;
-  font-variant-ligatures: contextual common-ligatures;
-  font-feature-settings: "kern" 1, "liga" 1, "ccmp" 1, "case" 1, "calt" 1,
-    "ss01" 1;
-}
-
-pre,
-code {
-  font-family: "Roboto Mono", monospace;
-  white-space: pre-wrap;
-}
-
 :root {
-  --header-color: #56585b;
-  --text-color: #000000e0;
-  --code-color: #000000c0;
-  --code-bg-color: #00000008;
-  --underline-color: #2222224d;
-  --link-highlight-color: #ffca00;
-  --decl-color: #00000066;
-  --keyword-color: #e10028;
-  --fn-color: #9300ff;
-  --type-color: #0155f3;
-  --param-color: #d100ac;
-  --prop-color: #d95b00;
-  --literal-color: #f0a000;
   --nav-size: 50px;
   --small-col-width: 285px;
   --gutter-size: 2.5rem;
@@ -37,6 +8,109 @@ code {
   --font-size: 15px;
   --letter-spacing: -0.009em;
   --max-width: calc(3 * var(--small-col-width) + 2 * var(--column-gap));
+
+  /* colors */
+  --header-color-lite: #56585b;
+  --header-color-dark: #56585b;
+  --header-text-color-lite: #fff;
+  --header-text-color-dark: #fff;
+  --text-color-lite: #000000e0;
+  --text-color-dark: #ffffffe0;
+  --code-color-lite: #00000090;
+  --code-color-dark: #ffffff90;
+  --section-bg-color-lite: #ffffff;
+  --section-bg-color-dark: #23252c;
+  --section-odd-bg-color-lite: #fafafa;
+  --section-odd-bg-color-dark: #2a2b33;
+  --api-bg-color-lite: #c2ffdb;
+  --api-bg-color-dark: #2b4e3d;
+  --error-bg-color-lite: #cd3b00;
+  --error-bg-color-dark: #cd3b00;
+  --link-highlight-color-lite: #ffca00;
+  --link-highlight-color-dark: #ffca00;
+  --keyword-color-lite: #1556be;
+  --keyword-color-dark: #6796e6;
+  --function-color-lite: #679c00;
+  --function-color-dark: #a6e22e;
+  --param-color-lite: #cf7000;
+  --param-color-dark: #fd971f;
+  --label-color-lite: #cf7000;
+  --label-color-dark: #fd971f;
+  --type-color-lite: #0089b3;
+  --type-color-dark: #66d9ef;
+  --operator-color-lite: #dd0856;
+  --operator-color-dark: #f92672;
+  --string-color-lite: #b3a20b;
+  --string-color-dark: #e6db74;
+  --number-color-lite: #684d99;
+  --number-color-dark: #ae81ff;
+  --comment-color-lite: #001f6870;
+  --comment-color-dark: #fffda370;
+}
+
+:root, .light {
+  --header-color: var(--header-color-lite);
+  --header-text-color: var(--header-text-color-lite);
+  --text-color: var(--text-color-lite);
+  --code-color: var(--code-color-lite);
+  --section-bg-color: var(--section-bg-color-lite);
+  --section-odd-bg-color: var(--section-odd-bg-color-lite);
+  --api-bg-color: var(--api-bg-color-lite);
+  --error-bg-color: var(--error-bg-color-lite);
+  --link-highlight-color: var(--link-highlight-color-lite);
+  --keyword-color: var(--keyword-color-lite);
+  --function-color: var(--function-color-lite);
+  --param-color: var(--param-color-lite);
+  --type-color: var(--type-color-lite);
+  --label-color: var(--label-color-lite);
+  --operator-color: var(--operator-color-lite);
+  --string-color: var(--string-color-lite);
+  --number-color: var(--number-color-lite);
+  --comment-color: var(--comment-color-lite);
+}
+
+.dark {
+  --header-color: var(--header-color-dark);
+  --header-text-color: var(--header-text-color-dark);
+  --text-color: var(--text-color-dark);
+  --code-color: var(--code-color-dark);
+  --section-bg-color: var(--section-bg-color-dark);
+  --section-odd-bg-color: var(--section-odd-bg-color-dark);
+  --api-bg-color: var(--api-bg-color-dark);
+  --error-bg-color: var(--error-bg-color-dark);
+  --link-highlight-color: var(--link-highlight-color-dark);
+  --keyword-color: var(--keyword-color-dark);
+  --function-color: var(--function-color-dark);
+  --param-color: var(--param-color-dark);
+  --type-color: var(--type-color-dark);
+  --label-color: var(--label-color-dark);
+  --operator-color: var(--operator-color-dark);
+  --string-color: var(--string-color-dark);
+  --number-color: var(--number-color-dark);
+  --comment-color: var(--comment-color-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --header-color: var(--header-color-dark);
+    --header-text-color: var(--header-text-color-dark);
+    --text-color: var(--text-color-dark);
+    --code-color: var(--code-color-dark);
+    --section-bg-color: var(--section-bg-color-dark);
+    --section-odd-bg-color: var(--section-odd-bg-color-dark);
+    --api-bg-color: var(--api-bg-color-dark);
+    --error-bg-color: var(--error-bg-color-dark);
+    --link-highlight-color: var(--link-highlight-color-dark);
+    --keyword-color: var(--keyword-color-dark);
+    --function-color: var(--function-color-dark);
+    --param-color: var(--param-color-dark);
+    --type-color: var(--type-color-dark);
+    --label-color: var(--label-color-dark);
+    --operator-color: var(--operator-color-dark);
+    --string-color: var(--string-color-dark);
+    --number-color: var(--number-color-dark);
+    --comment-color: var(--comment-color-dark);
+  }
 }
 
 @media not all and (min-width: 700px) {
@@ -45,22 +119,18 @@ code {
   }
 }
 
-header,
-footer {
-  --text-color: #fff;
-  --underline-color: #ffffff4d;
-}
-
-header,
-footer,
-section {
-  color: var(--text-color);
-}
-
 html,
-body,
-:root {
-  background: var(--header-color);
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  font-kerning: normal;
+  font-variant-ligatures: contextual common-ligatures;
+  font-feature-settings: "kern" 1, "liga" 1, "ccmp" 1, "case" 1, "calt" 1,
+    "ss01" 1;
+
+  --bg-color: var(--header-color);
+  background-color: var(--bg-color);
   font-size: var(--font-size);
   letter-spacing: var(--letter-spacing);
   line-height: 1.6;
@@ -69,6 +139,19 @@ body,
 * {
   margin: 0;
   padding: 0;
+}
+
+header,
+footer {
+  --text-color: var(--header-text-color);
+  --bg-color: var(--header-color);
+}
+
+header,
+footer,
+section {
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
 
 h1 {
@@ -99,46 +182,20 @@ header {
     calc(0.52 * min(100vw - 20px, 800px) - 2 * var(--nav-size))
   );
   padding: 0 var(--gutter-size) var(--nav-size);
-  background: var(--header-color);
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-header nav {
-  width: 100%;
-  max-width: var(--max-width);
-  list-style: none;
-  padding: 0 20px;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  white-space: nowrap;
-  --underline-color: transparent;
-  height: var(--nav-size);
-  align-items: center;
-}
-
-header nav a {
-  padding: 0.5em 1em;
-}
-
-header nav a:first-child {
-  padding-left: 0;
-}
-header nav a:last-child {
-  margin-left: auto;
-  padding-right: 0;
 }
 
 section {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: var(--bg-color);
 }
 
 body > section {
-  background: white;
+  --bg-color: var(--section-bg-color);
 }
 
 section > * {
@@ -164,41 +221,52 @@ p:not(:last-child) {
   margin-bottom: 1rem;
 }
 
-pre, code {
-  color: var(--code-color);
+pre {
+  overflow: scroll;
 }
 
-p code {
-  white-space: pre;
+pre,
+code {
+  font-family: "Roboto Mono", monospace;
+  white-space: pre-wrap;
+  --text-color: var(--code-color);
+  color: var(--text-color);
 }
 
-p code:not([class]) {
-  background: var(--code-bg-color);
-  border-radius: 0.2em;
-  padding: 0 0.2em;
-  margin: 0 -0.2em;
-}
-
-@property --underline-offset {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0;
-}
-
-@property --underline-thickness {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0;
+code span {
+  color: var(--text-color);
 }
 
 a {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--underline-color);
-  text-underline-offset: var(--underline-offset);
-  text-decoration-thickness: var(--underline-thickness);
-  transition: text-decoration-color, --underline-offset, --underline-thickness;
-  transition-duration: 0.2s;
+  --underline-color: var(--text-color);
+}
+
+a, a > span {
+  color: var(--text-color);
+  text-shadow: 2px 0 var(--bg-color), -2px 0 var(--bg-color);
+  position: relative;
+  z-index: 0;
+  text-decoration: none;
+}
+
+a:before, a > span:before {
+  content: "";
+  position: absolute;
+  background-color: var(--underline-color);
+  height: 0.06em;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  opacity: 0.3;
+  transform: scaleX(0.97) translateY(-0.08em);
+  transition: all 0.18s cubic-bezier(0.5, 0, 0.25, 1);
+}
+
+a:hover:before, a:hover > span:before {
+  transform: translateY(0.08em) scaleY(2);
+  opacity: 1;
+  background-color: var(--link-highlight-color);
 }
 
 section:not(:target) > h2 > a:not(:hover),
@@ -210,31 +278,25 @@ section:not(:target) > div > div > h3 > a:not(:hover),
 section:not(:target) > h4 > a:not(:hover),
 section:not(:target) > div > h4 > a:not(:hover),
 section:not(:target) > div > div > h4 > a:not(:hover) {
-  text-decoration-color: transparent;
+  --underline-color: transparent;
 }
 
-section:target > h2 > a,
-section:target > div > h2 > a,
-section:target > div > div > h2 > a,
-section:target > h3 > a,
-section:target > div > h3 > a,
-section:target > div > div > h3 > a,
-section:target > h4 > a,
-section:target > div > h4 > a,
-section:target > div > div > h4 > a,
-a:hover {
-  --underline-offset: 0.15em;
-  --underline-thickness: 0.2em;
+section:target > h2 > a:before,
+section:target > div > h2 > a:before,
+section:target > div > div > h2 > a:before,
+section:target > h3 > a:before,
+section:target > div > h3 > a:before,
+section:target > div > div > h3 > a:before,
+section:target > h4 > a:before,
+section:target > div > h4 > a:before,
+section:target > div > div > h4 > a:before,
+a:hover:before {
+  transform: translateY(0.08em) scaleY(2);
 }
 
-a:hover {
-  text-decoration-color: var(--link-highlight-color);
-}
-
-@supports not (background: paint(something)) {
-  a {
-    transition: text-underline-offset, text-decoration-color, text-decoration-thickness;
-  }
+a:hover:before {
+  background-color: var(--link-highlight-color);
+  opacity: 1;
 }
 
 @media (min-width: 700px) {
@@ -245,7 +307,118 @@ a:hover {
   }
 }
 
+/* Theme toggler */
+
+.theme-toggle {
+  position: fixed;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: all 0.15s ease-out;
+}
+
+@media (min-width: 1050px) {
+  .theme-toggle {
+    z-index: 1;
+  }
+}
+
+.theme-toggle:hover {
+  opacity: 0.5;
+}
+
+.theme-toggle svg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform-origin: center;
+  padding: 0.85em 1em;
+  width: 23px;
+  height: 23px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-toggle svg path {
+  fill: var(--text-color);
+}
+
+.dark-toggle,
+.light .dark-toggle,
+.dark .light-toggle {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.5em);
+  transition: all 0.35s ease-in;
+}
+
+.light-toggle,
+.light .light-toggle,
+.dark .dark-toggle {
+  opacity: 1;
+  pointer-events: all;
+  transform: none;
+  transition: all 0.35s ease-out 0.25s;
+}
+
+@media (prefers-color-scheme: dark) {
+  .light-toggle {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(0.5em);
+    transition: all 0.35s ease-in;
+  }
+
+  .dark-toggle {
+    opacity: 1;
+    pointer-events: all;
+    transform: none;
+    transition: all 0.35s ease-out 0.25s;
+  }
+}
+
 /* Section specific */
+
+header {
+  box-shadow: 0 0.33em 1em #00000030;
+}
+
+header nav {
+  width: 100%;
+  max-width: var(--max-width);
+  list-style: none;
+  padding: 0 20px;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  white-space: nowrap;
+  height: var(--nav-size);
+  align-items: center;
+}
+
+header nav a {
+  padding: 0.5em 1em;
+  --underline-color: transparent;
+}
+
+header nav a:before {
+  margin: 0.5em 1em;
+}
+
+header nav a:first-child {
+  padding-left: 0;
+}
+header nav a:first-child:before {
+  margin-left: 0;
+}
+
+header nav a:last-child {
+  margin-left: auto;
+  padding-right: 0;
+}
+header nav a:last-child:before {
+  margin-right: 0;
+}
 
 #intro h3 {
   position: absolute;
@@ -257,7 +430,7 @@ a:hover {
 }
 
 .api-toc-sec {
-  background: #c2ffdb;
+  --bg-color: var(--api-bg-color);
 }
 
 .api-toc-sec > div {
@@ -276,35 +449,39 @@ a:hover {
   align-items: baseline;
   --underline-color: transparent;
 }
+/* Fix links */
+.api-toc-sec li a:before {
+  display: none;
+}
+.api-toc-sec a span:before {
+  bottom: 0.1em;
+}
 
 .api-toc-sec pre {
   margin-left: 1.5em;
 }
 
-.api pre {
-  text-indent: -4ch;
-  padding-left: 4ch;
-  margin-bottom: 1em;
-  overflow: scroll;
-  white-space: pre-wrap;
-}
-
 .api.error {
-  background: #cd3b00;
-  --text-color: #fff;
-  --code-color: #ffffffc0;
+  --bg-color: var(--error-bg-color);
+  --text-color: #ffffff;
+  --code-color: #ffffff90;
   --code-bg-color: #ffffff08;
   --underline-color: #ffffff4d;
-  --keyword-color: #ffffffa0;
-  --fn-color: #ffffff;
-  --type-color: #ffffff;
-  --param-color: #ffffff;
-  --prop-color: #ffffff;
-  --literal-color: #ffe014;
+  --highlight-color: #ffe014;
+
+  --keyword-color: var(--code-color);
+  --function-color: var(--highlight-color);
+  --param-color: var(--highlight-color);
+  --type-color: var(--highlight-color);
+  --label-color: var(--highlight-color);
+  --operator-color: var(--code-color);
+  --string-color: var(--highlight-color);
+  --number-color: var(--code-color);
+  --comment-color: var(--comment-color-dark);
 }
 
 section.odd {
-  background: #f6f6f6;
+  --bg-color: var(--section-odd-bg-color);
 }
 
 @media (min-width: 700px) {
@@ -331,29 +508,48 @@ section.odd {
 }
 
 .decl {
-  color: var(--decl-color);
-}
-
-.fn {
-  color: var(--fn-color);
-}
-
-.param {
-  color: var(--param-color);
-}
-
-.prop {
-  color: var(--prop-color);
-}
-
-.type {
-  color: var(--type-color);
-}
-
-.literal {
-  color: var(--literal-color);
+  text-indent: -4ch;
+  padding-left: 4ch;
+  margin-bottom: 1em;
 }
 
 .keyword {
-  color: var(--keyword-color);
+  --text-color: var(--keyword-color);
+}
+
+.function {
+  --text-color: var(--function-color);
+}
+
+.param {
+  --text-color: var(--param-color);
+}
+
+.type {
+  --text-color: var(--type-color);
+}
+
+.label {
+  --text-color: var(--label-color);
+}
+
+.operator {
+  --text-color: var(--operator-color);
+}
+
+.string {
+  --text-color: var(--string-color);
+}
+
+a.string:before {
+  left: 1ch;
+  right: 1ch;
+}
+
+.number {
+  --text-color: var(--number-color);
+}
+
+.comment {
+  --text-color: var(--comment-color);
 }
