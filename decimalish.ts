@@ -55,7 +55,7 @@
  *  - 11 rounding modes
  *  - no global configuration or state
  *  - use it or lose it! per-method tree shaking supported
- *  - or at worst, only 5.7kb minified (2.7kb gzipped)!
+ *  - or at worst, only 5.8kb minified (2.7kb gzipped)!
  *  - does not support -0, NaN, or Infinity. -0 isn't useful outside of floating
  *    point, Infinity is not a decimal, and the only case which might produce
  *    Infinity or NaN, dividing by zero, throws.
@@ -441,12 +441,7 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
 
   // If there is a remainder, consider the provided rounding rule.
   if (remainder !== "0") {
-    // Euclidean division results in rounding the quotient down or up depending
-    // on whether the sign of the quotient differs from the divisor, ensuring
-    // the remainder will always be positive.
-    roundingMode =
-      roundingMode === EUCLIDEAN ? sign === signB ? DOWN : UP :
-      normalizeRoundingMode(roundingMode, sign, digit)
+    roundingMode = normalizeRoundingMode(roundingMode, sign, signA, digit)
 
     if (roundingMode === EXACT) {
       error("INEXACT", `${dividend}/${divisor}`)
@@ -839,7 +834,7 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
 
   // Only round if the rounded precision is less than the original precision.
   if (precision > roundingPrecision) {
-    roundingMode = normalizeRoundingMode(roundingMode, sign, +(significand[roundingPrecision - 1] || 0))
+    roundingMode = normalizeRoundingMode(roundingMode, sign, sign, +(significand[roundingPrecision - 1] || 0))
 
     if (roundingMode === EXACT) {
       error("INEXACT", `round(${value})`)
@@ -1178,23 +1173,31 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
 }
 
 /**
- * Normalize the rounding mode based on sign and least significant digit;
- * reducing the possible rounding modes to five (up, down, half up, half down,
- * and exact) which apply to the absolute value of quotient.
+ * Normalize the rounding mode based on sign and other contextual information
+ * to reduce the possible rounding modes to five (up, down, half up, half down,
+ * and exact) which apply to the absolute value of rounded value.
  *
  * @internal
  */
 function normalizeRoundingMode(
   roundingMode: RoundingMode | undefined,
   sign: number,
-  leastSignificantDigit: number
+  dividendSign: number,
+  leastSignificantDigit: number,
 ): 'up' | 'down' | 'half up' | 'half down' | 'exact' | undefined {
   return (
     roundingMode === CEIL ? sign < 0 ? DOWN : UP :
-    // When used with rounding, "euclidean" is an alias for "floor".
-    roundingMode === FLOOR || roundingMode === EUCLIDEAN ? sign < 0 ? UP : DOWN :
+    roundingMode === FLOOR  ? sign < 0 ? UP : DOWN :
+    // Euclidean division results in rounding the quotient up or down depending
+    // on the sign of dividend rather than the quotient, ensuring the remainder
+    // will always be positive. When used with round(), the sign of the rounded
+    // value is used such that "euclidean" is an alias for "floor".
+    roundingMode === EUCLIDEAN ? dividendSign < 0 ? UP : DOWN :
     roundingMode === HALF_CEIL ? sign < 0 ? HALF_DOWN : HALF_UP :
     roundingMode === HALF_FLOOR ? sign < 0 ? HALF_UP : HALF_DOWN :
+    // Half even rounds towards the next even value. This is determined by
+    // looking at the whether the least significant digit is even and rounding
+    // "half up" or "half down" accordingly.
     roundingMode === HALF_EVEN ? leastSignificantDigit % 2 ? HALF_UP : HALF_DOWN :
     roundingMode
   )
@@ -1364,9 +1367,8 @@ export function deconstruct(value: unknown): [sign: 1 | -1 | 0, significand: str
  * @category Et cetera
  */
 export function construct(sign: 1 | -1 | 0, significand: string, exponent: number): decimal {
-  let precision
-  [sign, significand, exponent, precision] = normalizeRepresentation(sign, significand, exponent)
-  return print(sign, significand, precision, precision, exponent + 1) as decimal
+  const [signA, significandA, exponentA, precisionA] = normalizeRepresentation(sign, significand, exponent)
+  return print(signA, significandA, precisionA, precisionA, exponentA + 1) as decimal
 }
 
 /**
