@@ -15,6 +15,7 @@
 :root {
   --nav-size: 50px;
   --small-col-width: 285px;
+  --medium-col-width: 350px;
   --gutter-size: 2.5rem;
   --column-gap: 2.5rem;
   --font-size: 15px;
@@ -30,6 +31,8 @@
   --text-color-dark: #ffffffe0;
   --code-color-lite: #00000090;
   --code-color-dark: #ffffff90;
+  --pre-bg-color-lite: #00000010;
+  --pre-bg-color-dark: #ffffff10;
   --section-bg-color-lite: #ffffff;
   --section-bg-color-dark: #23252c;
   --section-odd-bg-color-lite: #fafafa;
@@ -65,6 +68,7 @@
   --header-text-color: var(--header-text-color-lite);
   --text-color: var(--text-color-lite);
   --code-color: var(--code-color-lite);
+  --pre-bg-color: var(--pre-bg-color-lite);
   --section-bg-color: var(--section-bg-color-lite);
   --section-odd-bg-color: var(--section-odd-bg-color-lite);
   --api-bg-color: var(--api-bg-color-lite);
@@ -86,6 +90,7 @@
   --header-text-color: var(--header-text-color-dark);
   --text-color: var(--text-color-dark);
   --code-color: var(--code-color-dark);
+  --pre-bg-color: var(--pre-bg-color-dark);
   --section-bg-color: var(--section-bg-color-dark);
   --section-odd-bg-color: var(--section-odd-bg-color-dark);
   --api-bg-color: var(--api-bg-color-dark);
@@ -108,6 +113,7 @@
     --header-text-color: var(--header-text-color-dark);
     --text-color: var(--text-color-dark);
     --code-color: var(--code-color-dark);
+    --pre-bg-color: var(--pre-bg-color-dark);
     --section-bg-color: var(--section-bg-color-dark);
     --section-odd-bg-color: var(--section-odd-bg-color-dark);
     --api-bg-color: var(--api-bg-color-dark);
@@ -235,6 +241,12 @@ p:not(:last-child) {
 
 pre {
   overflow: scroll;
+  padding: 0.5em 1em;
+  margin: 1em 0;
+  border-radius: 2px;
+  background-color: var(--pre-bg-color);
+  width: fit-content;
+  min-width: 40ch;
 }
 
 pre,
@@ -250,6 +262,7 @@ code span {
 }
 
 a {
+  white-space: nowrap;
   --underline-color: var(--text-color);
 }
 
@@ -439,6 +452,17 @@ header nav a:last-child:before {
 #intro p:first-child:before {
   content: 'Decimalish';
   visibility: hidden;
+}
+
+.two-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--medium-col-width), 1fr));
+  gap: 0 var(--column-gap);
+  margin-top: 0;
+}
+
+.two-grid h3 {
+  margin-top: var(--gutter-size);
 }
 
 .api-toc-sec {
@@ -1613,7 +1637,7 @@ function sleep(ms) {
              is an arbitrary-precision decimal <em>(aka “BigNumber”)</em> library for JavaScript and TypeScript. How is this different from regular numbers and why would you need such a thing?
           </p>
           <p>
-            Consider this surprising fact about regular numbers: <code>0.1 + 0.2 != 0.3</code>. This isn't yet another JavaScript quirk, but an unfortunate pitfall of nearly all numbers represented by computers (floating point numbers).
+            Consider this surprising fact about regular numbers: <code><span class="number">0.1</span> + <span class="number">0.2</span> != <span class="number">0.3</span></code>. This isn't yet another JavaScript quirk, but an unfortunate pitfall of nearly all numbers represented by computers (floating point numbers).
           </p>
           <p>
             While we read and write numbers in decimal, computers use binary and must convert between them. This can cause trouble when doing so with a fixed number of bits, information can be lost along the way and yield confusing results. In areas like finance or engineering these errors are simply unacceptable.
@@ -1628,10 +1652,125 @@ function sleep(ms) {
             <strong>So what’s the catch?</strong> Well speed for one, computers are specifically designed to make working with floating point numbers fast. While nowhere close to native speed, Decimalish is unlikely to be your program’s bottleneck.
           </p>
           <p>
-            Then there's how you use them. While regular numbers can use the familiar operators (<code>+</code>, <code>*</code>, <code>&amp;equals;</code>), Decimalish cannot and offers equivalent functions in their place (<code>add</code>, <code>mul</code>, <code>eq</code>).
+            Then there's how you use them. While regular numbers can use the familiar operators (<code>+</code>, <code>*</code>, <code>=</code>), Decimalish cannot and offers equivalent functions in their place (<code><a href="#add()" class="function">add()</a></code>, <code><a href="#mul()" class="function">mul()</a></code>, <code><a href="#eq()" class="function">eq()</a></code>).
           </p>
           <p>
             Finally there's how they’re represented. Like regular numbers, Decimalish offers an <em>immutable primitive</em>. However …it’s a string… hence the <strong>–ish</strong>. Decimalish decimals are a specific format of <a href="#NumericString">numeric string</a>. While this has its advantages, ideally decimal could be its own primitive; but that’s just not JavaScript.
+          </p>
+        </div>
+      </div>
+    </section>
+    <section id="get-started" class="odd">
+      <div>
+        <h2>
+          <a href="#get-started">Get started</a>
+        </h2>
+        <p>
+          Decimalish can be used anywhere you use JavaScript. It supports decades-old browsers, modern module-aware Node.js, and web compilers like <a target="_blank" href="https://webpack.js.org/">Webpack</a>. It comes with TypeScript definitions in the box.
+        </p>
+        <p>
+          For most, install decimalish via npm:
+        </p>
+        <pre><code><span class="param">npm</span> <span class="param">install</span> <span class="param">decimalish</span></code></pre>
+        <p>
+          Otherwise, find a UMD module on your CDN of choice:
+        </p>
+        <pre><code>&lt;<span class="param">script</span> <span class="param">src</span>=<span class="string">&quot;https://unpkg.com/decimalish&quot;</span>&gt;&lt;/<span class="type">script</span>&gt;</code></pre>
+      </div>
+    </section>
+    <section id="why">
+      <div>
+        <h2>
+          <a href="#why">Why use Decimalish?</a>
+        </h2>
+        <p>
+          &quot;BigDecimal&quot; arbitrary-precision decimal arithmetic libraries are nothing new. Some programming languages like Java and Python come with one built-in. There are decades-old standards to consult. In JavaScript there are many existing decimal libraries, such as the very popular <a target="_blank" href="https://mikemcl.github.io/big.js">Big.js</a>, as well as a <a target="_blank" href="https://github.com/tc39/proposal-decimal">proposal</a> to add a native BigDecimal type. So why choose Decimalish?
+        </p>
+        <p>
+          Simply put, Decimalish is easy to use, runs everywhere without dependencies or polyfills, reduces common mistakes, and feels JavaScript native, all while keeping a light footprint.
+        </p>
+      </div>
+      <div class="two-grid">
+        <div id="lightweight">
+          <h3>
+            <a href="#lightweight">Lightweight</a>
+          </h3>
+          <p>
+            Decimalish is smaller than any library with comparable features. The entire library is 5KB minified and 2.3KB gzipped. Even better, Decimalish supports <em>tree shaking</em> so you only bundle what you use, as little as 0.45KB.
+          </p>
+          <p>
+            See how this <a href="#comparison">compares</a> to other libraries.
+          </p>
+        </div>
+        <div id="functional">
+          <h3>
+            <a href="#functional">Functional API</a>
+          </h3>
+          <p>
+            All methods in Decimalish's API are provided as top level functions, not prototype methods. This maintains similarity to the built-in <code><span class="type">Math</span></code> module, enables tree-shaking, and works well with functional utility libraries like <a target="_blank" href="https://ramdajs.com/">ramda</a> or <a target="_blank" href="https://lodash.com/">lodash</a>.
+          </p>
+        </div>
+        <div id="primitive-type">
+          <h3>
+            <a href="#primitive-type">Native primitive type</a>
+          </h3>
+          <p>
+            Most BigDecimal libraries introduce a Decimal type as an Object, which is potentially mutable, not comparable, and often require writing bulky code with repeated calls to constructors. Decimalish’s <code><a href="#decimal" class="type">decimal</a></code> type, much like the built in <code><span class="param">number</span></code>, is an <em>immutable primitive</em> …because it is a string.
+          </p>
+          <p>
+            A <code><a href="#decimal" class="type">decimal</a></code> can be used as an object key, compared for equality, safely cached, written to or read from a JSON file, printed to a console or debugger, or anything else you can do with a string.
+          </p>
+        </div>
+        <div id="no-special-values">
+          <h3>
+            <a href="#no-special-values">No special values</a>
+          </h3>
+          <p>
+            Unlike other BigDecimal libraries, Decimalish does not support the &quot;special values&quot; <code><span class="keyword">NaN</span></code>, <code><span class="keyword">Infinity</span></code>, or <code>-<span class="number">0</span></code>. Forgetting to handle these special values can be a common source of bugs, so that’s one less thing to worry about.
+          </p>
+          <p>
+            Operations that cannot return a finite <code><a href="#decimal" class="type">decimal</a></code> value will throw an error (such as <code><a href="#DIV_ZERO" class="string">&quot;DIV_ZERO&quot;</a></code>).
+          </p>
+        </div>
+        <div id="no-implicit-rounding">
+          <h3>
+            <a href="#no-implicit-rounding">No implicit rounding</a>
+          </h3>
+          <p>
+            Many BigDecimal libraries automatically round the result of every operation if too bigger, too smaller, or too high precision based on some globally defined config. This can be confusing, cumbersome to configure, and another common source of bugs.
+          </p>
+          <p>
+            Decimalish almost always returns exact results, only rounding when it must (such as non-terminating division) and always allowing locally configured behavior without any global state.
+          </p>
+        </div>
+        <div id="no-trailing-zeros">
+          <h3>
+            <a href="#no-trailing-zeros">No trailing zeros</a>
+          </h3>
+          <p>
+            Some BigDecimal libraries attempt to visually preserve precision after an operation by adding trailing zeros. While this can be useful for quick number formatting, this conflates mathematical value with presentation, require multiple kinds of equality (is <code><span class="number">1.0</span></code> equal to <code><span class="number">1</span></code>?), and sometimes operations such as multiple result in surprising results and thus, you guessed it, another source of bugs.
+          </p>
+          <p>
+            Decimalish's `decimal()` constructor, and all other math functions always return canonical normalized decimal values without any leading or trailing zeros.
+          </p>
+        </div>
+        <div id="places-or-precision">
+          <h3>
+            <a href="#places-or-precision">Places or precision</a>
+          </h3>
+          <p>
+            When determining how many digits should be in a rounded value, most BigDecimal libraries only interpret this as either decimal places or precision (significant digits). It's not always clear which based on reading code alone.
+          </p>
+          <p>
+            Decimalish offers both for all methods that might round with an easy to read API, alongside a rich set of rounding and division modes.
+          </p>
+        </div>
+        <div id="extensible">
+          <h3>
+            <a href="#extensible">Extensible</a>
+          </h3>
+          <p>
+            Decimalish exposes the core functions it uses to convert between <code><a href="#decimal" class="type">decimal</a></code> string values and an internal normalized form, making it straightforward to introduce new operations and functionality on an equal footing to Decimalish’s own API.
           </p>
         </div>
       </div>
@@ -1709,7 +1848,7 @@ function sleep(ms) {
           <h3>Comparison</h3>
           <ul>
             <li>
-              <a href="#eq()"><span>Equals (=)</span><pre class="function">eq()</pre></a>
+              <a href="#eq()"><span>Equals (==)</span><pre class="function">eq()</pre></a>
             </li>
             <li>
               <a href="#gt()"><span>Greater than (&gt;)</span><pre class="function">gt()</pre></a>
@@ -2206,7 +2345,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
       <section id="eq()" class="api">
         <div>
           <h3>
-            <a href="#eq()">Equals (=)</a>
+            <a href="#eq()">Equals (==)</a>
           </h3>
           <div>
             <pre class="decl"><code><span class="function">eq</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code></pre>Compares two numeric values and returns true if they are equivalent.
