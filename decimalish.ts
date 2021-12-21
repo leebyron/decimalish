@@ -25,6 +25,7 @@
  *  - "exact" rounding mode?
  *  - sqrt
  *  - build outputs
+ *  - int/intRem/isInteger - needs tests
  *
  * Todo:
  *  - should rounding from a negative result in -0? Reintroduce -0?
@@ -165,6 +166,23 @@ export type NumericString = `${number}`
  */
 export function isNumericString(value: unknown): value is NumericString {
   return value === ("" + value) && isNumeric(value)
+}
+
+/**
+ * Integer?
+ *
+ * Returns true if the provided value is an integer numeric value.
+ *
+ * Similar to `Number.isInteger()`, however operates on `decimal` or any other
+ * `Numeric` value. This is most useful when working with high precision values
+ * where converting to a JavaScript number might lose precision, inadvertently
+ * removing fractional information.
+ *
+ * @category Types
+ */
+export function isInteger(value: Numeric): boolean {
+  const [,, exponent, precision] = deconstruct(value)
+  return exponent + 1 >= precision
 }
 
 
@@ -531,7 +549,7 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
   let baseToPowerOf2 = decimal(base)
   let result = "1" as decimal
 
-  exponent = wholeNumber("exponent", exponent)
+  exponent = expectInt("exponent", exponent)
   if (exponent < 0) {
     error("NOT_POS", `exponent: ${exponent}`)
   }
@@ -796,7 +814,7 @@ export function precision(value: Numeric): number {
  */
 export function scale(value: Numeric, power: Numeric): decimal {
   const [sign, significand, exponent] = deconstruct(value)
-  return construct(sign, significand, exponent + wholeNumber("power", power))
+  return construct(sign, significand, exponent + expectInt("power", power))
 }
 
 
@@ -825,7 +843,7 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
   let roundingPrecision = getRoundingPrecision(roundingRules, exponent)
 
   // Start the rounded value as a truncated value to the desired precision.
-  let rounded = construct(sign, roundingPrecision > 0 ? significand.slice(0, roundingPrecision) : "", exponent)
+  let rounded = construct(sign, significand.slice(0, roundingPrecision > 0 ? roundingPrecision : 0), exponent)
 
   // Only round if the rounded precision is less than the original precision.
   if (precision > roundingPrecision) {
@@ -890,7 +908,7 @@ export function ceil(value: Numeric): decimal {
 }
 
 /**
- * Truncate
+ * Truncate to integer
  *
  * Returns the integer part of a number by rounding to the nearest whole number
  * in the direction of 0.
@@ -901,8 +919,23 @@ export function ceil(value: Numeric): decimal {
  * @see round
  * @category Rounding
  */
-export function trunc(value: Numeric): decimal {
+export function int(value: Numeric): decimal {
   return round(value, { mode: DOWN })
+}
+
+/**
+ * Integer and remainder
+ *
+ * Returns both the integer part and the remaining fractional part of a number.
+ *
+ * Note: This is equivalent to, but much faster than `divRem(value, 1)`.
+ *
+ * @see divRem
+ * @category Rounding
+ */
+export function intRem(value: Numeric): [integer: decimal, fraction: decimal] {
+  const parts = decimal(value).split('.')
+  return [parts[0], parts[1] ? '0.' + parts[1] : '0'] as [decimal, decimal]
 }
 
 /**
@@ -1131,9 +1164,9 @@ function normalizeRules(rules: RoundingRules | undefined, defaultPlaces: number,
 
   if (precision != null) {
     if (places != null) error("NOT_BOTH", `${PLACES}: ${places}, ${PRECISION}: ${precision}`)
-    precision = wholeNumber(PRECISION, precision)
+    precision = expectInt(PRECISION, precision)
   } else {
-    places = places != null ? wholeNumber(PLACES, places) : defaultPlaces
+    places = places != null ? expectInt(PLACES, places) : defaultPlaces
   }
 
   // Note: indexOf() or find() would work, however neither are available in ES3.
@@ -1174,15 +1207,13 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
  */
 export function toNumber(value: Numeric, options?: { exact?: boolean }): number {
   const canonical = decimal(value)
-  value = +canonical
   // Unless `exact` has been explicitly set to false, check to ensure the number
   // conversion has not lost information by converting it back to a canonical
   // decimal and comparing it to the original.
-  const exact = options && options.exact
-  if ((exact || exact == null) && decimal(value) !== canonical) {
-    error("INEXACT", `${canonical} toNumber ${value}`)
+  if (!(options && options.exact == false) && decimal(+canonical) !== canonical) {
+    error("INEXACT", `toNumber(${value})`)
   }
-  return value
+  return +canonical
 }
 
 /**
@@ -1366,16 +1397,15 @@ function normalizeRepresentation(sign: Sign, significand: string, exponent: numb
 // Errors and validation
 
 /**
- * Converts and validates a Numeric as a whole number (integer).
+ * Converts and validates a Numeric as an integer.
  *
  * @internal
  */
-function wholeNumber(name: string, value: Numeric): number {
-  value = toNumber(value)
-  if (~~value !== value) {
+function expectInt(name: string, value: Numeric): number {
+  if (!isInteger(value)) {
     error("NOT_INT", `${name}: ${value}`)
   }
-  return value
+  return toNumber(value)
 }
 
 /**
