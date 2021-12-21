@@ -607,7 +607,7 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
 // Comparison
 
 /**
- * Equals (=)
+ * Equals (==)
  *
  * Compares two numeric values and returns true if they are equivalent.
  *

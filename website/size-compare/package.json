@@ -1,0 +1,18 @@
+{
+  "scripts": {
+    "build:install": "npm_config_package_lock=false npm install",
+    "build:generate": "mkdir -p dist; node generate.mjs"
+  },
+  "dependencies": {
+    "@size-limit/esbuild": "^7.0.4",
+    "@size-limit/file": "^7.0.4",
+    "big-integer": "^1.6.51",
+    "big.js": "^6.1.1",
+    "bignumber.js": "^9.0.2",
+    "decimal.js": "^10.3.1",
+    "decimal.js-light": "^2.5.1",
+    "decimalish": "file:../../dist",
+    "js-big-decimal": "^1.3.4",
+    "size-limit": "^7.0.4"
+  }
+}

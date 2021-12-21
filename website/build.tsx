@@ -175,6 +175,8 @@ const Index = () =>
       <ThemeToggle />
       <Header />
       <IntroSection />
+      <GetStarted />
+      <WhySection />
       <APISection />
       <FAQSection />
       <Footer />
@@ -227,7 +229,7 @@ const IntroSection = () =>
           from regular numbers and why would you need such a thing?
         </p>
         <p>
-          Consider this surprising fact about regular numbers: <code>0.1 + 0.2 != 0.3</code>.
+          Consider this surprising fact about regular numbers: <Code>0.1 + 0.2 != 0.3</Code>.
           This isn&apos;t yet another JavaScript quirk, but an unfortunate pitfall of
           nearly all numbers represented by computers (floating point numbers).
         </p>
@@ -254,9 +256,9 @@ const IntroSection = () =>
         </p>
         <p>
           Then there's how you use them. While regular numbers can use the
-          familiar operators (<code>+</code>, <code>*</code>, <code>&equals;</code>),
+          familiar operators (<Code>+</Code>, <Code>*</Code>, <Code>{'='}</Code>),
           Decimalish cannot and offers equivalent functions in their place
-          (<code>add</code>, <code>mul</code>, <code>eq</code>).
+          (<Code>add()</Code>, <Code>mul()</Code>, <Code>eq()</Code>).
         </p>
         <p>
           Finally there's how they’re represented. Like regular numbers,
@@ -266,6 +268,152 @@ const IntroSection = () =>
           While this has its advantages, ideally decimal could be its own
           primitive; but that’s just not JavaScript.
         </p>
+      </div>
+    </div>
+  </section>
+
+const GetStarted = () =>
+  <section id="get-started" class="odd">
+    <div>
+      <h2><a href="#get-started">Get started</a></h2>
+      <Markdown>
+        {`
+Decimalish can be used anywhere you use JavaScript. It supports decades-old browsers, modern module-aware Node.js, and web compilers like [Webpack](https://webpack.js.org/). It comes with TypeScript definitions in the box.
+
+For most, install decimalish via npm:
+
+\`\`\`sh
+npm install decimalish
+\`\`\`
+
+Otherwise, find a UMD module on your CDN of choice:
+
+\`\`\`sh
+<script src="https://unpkg.com/decimalish"></script>
+\`\`\`
+        `}
+      </Markdown>
+    </div>
+  </section>
+
+const WhySection = () =>
+  <section id="why">
+    <div>
+      <h2><a href="#why">Why use Decimalish?</a></h2>
+      <P>
+        "BigDecimal" arbitrary-precision decimal arithmetic libraries are
+        nothing new. Some programming languages like Java and Python come with
+        one built-in. There are decades-old standards to consult. In JavaScript
+        there are many
+        existing decimal libraries, such as the very popular [Big.js](https://mikemcl.github.io/big.js),
+        as well as a [proposal](https://github.com/tc39/proposal-decimal) to
+        add a native BigDecimal type. So why choose Decimalish?
+      </P>
+      <p>
+        Simply put, Decimalish is easy to use, runs everywhere without
+        dependencies or polyfills, reduces common mistakes, and feels
+        JavaScript native, all while keeping a light footprint.
+      </p>
+    </div>
+    <div class="two-grid">
+      <div id="lightweight">
+        <h3><a href="#lightweight">Lightweight</a></h3>
+        <p>
+          Decimalish is smaller than any library with comparable features.
+          The entire library is 5KB minified and 2.3KB gzipped. Even better,
+          Decimalish supports <em>tree shaking</em> so you only bundle what you
+          use, as little as 0.45KB.
+        </p>
+        <p>See how this <a href="#comparison">compares</a> to other libraries.</p>
+      </div>
+      <div id="functional">
+        <h3><a href="#functional">Functional API</a></h3>
+        <P>
+          All methods in Decimalish's API are provided as top level functions,
+          not prototype methods. This maintains similarity to the built-in
+          `Math` module, enables tree-shaking, and works well with functional
+          utility libraries like [ramda](https://ramdajs.com/) or [lodash](https://lodash.com/).
+        </P>
+      </div>
+      <div id="primitive-type">
+        <h3><a href="#primitive-type">Native primitive type</a></h3>
+        <P>
+          Most BigDecimal libraries introduce a Decimal type as an Object, which
+          is potentially mutable, not comparable, and often require writing
+          bulky code with repeated calls to constructors. Decimalish’s `decimal`
+          type, much like the built in `number`, is an *immutable primitive*
+          …because it is a string.
+        </P>
+        <P>
+          A `decimal` can be used as an object key, compared for equality,
+          safely cached, written to or read from a JSON file, printed to a
+          console or debugger, or anything else you can do with a string.
+        </P>
+      </div>
+      <div id="no-special-values">
+        <h3><a href="#no-special-values">No special values</a></h3>
+        <P>
+          Unlike other BigDecimal libraries, Decimalish does not support the
+          "special values" `NaN`, `Infinity`, or `-0`. Forgetting to handle
+          these special values can be a common source of bugs, so that’s one
+          less thing to worry about.
+        </P>
+        <P>
+          Operations that cannot return a finite `decimal` value will throw an
+          error (such as `"DIV_ZERO"`).
+        </P>
+      </div>
+      <div id="no-implicit-rounding">
+        <h3><a href="#no-implicit-rounding">No implicit rounding</a></h3>
+        <p>
+          Many BigDecimal libraries automatically round the result of
+          every operation if too bigger, too smaller, or too high precision
+          based on some globally defined config. This can be confusing,
+          cumbersome to configure, and another common source of bugs.
+        </p>
+        <p>
+          Decimalish almost always returns exact results, only rounding when it
+          must (such as non-terminating division) and always allowing locally
+          configured behavior without any global state.
+        </p>
+      </div>
+      <div id="no-trailing-zeros">
+        <h3><a href="#no-trailing-zeros">No trailing zeros</a></h3>
+        <P>
+          Some BigDecimal libraries attempt to visually preserve precision after
+          an operation by adding trailing zeros. While this can be useful for
+          quick number formatting, this conflates mathematical value with
+          presentation, require multiple kinds of equality (is `1.0` equal to
+          `1`?), and sometimes operations such as multiple result in surprising
+          results and thus, you guessed it, another source of bugs.
+        </P>
+        <p>
+          Decimalish's `decimal()` constructor, and all other math functions
+          always return canonical normalized decimal values without any leading
+          or trailing zeros.
+        </p>
+      </div>
+      <div id="places-or-precision">
+        <h3><a href="#places-or-precision">Places or precision</a></h3>
+        <p>
+          When determining how many digits should be in a rounded value, most
+          BigDecimal libraries only interpret this as either decimal places or
+          precision (significant digits). It's not always clear which based on
+          reading code alone.
+        </p>
+        <p>
+          Decimalish offers both for all methods that might round with an easy
+          to read API, alongside a rich set of rounding and division modes.
+        </p>
+      </div>
+      <div id="extensible">
+        <h3><a href="#extensible">Extensible</a></h3>
+        <P>
+          Decimalish exposes the core functions it uses to convert between
+          `decimal` string values and an internal normalized form, making it
+          straightforward to introduce new operations and functionality on an
+          equal footing to Decimalish’s own API.
+        </P>
       </div>
     </div>
   </section>
@@ -312,40 +460,44 @@ const colorClass: { [color: string]: string | undefined } = {
   '#6a9955': 'comment',
 }
 
-const Markdown = ({ children }: { children?: string }) => {
+const Markdown = ({ children, ...props }: { children?: string, wrapper?: string, forceBlock?: boolean }) => {
   if (!children) return null
-  const ids = useTypedefs().ids
-
-  const Link = ({ children, ...props }: any) =>
-    <a target={props.href?.startsWith('http') && '_blank'} {...props}>{children}</a>
-
-  const Code = ({ children }: { children: string }) => {
-    const highlighter = useHighlighter()
-
-    // Convert inline code blocks into relative links.
-    const typeDef = children.startsWith('"') ? ids[children.slice(1, -1)] : ids[children]
-    if (typeDef) {
-      return <code><a href={'#' + typeDef.id} class={typeDef.kind}>{children}</a></code>
-    }
-
-    // Otherwise color and link as typescript.
-    const tokenLines = highlighter.codeToThemedTokens(children, 'typescript', 'dark-plus')
-    const lines = tokenLines.map(line => <>{line.map(({ content, color }, index) => {
-      const className = color && colorClass[color.toLowerCase()]
-      const typeDef = content.startsWith('"') ? ids[content.slice(1, -1)] : ids[content + (line[index + 1]?.content[0] === '(' ? '()' : '')]
-      return typeDef ?
-        <a href={'#' + typeDef.id} class={className}>{content}</a> :
-        className ? <span class={className}>{content}</span> : content
-    })}</>)
-
-    return <code>{lines.map((line, index) => index === 0 ? line : ['\n', line])}</code>
-  }
 
   return compiler(children, {
     wrapper: null,
+    ...props,
+    overrides: { a: Link, code: Code },
     createElement: jsx.h as any,
-    overrides: { a: Link, code: Code }
   })
+}
+
+const P = ({ children }: { children: string }) => <Markdown wrapper="p" forceBlock={true}>{children}</Markdown>
+
+const Link = ({ children, ...props }: any) =>
+  <a target={props.href?.startsWith('http') && '_blank'} {...props}>{children}</a>
+
+const Code = ({ children }: { children: string }) => {
+  const ids = useTypedefs().ids
+
+  const highlighter = useHighlighter()
+
+  // Convert inline code blocks into relative links.
+  const typeDef = children.startsWith('"') ? ids[children.slice(1, -1)] : ids[children]
+  if (typeDef) {
+    return <code><a href={'#' + typeDef.id} class={typeDef.kind}>{children}</a></code>
+  }
+
+  // Otherwise color and link as typescript.
+  const tokenLines = highlighter.codeToThemedTokens(children, 'typescript', 'dark-plus')
+  const lines = tokenLines.map(line => <>{line.map(({ content, color }, index) => {
+    const className = color && colorClass[color.toLowerCase()]
+    const typeDef = content.startsWith('"') ? ids[content.slice(1, -1)] : ids[content + (line[index + 1]?.content[0] === '(' ? '()' : '')]
+    return typeDef ?
+      <a href={'#' + typeDef.id} class={className}>{content}</a> :
+      className ? <span class={className}>{content}</span> : content
+  })}</>)
+
+  return <code>{lines.map((line, index) => index === 0 ? line : ['\n', line])}</code>
 }
 
 const APIItemSection = ({ item }: { item: Typedef }) =>
