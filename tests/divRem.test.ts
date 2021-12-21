@@ -56,4 +56,11 @@ describe('divRem', () => {
     expect(divRem(7, 3, { precision: 3 })).toStrictEqual(['2.33', '0.01'])
     expect(divRem(10, 3, { precision: 3 })).toStrictEqual(['3.33', '0.01'])
   })
+
+  it('performs euclidean division', () => {
+    expect(divRem(10, 3, { mode: 'euclidean' })).toStrictEqual(['3', '1'])
+    expect(divRem(10, -3, { mode: 'euclidean' })).toStrictEqual(['-3', '1'])
+    expect(divRem(-10, 3, { mode: 'euclidean' })).toStrictEqual(['-4', '2'])
+    expect(divRem(-10, -3, { mode: 'euclidean' })).toStrictEqual(['4', '2'])
+  })
 })

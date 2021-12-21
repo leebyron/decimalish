@@ -441,30 +441,22 @@ export function divRem(dividend: Numeric, divisor: Numeric, rules?: RoundingRule
 
   // If there is a remainder, consider the provided rounding rule.
   if (remainder !== "0") {
+    // Euclidean division results in rounding the quotient down or up depending
+    // on whether the sign of the quotient differs from the divisor, ensuring
+    // the remainder will always be positive.
+    roundingMode =
+      roundingMode === EUCLIDEAN ? sign === signB ? DOWN : UP :
+      normalizeRoundingMode(roundingMode, sign, digit)
+
     if (roundingMode === EXACT) {
       error("INEXACT", `${dividend}/${divisor}`)
     }
 
-    // Normalize the rounding mode based on sign and other context; reducing the
-    // set of possible rounding modes to four (up, down, half up, and half down)
-    // which apply to the absolute value of quotient.
-    // TODO: can this be shared with round()?
-    roundingMode =
-      roundingMode === CEIL ? sign < 0 ? DOWN : UP :
-      roundingMode === FLOOR ? sign < 0 ? UP : DOWN :
-      roundingMode === EUCLIDEAN ? sign === signB ? DOWN : UP :
-      roundingMode === HALF_CEIL ? sign < 0 ? HALF_DOWN : HALF_UP :
-      roundingMode === HALF_FLOOR ? sign < 0 ? HALF_UP : HALF_DOWN :
-      roundingMode === HALF_EVEN ? digit % 2 ? HALF_DOWN : HALF_UP :
-      roundingMode
-
     // Determine whether to round up the quotient. This is trivial for whole
     // rounding modes, however half rounding modes need to compare the remainder
     // to the midpoint of the divisor, treating exactly the midpoint specially.
-    let shouldRoundUp
-    if (roundingMode === UP || roundingMode === DOWN) {
-      shouldRoundUp = roundingMode === UP
-    } else {
+    let shouldRoundUp = roundingMode === UP
+    if (roundingMode === HALF_UP || roundingMode === HALF_DOWN) {
       const midpointCmp = cmp(mul(2, remainderSignificand as decimal), significandB as decimal)
       shouldRoundUp = roundingMode === HALF_UP ? midpointCmp >= 0 : midpointCmp > 0
     }
@@ -847,18 +839,11 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
 
   // Only round if the rounded precision is less than the original precision.
   if (precision > roundingPrecision) {
+    roundingMode = normalizeRoundingMode(roundingMode, sign, +(significand[roundingPrecision - 1] || 0))
+
     if (roundingMode === EXACT) {
       error("INEXACT", `round(${value})`)
     }
-
-    // Normalize the rounding mode to either: up, down, half up, or half down.
-    roundingMode =
-      roundingMode === CEIL ? sign < 0 ? DOWN : UP :
-      roundingMode === FLOOR || roundingMode === EUCLIDEAN ? sign < 0 ? UP : DOWN :
-      roundingMode === HALF_CEIL ? sign < 0 ? HALF_DOWN : HALF_UP :
-      roundingMode === HALF_FLOOR ? sign < 0 ? HALF_UP : HALF_DOWN :
-      roundingMode === HALF_EVEN ? +(significand[roundingPrecision - 1] || 0) % 2 ? HALF_UP : HALF_DOWN :
-      roundingMode
 
     const roundingDigit = +(significand[roundingPrecision] || 0)
     if (
@@ -1192,6 +1177,29 @@ function getRoundingPrecision(rules: RoundingRules, exponent: number): number {
     toNumber(rules[PLACES] || 0) + exponent + 1
 }
 
+/**
+ * Normalize the rounding mode based on sign and least significant digit;
+ * reducing the possible rounding modes to five (up, down, half up, half down,
+ * and exact) which apply to the absolute value of quotient.
+ *
+ * @internal
+ */
+function normalizeRoundingMode(
+  roundingMode: RoundingMode | undefined,
+  sign: number,
+  leastSignificantDigit: number
+): 'up' | 'down' | 'half up' | 'half down' | 'exact' | undefined {
+  return (
+    roundingMode === CEIL ? sign < 0 ? DOWN : UP :
+    // When used with rounding, "euclidean" is an alias for "floor".
+    roundingMode === FLOOR || roundingMode === EUCLIDEAN ? sign < 0 ? UP : DOWN :
+    roundingMode === HALF_CEIL ? sign < 0 ? HALF_DOWN : HALF_UP :
+    roundingMode === HALF_FLOOR ? sign < 0 ? HALF_UP : HALF_DOWN :
+    roundingMode === HALF_EVEN ? leastSignificantDigit % 2 ? HALF_UP : HALF_DOWN :
+    roundingMode
+  )
+}
+
 
 // Et cetera
 
@@ -1518,6 +1526,7 @@ export type ErrorCode =
    * which returns `NaN`, however Decimalish does not support this special value.
    */
   | "SQRT_NEG"
+
 
 // Constant keywords
 
