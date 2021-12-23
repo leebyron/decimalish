@@ -1,4 +1,4 @@
-import { add, sub } from "../decimalish"
+import { add } from "../decimalish"
 
 describe("add", () => {
   it("Adds two positive numbers", () => {
@@ -51,12 +51,5 @@ describe("add", () => {
 
   it("Adds negated of itself to get zero", () => {
     expect(add(100, -100)).toBe("0")
-  })
-})
-
-describe("sub", () => {
-  it("is equivalent to adding a negated number", () => {
-    expect(sub(100, 50)).toBe("50")
-    expect(sub(50, 100)).toBe("-50")
   })
 })
