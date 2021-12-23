@@ -63,7 +63,8 @@
   --comment-color-dark: #fffda370;
 }
 
-:root, .light {
+:root,
+.light {
   --header-color: var(--header-color-lite);
   --header-text-color: var(--header-text-color-lite);
   --text-color: var(--text-color-lite);
@@ -246,7 +247,7 @@ pre {
   border-radius: 2px;
   background-color: var(--pre-bg-color);
   width: fit-content;
-  min-width: 40ch;
+  min-width: min(100% - 2em, 60ch);
 }
 
 pre,
@@ -266,7 +267,8 @@ a {
   --underline-color: var(--text-color);
 }
 
-a, a > span {
+a,
+a > span {
   color: var(--text-color);
   text-shadow: 2px 0 var(--bg-color), -2px 0 var(--bg-color);
   position: relative;
@@ -274,7 +276,8 @@ a, a > span {
   text-decoration: none;
 }
 
-a:before, a > span:before {
+a:before,
+a > span:before {
   content: "";
   position: absolute;
   background-color: var(--underline-color);
@@ -288,7 +291,8 @@ a:before, a > span:before {
   transition: all 0.18s cubic-bezier(0.5, 0, 0.25, 1);
 }
 
-a:hover:before, a:hover > span:before {
+a:hover:before,
+a:hover > span:before {
   transform: translateY(0.08em) scaleY(2);
   opacity: 1;
   background-color: var(--link-highlight-color);
@@ -450,13 +454,16 @@ header nav a:last-child:before {
 }
 
 #intro p:first-child:before {
-  content: 'Decimalish';
+  content: "Decimalish";
   visibility: hidden;
 }
 
 .two-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--medium-col-width), 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--medium-col-width), 1fr)
+  );
   gap: 0 var(--column-gap);
   margin-top: 0;
 }
@@ -544,6 +551,7 @@ section.odd {
 }
 
 .decl {
+  display: block;
   text-indent: -4ch;
   padding-left: 4ch;
   margin-bottom: 1em;
@@ -608,7 +616,7 @@ a.string:before {
   align-items: center;
   width: 100%;
   /* Overhang to align letters if space allows */
-  max-width: calc(var(--max-width)/(1 - 0.026 * 2));
+  max-width: calc(var(--max-width) / (1 - 0.026 * 2));
 }
 
 .sf-cell {
@@ -1423,18 +1431,18 @@ a.string:before {
 </svg>
 
         <script>class SplitFlap {
-  static speed = 100;
+  static speed = 100
   // prettier-ignore
   static symbols = [
     "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
     "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
     "u", "v", "w", "x", "y", "z"];
-  static secretSymbols = [".", "-", "+", " ", "=", "?"];
+  static secretSymbols = [".", "-", "+", " ", "=", "?"]
 
   constructor() {
-    const root = document.createElement("div");
-    root.className = "sf-cell";
+    const root = document.createElement("div")
+    root.className = "sf-cell"
     root.innerHTML = `
       <svg viewBox="0 0 50 89"><use href="#sf-back" /></svg>
       <svg viewBox="0 0 50 89" class="behind">
@@ -1457,81 +1465,81 @@ a.string:before {
           <use href="#sf- -bottom" class="next-bottom" />
           <use href="#sf-shine" class="shine" />
         </svg>
-      </div>`;
-    this.root = root;
-    this.lastTop = root.getElementsByClassName("last-top")[0];
-    this.lastBottom = root.getElementsByClassName("last-bottom")[0];
-    this.nextTop = root.getElementsByClassName("next-top")[0];
-    this.nextBottom = root.getElementsByClassName("next-bottom")[0];
-    this.behind = root.getElementsByClassName("behind")[0];
-    this.flap = root.getElementsByClassName("flap")[0];
-    this.shadow = root.getElementsByClassName("shadow")[0];
-    this.shine = root.getElementsByClassName("shine")[0];
-    this.reset(" ");
+      </div>`
+    this.root = root
+    this.lastTop = root.getElementsByClassName("last-top")[0]
+    this.lastBottom = root.getElementsByClassName("last-bottom")[0]
+    this.nextTop = root.getElementsByClassName("next-top")[0]
+    this.nextBottom = root.getElementsByClassName("next-bottom")[0]
+    this.behind = root.getElementsByClassName("behind")[0]
+    this.flap = root.getElementsByClassName("flap")[0]
+    this.shadow = root.getElementsByClassName("shadow")[0]
+    this.shine = root.getElementsByClassName("shine")[0]
+    this.reset(" ")
   }
 
   _updateDOM(char) {
-    this.lastTop.setAttribute("href", this.nextTop.getAttribute("href"));
-    this.lastBottom.setAttribute("href", this.nextBottom.getAttribute("href"));
-    this.nextTop.setAttribute("href", `#sf-${char}-top`);
-    this.nextBottom.setAttribute("href", `#sf-${char}-bottom`);
+    this.lastTop.setAttribute("href", this.nextTop.getAttribute("href"))
+    this.lastBottom.setAttribute("href", this.nextBottom.getAttribute("href"))
+    this.nextTop.setAttribute("href", `#sf-${char}-top`)
+    this.nextBottom.setAttribute("href", `#sf-${char}-bottom`)
   }
 
   reset(char) {
-    this.target = SplitFlap.symbols.indexOf(char);
-    this.targetChar = char;
-    this.extra = 0;
-    this.current = this.target;
-    this._updateDOM(char);
+    this.target = SplitFlap.symbols.indexOf(char)
+    this.targetChar = char
+    this.extra = 0
+    this.current = this.target
+    this._updateDOM(char)
   }
 
   async set({ char, delay, immediate, extra }) {
-    if (char === this.targetChar) return;
+    if (char === this.targetChar) return
 
     // TODO: if it's starting and ending on a digit, don't circle all
     // around. Similar for letter to letter
-    let index = SplitFlap.symbols.indexOf(char);
+    let index = SplitFlap.symbols.indexOf(char)
     if (index < 0) {
       if (SplitFlap.secretSymbols.indexOf(char) < 0) {
-        throw new Error(`Cannot draw ${char}`);
+        throw new Error(`Cannot draw ${char}`)
       }
       index =
         (this.current + Math.floor(Math.random() * SplitFlap.symbols.length)) %
-        SplitFlap.symbols.length;
+        SplitFlap.symbols.length
     }
-    this.target = index;
-    this.targetChar = char;
-    this.extra = extra;
-    if (this.animating) return;
-    this.animating = true;
+    this.target = index
+    this.targetChar = char
+    this.extra = extra
+    if (this.animating) return
+    this.animating = true
     if (delay) {
-      await sleep(delay);
+      await sleep(delay)
     }
     while (this.current !== this.target || this.extra) {
-      this.current = (this.current + 1) % SplitFlap.symbols.length;
+      this.current = (this.current + 1) % SplitFlap.symbols.length
       if (this.current === this.target && this.extra) {
         this.current =
           (this.current + SplitFlap.symbols.length - this.extra) %
-          SplitFlap.symbols.length;
-        this.extra = 0;
+          SplitFlap.symbols.length
+        this.extra = 0
       }
       this._updateDOM(
         this.current === this.target && !this.extra
           ? this.targetChar
           : SplitFlap.symbols[this.current]
-      );
+      )
       const timing = {
         duration: Math.round(SplitFlap.speed * (0.95 + 0.1 * Math.random())),
         easing: "ease-in",
-      };
+      }
       const animation = this.behind.animate(
         [
           { transform: "translate3d(0, -2.25%, 0)" },
           { transform: "translate3d(0, 0, 0)", offset: 0.7 },
         ],
         timing
-      );
-      const perspective = 6 * this.flap.clientWidth;
+      )
+      const perspective = 6 * this.flap.clientWidth
       this.flap.animate(
         [
           {
@@ -1543,11 +1551,11 @@ a.string:before {
           },
         ],
         timing
-      );
+      )
       this.shadow.animate(
         [{ opacity: "0" }, { opacity: "1", offset: 0.7 }],
         timing
-      );
+      )
       this.shine.animate(
         [
           { opacity: "0.5" },
@@ -1555,48 +1563,48 @@ a.string:before {
           { opacity: "0", offset: 0.7 },
         ],
         timing
-      );
-      await animation.finished;
+      )
+      await animation.finished
     }
-    this.animating = false;
+    this.animating = false
   }
 }
 
-const host = document.getElementById("split-flap");
-const cells = [];
+const host = document.getElementById("split-flap")
+const cells = []
 for (let i = 0; i < 10; i++) {
-  const cell = new SplitFlap();
-  host.appendChild(cell.root);
-  cells.push(cell);
+  const cell = new SplitFlap()
+  host.appendChild(cell.root)
+  cells.push(cell)
 }
 
 function sfDisplay(text, reset) {
-  text = Array.from(text).slice(0, 10);
-  const padding = 10 - text.length;
+  text = Array.from(text).slice(0, 10)
+  const padding = 10 - text.length
   for (let i = Math.floor(padding / 2); i--; ) {
-    text.unshift(" ");
+    text.unshift(" ")
   }
   for (let i = Math.ceil(padding / 2); i--; ) {
-    text.push(" ");
+    text.push(" ")
   }
   text = text.map((v, i) =>
     typeof v === "string"
       ? { char: v, delay: i * 50 }
       : { ...v, delay: v.delay ?? i * 50 }
-  );
+  )
   return Promise.all(
     text.map((data, i) =>
       reset ? cells[i].reset(data.char) : cells[i].set(data)
     )
-  );
+  )
 }
 
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-(async () => {
-  sfDisplay("decimalish", true);
+;(async () => {
+  sfDisplay("decimalish", true)
 
   // during development
   return
@@ -1614,16 +1622,16 @@ function sleep(ms) {
       { char: "i", extra: 17 },
       { char: "s", extra: 9 },
       { char: "h", extra: 22 },
-    ]);
-    await sleep(3000);
+    ])
+    await sleep(3000)
     // await sleep(2000);
     // await sfDisplay("0.1+0.2= ?");
     // await sleep(2000);
     // await sfDisplay("0.30000004");
-    await sfDisplay("0123456789");
-    await sleep(2000);
+    await sfDisplay("0123456789")
+    await sleep(2000)
   }
-})();
+})()
 </script>
       </div>
     </header>
@@ -1634,13 +1642,15 @@ function sleep(ms) {
         </h3>
         <div class="two-col">
           <p>
-             is an arbitrary-precision decimal <em>(aka “BigNumber”)</em> library for JavaScript and TypeScript. How is this different from regular numbers and why would you need such a thing?
+             is an arbitrary-precision decimal <em>(aka “BigNumber”)</em> library for JavaScript and TypeScript. How is this different from regular numbers and why would you need such a thing? Consider this surprising fact about regular numbers:
+          </p>
+          <pre><code><span class="number">0.1</span> + <span class="number">0.2</span> != <span class="number">0.3</span>
+<span class="number">0.1</span> + <span class="number">0.2</span> == <span class="number">0.30000000000000004</span></code></pre>
+          <p>
+            This isn't yet another JavaScript quirk, but an unfortunate pitfall of nearly all numbers represented by computers.
           </p>
           <p>
-            Consider this surprising fact about regular numbers: <code><span class="number">0.1</span> + <span class="number">0.2</span> != <span class="number">0.3</span></code>. This isn't yet another JavaScript quirk, but an unfortunate pitfall of nearly all numbers represented by computers (floating point numbers).
-          </p>
-          <p>
-            While we read and write numbers in decimal, computers use binary and must convert between them. This can cause trouble when doing so with a fixed number of bits, information can be lost along the way and yield confusing results. In areas like finance or engineering these errors are simply unacceptable.
+            While we read numbers in decimal, computers read binary and must convert. Information can be lost when converting a fixed number of bits and yield confusing results. In finance or engineering these errors are simply unacceptable.
           </p>
           <p>
             Decimalish addresses exactly this concern. It removes the need to convert by directly representing numbers in decimal.
@@ -1671,11 +1681,11 @@ function sleep(ms) {
         <p>
           For most, install decimalish via npm:
         </p>
-        <pre><code><span class="param">npm</span> <span class="param">install</span> <span class="param">decimalish</span></code></pre>
+        <pre><code>npm install decimalish</code></pre>
         <p>
           Otherwise, find a UMD module on your CDN of choice:
         </p>
-        <pre><code>&lt;<span class="param">script</span> <span class="param">src</span>=<span class="string">&quot;https://unpkg.com/decimalish&quot;</span>&gt;&lt;/<span class="type">script</span>&gt;</code></pre>
+        <pre><code>&lt;<span class="keyword">script</span> <span class="param">src</span>=<span class="string">&quot;https://unpkg.com/decimalish&quot;</span>&gt;&lt;/<span class="keyword">script</span>&gt;</code></pre>
       </div>
     </section>
     <section id="why">
@@ -1784,28 +1794,28 @@ function sleep(ms) {
           <h3>Types</h3>
           <ul>
             <li>
-              <a href="#decimal"><span>Decimal type</span><pre class="type">decimal</pre></a>
+              <a href="#decimal"><span>Decimal type</span><code class="type">decimal</code></a>
             </li>
             <li>
-              <a href="#decimal()"><span>Convert to decimal</span><pre class="function">decimal()</pre></a>
+              <a href="#decimal()"><span>Convert to decimal</span><code class="function">decimal()</code></a>
             </li>
             <li>
-              <a href="#isDecimal()"><span>Decimal?</span><pre class="function">isDecimal()</pre></a>
+              <a href="#isDecimal()"><span>Decimal?</span><code class="function">isDecimal()</code></a>
             </li>
             <li>
-              <a href="#Numeric"><span>Numeric value</span><pre class="type">Numeric</pre></a>
+              <a href="#Numeric"><span>Numeric value</span><code class="type">Numeric</code></a>
             </li>
             <li>
-              <a href="#isNumeric()"><span>Numeric value?</span><pre class="function">isNumeric()</pre></a>
+              <a href="#isNumeric()"><span>Numeric value?</span><code class="function">isNumeric()</code></a>
             </li>
             <li>
-              <a href="#NumericString"><span>Numeric string</span><pre class="type">NumericString</pre></a>
+              <a href="#NumericString"><span>Numeric string</span><code class="type">NumericString</code></a>
             </li>
             <li>
-              <a href="#isNumericString()"><span>Numeric string?</span><pre class="function">isNumericString()</pre></a>
+              <a href="#isNumericString()"><span>Numeric string?</span><code class="function">isNumericString()</code></a>
             </li>
             <li>
-              <a href="#isInteger()"><span>Integer?</span><pre class="function">isInteger()</pre></a>
+              <a href="#isInteger()"><span>Integer?</span><code class="function">isInteger()</code></a>
             </li>
           </ul>
         </div>
@@ -1813,34 +1823,34 @@ function sleep(ms) {
           <h3>Arithmetic</h3>
           <ul>
             <li>
-              <a href="#add()"><span>Add (Plus)</span><pre class="function">add()</pre></a>
+              <a href="#add()"><span>Add (Plus)</span><code class="function">add()</code></a>
             </li>
             <li>
-              <a href="#sub()"><span>Subtract (Minus)</span><pre class="function">sub()</pre></a>
+              <a href="#sub()"><span>Subtract (Minus)</span><code class="function">sub()</code></a>
             </li>
             <li>
-              <a href="#mul()"><span>Multiply (Times)</span><pre class="function">mul()</pre></a>
+              <a href="#mul()"><span>Multiply (Times)</span><code class="function">mul()</code></a>
             </li>
             <li>
-              <a href="#div()"><span>Divide</span><pre class="function">div()</pre></a>
+              <a href="#div()"><span>Divide</span><code class="function">div()</code></a>
             </li>
             <li>
-              <a href="#divRem()"><span>Divide and remainder</span><pre class="function">divRem()</pre></a>
+              <a href="#divRem()"><span>Divide and remainder</span><code class="function">divRem()</code></a>
             </li>
             <li>
-              <a href="#divInt()"><span>Divide to integer</span><pre class="function">divInt()</pre></a>
+              <a href="#divInt()"><span>Divide to integer</span><code class="function">divInt()</code></a>
             </li>
             <li>
-              <a href="#rem()"><span>Remainder</span><pre class="function">rem()</pre></a>
+              <a href="#rem()"><span>Remainder</span><code class="function">rem()</code></a>
             </li>
             <li>
-              <a href="#mod()"><span>Modulo</span><pre class="function">mod()</pre></a>
+              <a href="#mod()"><span>Modulo</span><code class="function">mod()</code></a>
             </li>
             <li>
-              <a href="#pow()"><span>Power (Exponent)</span><pre class="function">pow()</pre></a>
+              <a href="#pow()"><span>Power (Exponent)</span><code class="function">pow()</code></a>
             </li>
             <li>
-              <a href="#sqrt()"><span>Square root</span><pre class="function">sqrt()</pre></a>
+              <a href="#sqrt()"><span>Square root</span><code class="function">sqrt()</code></a>
             </li>
           </ul>
         </div>
@@ -1848,22 +1858,22 @@ function sleep(ms) {
           <h3>Comparison</h3>
           <ul>
             <li>
-              <a href="#eq()"><span>Equals (==)</span><pre class="function">eq()</pre></a>
+              <a href="#eq()"><span>Equals (==)</span><code class="function">eq()</code></a>
             </li>
             <li>
-              <a href="#gt()"><span>Greater than (&gt;)</span><pre class="function">gt()</pre></a>
+              <a href="#gt()"><span>Greater than (&gt;)</span><code class="function">gt()</code></a>
             </li>
             <li>
-              <a href="#gte()"><span>Greater than or equals (≥)</span><pre class="function">gte()</pre></a>
+              <a href="#gte()"><span>Greater than or equals (≥)</span><code class="function">gte()</code></a>
             </li>
             <li>
-              <a href="#lt()"><span>Less than (&lt;)</span><pre class="function">lt()</pre></a>
+              <a href="#lt()"><span>Less than (&lt;)</span><code class="function">lt()</code></a>
             </li>
             <li>
-              <a href="#lte()"><span>Less than or equals (≤)</span><pre class="function">lte()</pre></a>
+              <a href="#lte()"><span>Less than or equals (≤)</span><code class="function">lte()</code></a>
             </li>
             <li>
-              <a href="#cmp()"><span>Compare</span><pre class="function">cmp()</pre></a>
+              <a href="#cmp()"><span>Compare</span><code class="function">cmp()</code></a>
             </li>
           </ul>
         </div>
@@ -1871,25 +1881,25 @@ function sleep(ms) {
           <h3>Magnitude</h3>
           <ul>
             <li>
-              <a href="#abs()"><span>Absolute value</span><pre class="function">abs()</pre></a>
+              <a href="#abs()"><span>Absolute value</span><code class="function">abs()</code></a>
             </li>
             <li>
-              <a href="#neg()"><span>Negate</span><pre class="function">neg()</pre></a>
+              <a href="#neg()"><span>Negate</span><code class="function">neg()</code></a>
             </li>
             <li>
-              <a href="#sign()"><span>Sign</span><pre class="function">sign()</pre></a>
+              <a href="#sign()"><span>Sign</span><code class="function">sign()</code></a>
             </li>
             <li>
-              <a href="#places()"><span>Decimal Places</span><pre class="function">places()</pre></a>
+              <a href="#places()"><span>Decimal Places</span><code class="function">places()</code></a>
             </li>
             <li>
-              <a href="#precision()"><span>Significant digits</span><pre class="function">precision()</pre></a>
+              <a href="#precision()"><span>Significant digits</span><code class="function">precision()</code></a>
             </li>
             <li>
-              <a href="#exponent()"><span>Most significant digit</span><pre class="function">exponent()</pre></a>
+              <a href="#exponent()"><span>Most significant digit</span><code class="function">exponent()</code></a>
             </li>
             <li>
-              <a href="#scale()"><span>Scale exponent</span><pre class="function">scale()</pre></a>
+              <a href="#scale()"><span>Scale exponent</span><code class="function">scale()</code></a>
             </li>
           </ul>
         </div>
@@ -1897,34 +1907,34 @@ function sleep(ms) {
           <h3>Rounding</h3>
           <ul>
             <li>
-              <a href="#round()"><span>Round</span><pre class="function">round()</pre></a>
+              <a href="#round()"><span>Round</span><code class="function">round()</code></a>
             </li>
             <li>
-              <a href="#floor()"><span>Floor</span><pre class="function">floor()</pre></a>
+              <a href="#floor()"><span>Floor</span><code class="function">floor()</code></a>
             </li>
             <li>
-              <a href="#ceil()"><span>Ceiling</span><pre class="function">ceil()</pre></a>
+              <a href="#ceil()"><span>Ceiling</span><code class="function">ceil()</code></a>
             </li>
             <li>
-              <a href="#int()"><span>Truncate to integer</span><pre class="function">int()</pre></a>
+              <a href="#int()"><span>Truncate to integer</span><code class="function">int()</code></a>
             </li>
             <li>
-              <a href="#intRem()"><span>Integer and remainder</span><pre class="function">intRem()</pre></a>
+              <a href="#intRem()"><span>Integer and remainder</span><code class="function">intRem()</code></a>
             </li>
             <li>
-              <a href="#max()"><span>Maximum</span><pre class="function">max()</pre></a>
+              <a href="#max()"><span>Maximum</span><code class="function">max()</code></a>
             </li>
             <li>
-              <a href="#min()"><span>Minimum</span><pre class="function">min()</pre></a>
+              <a href="#min()"><span>Minimum</span><code class="function">min()</code></a>
             </li>
             <li>
-              <a href="#clamp()"><span>Constrain</span><pre class="function">clamp()</pre></a>
+              <a href="#clamp()"><span>Constrain</span><code class="function">clamp()</code></a>
             </li>
             <li>
-              <a href="#RoundingRules"><span>Configure rounding</span><pre class="type">RoundingRules</pre></a>
+              <a href="#RoundingRules"><span>Configure rounding</span><code class="type">RoundingRules</code></a>
             </li>
             <li>
-              <a href="#RoundingMode"><span>Round method</span><pre class="type">RoundingMode</pre></a>
+              <a href="#RoundingMode"><span>Round method</span><code class="type">RoundingMode</code></a>
             </li>
           </ul>
         </div>
@@ -1932,25 +1942,25 @@ function sleep(ms) {
           <h3>Et cetera</h3>
           <ul>
             <li>
-              <a href="#toNumber()"><span>Numeric → number</span><pre class="function">toNumber()</pre></a>
+              <a href="#toNumber()"><span>Numeric → number</span><code class="function">toNumber()</code></a>
             </li>
             <li>
-              <a href="#toString()"><span>Numeric → string</span><pre class="function">toString()</pre></a>
+              <a href="#toString()"><span>Numeric → string</span><code class="function">toString()</code></a>
             </li>
             <li>
-              <a href="#toFixed()"><span>Fixed notation</span><pre class="function">toFixed()</pre></a>
+              <a href="#toFixed()"><span>Fixed notation</span><code class="function">toFixed()</code></a>
             </li>
             <li>
-              <a href="#toExponential()"><span>Scientific notation</span><pre class="function">toExponential()</pre></a>
+              <a href="#toExponential()"><span>Scientific notation</span><code class="function">toExponential()</code></a>
             </li>
             <li>
-              <a href="#deconstruct()"><span>Numeric elements</span><pre class="function">deconstruct()</pre></a>
+              <a href="#deconstruct()"><span>Numeric elements</span><code class="function">deconstruct()</code></a>
             </li>
             <li>
-              <a href="#construct()"><span>Elements → decimal</span><pre class="function">construct()</pre></a>
+              <a href="#construct()"><span>Elements → decimal</span><code class="function">construct()</code></a>
             </li>
             <li>
-              <a href="#ErrorCode"><span>Errors</span><pre class="type">ErrorCode</pre></a>
+              <a href="#ErrorCode"><span>Errors</span><code class="type">ErrorCode</code></a>
             </li>
           </ul>
         </div>
@@ -1964,7 +1974,7 @@ function sleep(ms) {
             <a href="#decimal">Decimal type</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="keyword">type</span> <span class="type">decimal</span></code></pre>
+            <code class="decl"><span class="keyword">type</span> <span class="type">decimal</span></code>
             <p>
               A decimal is represented as a numeric string, allowing arbitrary precision.
 It is a subtype of numeric string, that is all decimal types are numeric
@@ -1979,7 +1989,7 @@ strings, but not all numeric strings are decimals.
             <a href="#decimal()">Convert to decimal</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">decimal</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">decimal</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Converts any numeric value to a <code><a href="#decimal" class="type">decimal</a></code>.
             </p>
@@ -1998,7 +2008,7 @@ strings, but not all numeric strings are decimals.
             <a href="#isDecimal()">Decimal?</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">isDecimal</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">isDecimal</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns true if the provided value is a decimal value.
             </p>
@@ -2014,7 +2024,7 @@ strings, but not all numeric strings are decimals.
             <a href="#Numeric">Numeric value</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="keyword">type</span> <span class="type">Numeric</span></code></pre>
+            <code class="decl"><span class="keyword">type</span> <span class="type">Numeric</span></code>
             <p>
               The Numeric type represents all numeric values: numbers, bigint, and
 numeric strings (including <code><a href="#decimal" class="type">decimal</a></code>).
@@ -2028,7 +2038,7 @@ numeric strings (including <code><a href="#decimal" class="type">decimal</a></co
             <a href="#isNumeric()">Numeric value?</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">isNumeric</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#Numeric" class="type">Numeric</a></code></pre>
+            <code class="decl"><span class="function">isNumeric</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#Numeric" class="type">Numeric</a></code>
             <p>
               Returns true if the provided value is a (finite) numeric value.
             </p>
@@ -2044,7 +2054,7 @@ numeric strings (including <code><a href="#decimal" class="type">decimal</a></co
             <a href="#NumericString">Numeric string</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="keyword">type</span> <span class="type">NumericString</span></code></pre>The NumericString type represents strings that can be parsed as a number.
+            <code class="decl"><span class="keyword">type</span> <span class="type">NumericString</span></code>The NumericString type represents strings that can be parsed as a number.
           </div>
         </div>
       </section>
@@ -2054,7 +2064,7 @@ numeric strings (including <code><a href="#decimal" class="type">decimal</a></co
             <a href="#isNumericString()">Numeric string?</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">isNumericString</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#NumericString" class="type">NumericString</a></code></pre>
+            <code class="decl"><span class="function">isNumericString</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#NumericString" class="type">NumericString</a></code>
             <p>
               Returns true if the provided value is a (finite) numeric string.
             </p>
@@ -2071,7 +2081,7 @@ notation, and leading or trailing zeros or decimal points.
             <a href="#isInteger()">Integer?</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">isInteger</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code></pre>
+            <code class="decl"><span class="function">isInteger</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code>
             <p>
               Returns true if the provided value is an integer numeric value.
             </p>
@@ -2093,7 +2103,7 @@ removing fractional information.
             <a href="#add()">Add (Plus)</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">add</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>Adds two numeric values as a decimal result.
+            <code class="decl"><span class="function">add</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>Adds two numeric values as a decimal result.
           </div>
         </div>
       </section>
@@ -2103,7 +2113,7 @@ removing fractional information.
             <a href="#sub()">Subtract (Minus)</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">sub</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>Subtracts the numeric b from the numeric a, returning a decimal result.
+            <code class="decl"><span class="function">sub</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>Subtracts the numeric b from the numeric a, returning a decimal result.
           </div>
         </div>
       </section>
@@ -2113,7 +2123,7 @@ removing fractional information.
             <a href="#mul()">Multiply (Times)</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">mul</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>Multiplies two numeric values as a decimal result.
+            <code class="decl"><span class="function">mul</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>Multiplies two numeric values as a decimal result.
           </div>
         </div>
       </section>
@@ -2123,7 +2133,7 @@ removing fractional information.
             <a href="#div()">Divide</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">div</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">div</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns the result of dividing <code><span class="param">dividend</span></code> by <code><span class="param">divisor</span></code>.
             </p>
@@ -2140,7 +2150,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
             <a href="#divRem()">Divide and remainder</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">divRem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): [<wbr><span class="label">quotient</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">remainder</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code></pre>
+            <code class="decl"><span class="function">divRem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): [<wbr><span class="label">quotient</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">remainder</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
             <p>
               Divides two numeric values to a given places or precision returning both the
 quotient and the remainder while satisfying the two conditions:
@@ -2259,7 +2269,7 @@ precision of the quotient can be provided via <code><span class="param">rules</s
             <a href="#divInt()">Divide to integer</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">divInt</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">divInt</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns the integer result of dividing <code><span class="param">dividend</span></code> by <code><span class="param">divisor</span></code> using
 truncated (round <code><a href="#down" class="string">&quot;down&quot;</a></code>) division by default.
@@ -2276,7 +2286,7 @@ truncated (round <code><a href="#down" class="string">&quot;down&quot;</a></code
             <a href="#rem()">Remainder</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">rem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">rem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns the remainder of dividing <code><span class="param">dividend</span></code> by <code><span class="param">divisor</span></code> using truncated
 (round &quot;down&quot;) division by default. The result always has the same sign as
@@ -2296,7 +2306,7 @@ better yet use <code><a href="#divRem()" class="function">divRem()</a></code>.
             <a href="#mod()">Modulo</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">mod</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">mod</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns the modulo of dividing a by b using floored (round &quot;floor&quot;) division.
 The result always has the same sign as the second argument (or 0).
@@ -2314,7 +2324,7 @@ equivalent to <code>%</code>.
             <a href="#pow()">Power (Exponent)</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">pow</span>(<wbr><span class="param">base</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">exponent</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">pow</span>(<wbr><span class="param">base</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">exponent</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Raises <code><span class="param">base</span></code> to the power <code><span class="param">exponent</span></code>, where <code><span class="param">exponent</span></code> must be a positive
 whole number.
@@ -2328,7 +2338,7 @@ whole number.
             <a href="#sqrt()">Square root</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">sqrt</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">sqrt</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns the square root of <code><span class="param">value</span></code>.
             </p>
@@ -2348,7 +2358,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
             <a href="#eq()">Equals (==)</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">eq</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code></pre>Compares two numeric values and returns true if they are equivalent.
+            <code class="decl"><span class="function">eq</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code>Compares two numeric values and returns true if they are equivalent.
           </div>
         </div>
       </section>
@@ -2358,7 +2368,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
             <a href="#gt()">Greater than (&gt;)</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">gt</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code></pre>Compares two numeric values and returns true if a is greater than b.
+            <code class="decl"><span class="function">gt</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code>Compares two numeric values and returns true if a is greater than b.
           </div>
         </div>
       </section>
@@ -2368,7 +2378,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
             <a href="#gte()">Greater than or equals (≥)</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">gte</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code></pre>Compares two numeric values and returns true if a is greater than or equal to b.
+            <code class="decl"><span class="function">gte</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code>Compares two numeric values and returns true if a is greater than or equal to b.
           </div>
         </div>
       </section>
@@ -2378,7 +2388,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
             <a href="#lt()">Less than (&lt;)</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">lt</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code></pre>Compares two numeric values and returns true if a is less than b.
+            <code class="decl"><span class="function">lt</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code>Compares two numeric values and returns true if a is less than b.
           </div>
         </div>
       </section>
@@ -2388,7 +2398,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
             <a href="#lte()">Less than or equals (≤)</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">lte</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code></pre>Compares two numeric values and returns true if a is less than or equal to b.
+            <code class="decl"><span class="function">lte</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code>Compares two numeric values and returns true if a is less than or equal to b.
           </div>
         </div>
       </section>
@@ -2398,7 +2408,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
             <a href="#cmp()">Compare</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">cmp</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span></code></pre>
+            <code class="decl"><span class="function">cmp</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span></code>
             <p>
               Compares two numeric values and returns <code><span class="number">1</span></code> if a is greater than b, <code>-<span class="number">1</span></code> if b
 is greater than a, and <code><span class="number">0</span></code> if a and b are equivalent.
@@ -2418,7 +2428,7 @@ is greater than a, and <code><span class="number">0</span></code> if a and b are
             <a href="#abs()">Absolute value</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">abs</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>Returns a decimal with the same value but always positive.
+            <code class="decl"><span class="function">abs</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>Returns a decimal with the same value but always positive.
           </div>
         </div>
       </section>
@@ -2428,7 +2438,7 @@ is greater than a, and <code><span class="number">0</span></code> if a and b are
             <a href="#neg()">Negate</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">neg</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>Returns a decimal with the same value but an opposite sign.
+            <code class="decl"><span class="function">neg</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>Returns a decimal with the same value but an opposite sign.
           </div>
         </div>
       </section>
@@ -2438,7 +2448,7 @@ is greater than a, and <code><span class="number">0</span></code> if a and b are
             <a href="#sign()">Sign</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">sign</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span></code></pre>
+            <code class="decl"><span class="function">sign</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span></code>
             <p>
               Returns a number indicating the sign of the provided value. A <code><span class="number">1</span></code> for
 positive values, <code>-<span class="number">1</span></code> for negative, or <code><span class="number">0</span></code> for zero.
@@ -2455,7 +2465,7 @@ positive values, <code>-<span class="number">1</span></code> for negative, or <c
             <a href="#places()">Decimal Places</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">places</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code></pre>Returns the number of significant digits after the decimal point.
+            <code class="decl"><span class="function">places</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code>Returns the number of significant digits after the decimal point.
           </div>
         </div>
       </section>
@@ -2465,7 +2475,7 @@ positive values, <code>-<span class="number">1</span></code> for negative, or <c
             <a href="#precision()">Significant digits</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">precision</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code></pre>Returns the number of significant digits of the provided value.
+            <code class="decl"><span class="function">precision</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code>Returns the number of significant digits of the provided value.
           </div>
         </div>
       </section>
@@ -2475,7 +2485,7 @@ positive values, <code>-<span class="number">1</span></code> for negative, or <c
             <a href="#exponent()">Most significant digit</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">exponent</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code></pre>
+            <code class="decl"><span class="function">exponent</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code>
             <p>
               Returns a number indicating the exponent of the provided value, which is also
 the most significant digit.
@@ -2489,7 +2499,7 @@ the most significant digit.
             <a href="#scale()">Scale exponent</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">scale</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">power</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">scale</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">power</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns the <code><span class="param">value</span></code> with the exponent scaled up or down by <code><span class="param">power</span></code>. In other
 words, this moves the decimal point to the right <code><span class="param">power</span></code> places.
@@ -2509,7 +2519,7 @@ words, this moves the decimal point to the right <code><span class="param">power
             <a href="#round()">Round</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">round</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">round</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Rounds a numeric value according to the provided <code><a href="#RoundingRules" class="type">RoundingRules</a></code>, defaulting
 to <code>{ <a href="#places" class="label">places</a>: <span class="number">0</span>, <a href="#mode" class="label">mode</a>: <a href="#half ceil" class="string">&quot;half ceil&quot;</a> }</code>.
@@ -2529,7 +2539,7 @@ JavaScript's Math.round().
             <a href="#floor()">Floor</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">floor</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">floor</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Rounds down to the nearest whole number in the direction of <code>-<span class="keyword">Infinity</span></code>.
             </p>
@@ -2545,7 +2555,7 @@ JavaScript's Math.round().
             <a href="#ceil()">Ceiling</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">ceil</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">ceil</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Rounds up to the nearest whole number in the direction of <code><span class="keyword">Infinity</span></code>.
             </p>
@@ -2561,7 +2571,7 @@ JavaScript's Math.round().
             <a href="#int()">Truncate to integer</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">int</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">int</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns the integer part of a number by rounding to the nearest whole number
 in the direction of 0.
@@ -2578,7 +2588,7 @@ in the direction of 0.
             <a href="#intRem()">Integer and remainder</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">intRem</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): [<wbr><span class="label">integer</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">fraction</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code></pre>
+            <code class="decl"><span class="function">intRem</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): [<wbr><span class="label">integer</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">fraction</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
             <p>
               Returns both the integer part and the remaining fractional part of a number.
             </p>
@@ -2594,7 +2604,7 @@ in the direction of 0.
             <a href="#max()">Maximum</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">max</span>(<wbr>...<span class="param">values</span>: <a href="#Numeric" class="type">Numeric</a>[]<wbr>): <a href="#decimal" class="type">decimal</a></code></pre>Returns the maximum of the provided values as a decimal.
+            <code class="decl"><span class="function">max</span>(<wbr>...<span class="param">values</span>: <a href="#Numeric" class="type">Numeric</a>[]<wbr>): <a href="#decimal" class="type">decimal</a></code>Returns the maximum of the provided values as a decimal.
           </div>
         </div>
       </section>
@@ -2604,7 +2614,7 @@ in the direction of 0.
             <a href="#min()">Minimum</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">min</span>(<wbr>...<span class="param">values</span>: <a href="#Numeric" class="type">Numeric</a>[]<wbr>): <a href="#decimal" class="type">decimal</a></code></pre>Returns the minimum of the provided values as a decimal.
+            <code class="decl"><span class="function">min</span>(<wbr>...<span class="param">values</span>: <a href="#Numeric" class="type">Numeric</a>[]<wbr>): <a href="#decimal" class="type">decimal</a></code>Returns the minimum of the provided values as a decimal.
           </div>
         </div>
       </section>
@@ -2614,7 +2624,7 @@ in the direction of 0.
             <a href="#clamp()">Constrain</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">clamp</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">low</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">high</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>Constrains <code><span class="param">value</span></code> between <code><span class="param">low</span></code> and <code><span class="param">high</span></code> values.
+            <code class="decl"><span class="function">clamp</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">low</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">high</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>Constrains <code><span class="param">value</span></code> between <code><span class="param">low</span></code> and <code><span class="param">high</span></code> values.
           </div>
         </div>
       </section>
@@ -2624,7 +2634,7 @@ in the direction of 0.
             <a href="#RoundingRules">Configure rounding</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="keyword">interface</span> <span class="type">RoundingRules</span></code></pre>
+            <code class="decl"><span class="keyword">interface</span> <span class="type">RoundingRules</span></code>
           </div>
         </div>
         <section id="places" class="api member">
@@ -2687,7 +2697,7 @@ to round towards.
             <a href="#RoundingMode">Round method</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="keyword">type</span> <span class="type">RoundingMode</span></code></pre>
+            <code class="decl"><span class="keyword">type</span> <span class="type">RoundingMode</span></code>
           </div>
         </div>
         <section id="up" class="api member">
@@ -2883,7 +2893,7 @@ in a non-terminating repeating decimal.
             <a href="#toNumber()">Numeric → number</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">toNumber</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">options</span>?: { <span class="label">exact</span>?: <span class="type">boolean</span> }<wbr>): <span class="type">number</span></code></pre>
+            <code class="decl"><span class="function">toNumber</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">options</span>?: { <span class="label">exact</span>?: <span class="type">boolean</span> }<wbr>): <span class="type">number</span></code>
             <p>
               Converts a <code><a href="#Numeric" class="type">Numeric</a></code> value (including <code><a href="#decimal" class="type">decimal</a></code>) to a JavaScript number.
             </p>
@@ -2900,7 +2910,7 @@ unless <code>{ <a href="#exact" class="label">exact</a>: <span class="keyword">f
             <a href="#toString()">Numeric → string</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">toString</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code></pre>
+            <code class="decl"><span class="function">toString</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code>
             <p>
               A string representation of the provided Numeric <code><span class="param">value</span></code> using canonical
 decimal format.
@@ -2917,7 +2927,7 @@ decimal format.
             <a href="#toFixed()">Fixed notation</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">toFixed</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code></pre>
+            <code class="decl"><span class="function">toFixed</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code>
             <p>
               A string representation of the provided Numeric <code><span class="param">value</span></code> using fixed notation.
 Uses rules to specify <code><a href="#precision" class="label">precision</a></code> or <code><a href="#places" class="label">places</a></code> and the rounding <code><a href="#mode" class="label">mode</a></code> should
@@ -2932,7 +2942,7 @@ that result in fewer digits.
             <a href="#toExponential()">Scientific notation</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">toExponential</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code></pre>
+            <code class="decl"><span class="function">toExponential</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code>
             <p>
               A string representation of the provided Numeric <code><span class="param">value</span></code> using exponential
 scientific notation. Uses rules to specify <code><a href="#precision" class="label">precision</a></code> or <code><a href="#places" class="label">places</a></code> and the
@@ -2947,7 +2957,7 @@ rounding <code><a href="#mode" class="label">mode</a></code> should that result 
             <a href="#deconstruct()">Numeric elements</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">deconstruct</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): [<wbr><span class="label">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="label">significand</span>: <span class="type">string</span>, <span class="label">exponent</span>: <span class="type">number</span>, <span class="label">precision</span>: <span class="type">number</span><wbr>]</code></pre>
+            <code class="decl"><span class="function">deconstruct</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): [<wbr><span class="label">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="label">significand</span>: <span class="type">string</span>, <span class="label">exponent</span>: <span class="type">number</span>, <span class="label">precision</span>: <span class="type">number</span><wbr>]</code>
             <p>
               Given a numeric value, deconstruct to normalized representation of a decimal:
 a <code>[<span class="param">significand</span>, <span class="param">exponent</span>, <span class="param">sign</span>, <a href="#precision" class="param">precision</a>]</code> tuple.
@@ -2984,7 +2994,7 @@ significant digits). Yes this is redundant information with the length of
             <a href="#construct()">Elements → decimal</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="function">construct</span>(<wbr><span class="param">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="param">significand</span>: <span class="type">string</span>, <span class="param">exponent</span>: <span class="type">number</span><wbr>): <a href="#decimal" class="type">decimal</a></code></pre>
+            <code class="decl"><span class="function">construct</span>(<wbr><span class="param">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="param">significand</span>: <span class="type">string</span>, <span class="param">exponent</span>: <span class="type">number</span><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Construct a decimal from an internal representation
             </p>
@@ -3000,7 +3010,7 @@ significant digits). Yes this is redundant information with the length of
             <a href="#ErrorCode">Errors</a>
           </h3>
           <div>
-            <pre class="decl"><code><span class="keyword">type</span> <span class="type">ErrorCode</span></code></pre>
+            <code class="decl"><span class="keyword">type</span> <span class="type">ErrorCode</span></code>
             <p>
               All errors thrown will include a <code>.<span class="param">code</span></code> property set to one of the possible
 values of ErrorCode as well as a link to documentation describing the error.
