@@ -5,7 +5,7 @@
   align-items: center;
   width: 100%;
   /* Overhang to align letters if space allows */
-  max-width: calc(var(--max-width)/(1 - 0.026 * 2));
+  max-width: calc(var(--max-width) / (1 - 0.026 * 2));
 }
 
 .sf-cell {

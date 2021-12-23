@@ -51,7 +51,8 @@
   --comment-color-dark: #fffda370;
 }
 
-:root, .light {
+:root,
+.light {
   --header-color: var(--header-color-lite);
   --header-text-color: var(--header-text-color-lite);
   --text-color: var(--text-color-lite);
@@ -254,7 +255,8 @@ a {
   --underline-color: var(--text-color);
 }
 
-a, a > span {
+a,
+a > span {
   color: var(--text-color);
   text-shadow: 2px 0 var(--bg-color), -2px 0 var(--bg-color);
   position: relative;
@@ -262,7 +264,8 @@ a, a > span {
   text-decoration: none;
 }
 
-a:before, a > span:before {
+a:before,
+a > span:before {
   content: "";
   position: absolute;
   background-color: var(--underline-color);
@@ -276,7 +279,8 @@ a:before, a > span:before {
   transition: all 0.18s cubic-bezier(0.5, 0, 0.25, 1);
 }
 
-a:hover:before, a:hover > span:before {
+a:hover:before,
+a:hover > span:before {
   transform: translateY(0.08em) scaleY(2);
   opacity: 1;
   background-color: var(--link-highlight-color);
@@ -438,13 +442,16 @@ header nav a:last-child:before {
 }
 
 #intro p:first-child:before {
-  content: 'Decimalish';
+  content: "Decimalish";
   visibility: hidden;
 }
 
 .two-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--medium-col-width), 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--medium-col-width), 1fr)
+  );
   gap: 0 var(--column-gap);
   margin-top: 0;
 }
