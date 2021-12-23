@@ -235,7 +235,7 @@ pre {
   border-radius: 2px;
   background-color: var(--pre-bg-color);
   width: fit-content;
-  min-width: 40ch;
+  min-width: min(100% - 2em, 60ch);
 }
 
 pre,
@@ -539,6 +539,7 @@ section.odd {
 }
 
 .decl {
+  display: block;
   text-indent: -4ch;
   padding-left: 4ch;
   margin-bottom: 1em;

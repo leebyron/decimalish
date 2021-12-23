@@ -285,20 +285,23 @@ const IntroSection = () => (
           &nbsp;is an arbitrary-precision decimal{" "}
           <em>(aka &ldquo;BigNumber&rdquo;)</em> library for JavaScript and
           TypeScript. How is this different from regular numbers and why would
-          you need such a thing?
+          you need such a thing? Consider this surprising fact about regular
+          numbers:
+        </p>
+        <pre>
+          <Code>
+            {"0.1 + 0.2 != 0.3\n" + "0.1 + 0.2 == 0.30000000000000004"}
+          </Code>
+        </pre>
+        <p>
+          This isn&apos;t yet another JavaScript quirk, but an unfortunate
+          pitfall of nearly all numbers represented by computers.
         </p>
         <p>
-          Consider this surprising fact about regular numbers:{" "}
-          <Code>0.1 + 0.2 != 0.3</Code>. This isn&apos;t yet another JavaScript
-          quirk, but an unfortunate pitfall of nearly all numbers represented by
-          computers (floating point numbers).
-        </p>
-        <p>
-          While we read and write numbers in decimal, computers use binary and
-          must convert between them. This can cause trouble when doing so with a
-          fixed number of bits, information can be lost along the way and yield
-          confusing results. In areas like finance or engineering these errors
-          are simply unacceptable.
+          While we read numbers in decimal, computers read binary and must
+          convert. Information can be lost when converting a fixed number of
+          bits and yield confusing results. In finance or engineering these
+          errors are simply unacceptable.
         </p>
         <p>
           Decimalish addresses exactly this concern. It removes the need to
@@ -345,13 +348,13 @@ Decimalish can be used anywhere you use JavaScript. It supports decades-old brow
 
 For most, install decimalish via npm:
 
-\`\`\`sh
+\`\`\`shell
 npm install decimalish
 \`\`\`
 
 Otherwise, find a UMD module on your CDN of choice:
 
-\`\`\`sh
+\`\`\`html
 <script src="https://unpkg.com/decimalish"></script>
 \`\`\`
         `}
@@ -519,7 +522,7 @@ const APISection = () => (
                 <li>
                   <a href={"#" + member.id}>
                     <span>{getJSDoc(member.node)?.title}</span>
-                    <pre class={member.kind}>{member.id}</pre>
+                    <code class={member.kind}>{member.id}</code>
                   </a>
                 </li>
               ))}
@@ -583,7 +586,14 @@ const Link = ({ children, ...props }: any) => (
   </a>
 )
 
-const Code = ({ children }: { children: string }) => {
+const Code = ({
+  children,
+  className,
+}: {
+  children: string
+  className?: string
+}) => {
+  const language = (className && className.replace("lang-", "")) || "typescript"
   const ids = useTypedefs().ids
 
   const highlighter = useHighlighter()
@@ -605,7 +615,7 @@ const Code = ({ children }: { children: string }) => {
   // Otherwise color and link as typescript.
   const tokenLines = highlighter.codeToThemedTokens(
     children,
-    "typescript",
+    language,
     "dark-plus"
   )
   const lines = tokenLines.map(line => (
@@ -642,11 +652,10 @@ const APIItemSection = ({ item }: { item: Typedef }) => (
         <a href={"#" + item.id}>{getJSDoc(item.node)?.title}</a>
       </h3>
       <div>
-        <pre class="decl">
-          <code>
-            <Source node={item.node} />
-          </code>
-        </pre>
+        <code class="decl">
+          <Source node={item.node} />
+        </code>
+
         <Markdown>{getJSDoc(item.node)?.comment}</Markdown>
       </div>
     </div>
@@ -803,7 +812,7 @@ const FAQSection = () => (
 // Run
 ;(async () => {
   const highlighter = await shiki.getHighlighter({
-    langs: ["typescript"],
+    langs: ["typescript", "shell", "html"],
     theme: "dark-plus",
   })
   const typeDefs = getTypedefByCategory()

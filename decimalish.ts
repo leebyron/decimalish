@@ -1591,7 +1591,7 @@ function error(code: ErrorCode, message: unknown): never {
  * Detect this property in a catch clause to provide customized error handling
  * behavior. For example, to re-introduce `Infinity` as a result of division:
  *
- * ```js
+ * ```
  * function customDivide(a: Numeric, b: Numeric): decimal {
  *   try {
  *     return div(a, b)
