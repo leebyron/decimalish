@@ -153,6 +153,7 @@ body {
   font-size: var(--font-size);
   letter-spacing: var(--letter-spacing);
   line-height: 1.6;
+  scroll-behavior: smooth;
 }
 
 * {
@@ -417,7 +418,6 @@ header nav {
   max-width: var(--max-width);
   list-style: none;
   padding: 0 20px;
-  margin: 0;
   display: flex;
   flex-wrap: wrap;
   white-space: nowrap;
@@ -435,18 +435,24 @@ header nav a:before {
 }
 
 header nav a:first-child {
-  padding-left: 0;
-}
-header nav a:first-child:before {
-  margin-left: 0;
+  margin-left: -1em;
 }
 
 header nav a:last-child {
   margin-left: auto;
-  padding-right: 0;
+  margin-right: -1em;
 }
-header nav a:last-child:before {
-  margin-right: 0;
+
+.skip-nav {
+  overflow: hidden;
+  width: fit-content;
+  transition: all 0.2s ease-in-out;
+}
+
+.skip-nav:not(:focus) {
+  width: 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 #intro h3 {
@@ -598,7 +604,7 @@ a.string:before {
   --text-color: var(--comment-color);
 }
 </style>
-    <script>!function(n,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((n="undefined"!=typeof globalThis?globalThis:n||self).decimalish={})}(this,(function(n){"use strict";function r(n){var r=I(n);return _(r[0],r[1],r[2])}function t(n){return E.test(""+n)}function e(n){return n===""+n&&t(n)}function u(n){var r=I(n);return r[2]+1>=r[3]}function i(n,r){var t=I(n),e=t[0],u=t[1],i=t[2],o=t[3],f=I(r),c=f[0],a=f[1],l=f[2],v=f[3];if(!e)return _(c,a,l);if(!c)return _(e,u,i);var d,p=e,m=i>l?i:l,h=o-i>v-l?o-i:v-l,N=new Array(h+m),T=0;if(e===c){for(;h-- >-m;)T+=+(u[h+i]||0)+ +(a[h+l]||0),N[h+m]=T%10,T=T>9?1:0;d=N.join(""),T&&(d=T+d,m++)}else{var g=s(u,i,o,a,l,v);if(g)for(p*=g;h-- >-m;)T+=10+g*(+(u[h+i]||0)-+(a[h+l]||0)),N[h+m]=T%10,T=T>9?0:-1;d=N.join("")}return _(p,d,m)}function o(n,r){return i(n,d(r))}function f(n,r){for(var t=I(n),e=t[0],u=t[1],i=t[2],o=t[3],f=I(r),c=f[0],a=f[1],l=f[2],v=f[3],s=new Array(o+v),d=0,p=o;p--;){d=0;for(var m=v;m--;)d+=(s[p+m+1]||0)+ +(u[p]||0)*+(a[m]||0),s[p+m+1]=d%10,d=d/10|0;s[p]=d}return _(e*c,s.join(""),i+l+1)}function c(n,r,t){return a(n,r,T(t,20,H))[0]}function a(n,r,t){var e=I(n),u=e[0],c=e[1],a=e[2],l=e[3],s=I(r),d=s[0],p=s[1],m=s[2],h=s[3],N=u*d,w=a-m,O=(t=T(t,0,D))[q],b=g(t,w);p||A("DIV_ZERO",n+"/"+r);for(var E="",y=h>l?h:l,j=[],R=y;R--;)j[R]=+(c[R]||0);for(var M=0,X=0,F=0;X<b&&(X<=l-h||M<X+h-1);X++){y<X+h&&(j[y++]=0),F=-1;n:for(;F++<9;){if(M>=X)for(var G=-1,H=0;!H&&++G<h;)if((H=j[X+G]-+p[G])<0)break n;for(var P=X+h;P-- >X;)j[P]-=+(p[P-X]||0),j[P]<0&&(j[P]+=10,j[P-1]-=1);for(;0===j[M];)M++}0===X&&0===F&&null!=t[S]&&b++,E+=F}var U=j.join(""),V=_(N,E,w),Z=_(u,U,a);if("0"!==Z){(O=x(O,N,u,F))===Q&&A("INEXACT",n+"/"+r);var $=O===C;if(O===k||O===B){var z=v(f(2,U),p);$=O===k?z>=0:z>0}$&&(V=i(V,_(N,"1",w-X+1)),Z=o(Z,_(u,p,a-X+1)))}return[V,Z]}function l(n,r,t){return a(n,r,t)[1]}function v(n,r){var t=I(n),e=t[0],u=t[1],i=t[2],o=t[3],f=I(r),c=f[0],a=f[1],l=f[2],v=f[3];return e?c&&e===c?s(u,i,o,a,l,v)*e|0:e:0|-c}function s(n,r,t,e,u,i){if(r!==u)return r>u?1:-1;for(var o=-1,f=t<i?t:i;++o<f;)if(n[o]!==e[o])return n[o]>e[o]?1:-1;return t===i?0:t>i?1:-1}function d(n){var r=I(n);return _(-r[0],r[1],r[2])}function p(n,r){var t=T(r,0,F),e=I(n),u=e[0],o=e[1],f=e[2],c=e[3],a=t[q],l=g(t,f),v=_(u,o.slice(0,l>0?l:0),f);if(c>l){(a=x(a,u,u,+(o[l-1]||0)))===Q&&A("INEXACT","round("+n+")");var s=+(o[l]||0);(a===k?s>4:a===B?s>5||5===s&&c>l+1:a===C&&u)&&(v=i(v,_(u,"1",f-l+1)))}return v}function m(){return N(arguments,1)}function h(){return N(arguments,-1)}function N(n,t){for(var e=r(n[0]),u=1;u<n.length;u++){var i=r(n[u]);v(i,e)===t&&(e=i)}return e}function T(n,r,t){var e,u=n&&n[S],i=n&&n[R],o=n&&n[q]||t,f=[C,D,M,X,P,k,B,F,G,H,Q];for(var c in null!=u?(null!=i&&A("NOT_BOTH",R+": "+i+", "+S+": "+u),u=j(S,u)):i=null!=i?j(R,i):r,f)e|=f[c]==o;return e||A("NOT_MODE",o),{precision:u,places:i,mode:o}}function g(n,r){return null!=n[S]?w(n[S]):w(n[R]||0)+r+1}function x(n,r,t,e){return n===M?r<0?D:C:n===X?r<0?C:D:n===P?t<0?C:D:n===F?r<0?B:k:n===G?r<0?k:B:n===H?e%2?k:B:n}function w(n,t){var e=r(n);return t&&0==t.exact||r(+e)===e||A("INEXACT","toNumber("+n+")"),+e}function O(n,r,t){var e=I(t?p(r,t):r),u=e[0],i=e[1],o=e[2],f=e[3];return b(u,i,f,t?g(t,o):f,n?1:o+1)+(n?(o<0?"e":"e+")+o:"")}function b(n,r,t,e,u){for(var i=n<0?"-":"";t<e;)r+="0",t++;if(u<1){for(i+="0.";u++;)i+="0";i+=r}else if(u<e)i+=r.slice(0,u)+"."+r.slice(u);else for(i+=r;u-- >t;)i+="0";return i}var E=/^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i;function I(n){var r=E.exec(""+n);r||A("NOT_NUM",n);var t=r[1],e=r[2],u=r[3];return e||(e=""),y("-"===t?-1:1,u?e+u:e,+(r[4]||0)+e.length-1)}function _(n,r,t){var e=y(n,r,t),u=e[0],i=e[1],o=e[2],f=e[3];return b(u,i,f,f,o+1)}function y(n,r,t){for(var e=r.length,u=0,i=0;"0"===r[u];)u++,t--;if(u===e)return[0,"",0,0];for(;"0"===r[e-1-i];)i++;return(u||i)&&(r=r.slice(u,e-i)),[n,r,t,e-u-i]}function j(n,r){return u(r)||A("NOT_INT",n+": "+r),w(r)}function A(n,r){var t=new Error("https://decimali.sh/#"+n+" "+r);throw t.code=n,t}var R="places",S="precision",q="mode",C="up",D="down",M="ceil",X="floor",k="half up",B="half down",F="half ceil",G="half floor",H="half even",P="euclidean",Q="exact";n.abs=function(n){var r=I(n);return _(1,r[1],r[2])},n.add=i,n.ceil=function(n){return p(n,{mode:M})},n.clamp=function(n,r,t){return h(t,m(r,n))},n.cmp=v,n.construct=_,n.decimal=r,n.deconstruct=I,n.div=c,n.divInt=function(n,r,t){return a(n,r,t)[0]},n.divRem=a,n.eq=function(n,r){return 0===v(n,r)},n.exponent=function(n){return I(n)[2]},n.floor=function(n){return p(n,{mode:X})},n.gt=function(n,r){return 1===v(n,r)},n.gte=function(n,r){return-1!==v(n,r)},n.int=function(n){return p(n,{mode:D})},n.intRem=function(n){var t=r(n).split(".");return[t[0],t[1]?"0."+t[1]:"0"]},n.isDecimal=function(n){return e(n)&&r(n)===n},n.isInteger=u,n.isNumeric=t,n.isNumericString=e,n.lt=function(n,r){return-1===v(n,r)},n.lte=function(n,r){return 1!==v(n,r)},n.max=m,n.min=h,n.mod=function(n,r){return l(n,r,{mode:X})},n.mul=f,n.neg=d,n.places=function(n){var r=I(n),t=r[2],e=r[3]-t-1;return e>0?e:0},n.pow=function(n,t){var e=r(n),u="1";for((t=j("exponent",t))<0&&A("NOT_POS","exponent: "+t);t;)1&t&&(u=f(u,e)),(t>>=1)&&(e=f(e,e));return u},n.precision=function(n){return I(n)[3]},n.rem=l,n.round=p,n.scale=function(n,r){var t=I(n);return _(t[0],t[1],t[2]+j("power",r))},n.sign=function(n){return I(n)[0]},n.sqrt=function(n,r){var t=I(n),e=t[0],u=t[1],o=t[2],a=t[3];e<0&&A("SQRT_NEG",n);var l=g(r=T(r,20,H),o),v="0";if(e){var s=Math.sqrt(+(u+(a+o&1?"":"0")));v=_(1,u=(s==1/0?"5":I(s)[1]).slice(0,l),((o+1)/2|0)-+(o<0||1&o));var d=u;do{d=u,u=I(v=f(.5,i(v,c(n,v,{precision:l+4}))))[1].slice(0,l)}while(d!==u)}return p(v,r)},n.sub=o,n.toExponential=function(n,r){return O(!0,n,r&&null!=r[R]?{precision:w(r[R])+1,mode:r[q]}:r)},n.toFixed=function(n,r){return O(!1,n,r)},n.toNumber=w,n.toString=function(n){return r(n)}}));</script>
+    <script>!function(n,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((n="undefined"!=typeof globalThis?globalThis:n||self).decimalish={})}(this,(function(n){"use strict";function r(n){var r=_(n);return j(r[0],r[1],r[2])}function t(n){return!!E(n)}function e(n){return t(n)&&n===String(n)}function u(n){var r;return t(n)&&(r=_(n))[2]+1>=r[3]}function i(n,r){var t=_(n),e=t[0],u=t[1],i=t[2],o=t[3],f=_(r),c=f[0],a=f[1],l=f[2],v=f[3];if(!e)return j(c,a,l);if(!c)return j(e,u,i);var d,p=e,m=i>l?i:l,h=o-i>v-l?o-i:v-l,N=new Array(h+m),g=0;if(e===c){for(;h-- >-m;)g+=+(u[h+i]||0)+ +(a[h+l]||0),N[h+m]=g%10,g=g>9?1:0;d=N.join(""),g&&(d=g+d,m++)}else{var T=s(u,i,o,a,l,v);if(T)for(p*=T;h-- >-m;)g+=10+T*(+(u[h+i]||0)-+(a[h+l]||0)),N[h+m]=g%10,g=g>9?0:-1;d=N.join("")}return j(p,d,m)}function o(n,r){return i(n,d(r))}function f(n,r){for(var t=_(n),e=t[0],u=t[1],i=t[2],o=t[3],f=_(r),c=f[0],a=f[1],l=f[2],v=f[3],s=new Array(o+v),d=0,p=o;p--;){d=0;for(var m=v;m--;)d+=(s[p+m+1]||0)+ +(u[p]||0)*+(a[m]||0),s[p+m+1]=d%10,d=d/10|0;s[p]=d}return j(e*c,s.join(""),i+l+1)}function c(n,r,t){return a(n,r,g(t,20,P))[0]}function a(n,r,t){var e=_(n),u=e[0],c=e[1],a=e[2],l=e[3],s=_(r),d=s[0],p=s[1],m=s[2],h=s[3],N=u*d,O=a-m,b=(t=g(t,0,M))[C],w=T(t,O);p||A("DIV_ZERO",n+"/"+r);for(var E="",I=h>l?h:l,y=[],S=I;S--;)y[S]=+(c[S]||0);for(var R=0,X=0,k=0;X<w&&(X<=l-h||R<X+h-1);X++){I<X+h&&(y[I++]=0),k=-1;n:for(;k++<9;){if(R>=X)for(var G=-1,H=0;!H&&++G<h;)if((H=y[X+G]-+p[G])<0)break n;for(var P=X+h;P-- >X;)y[P]-=+(p[P-X]||0),y[P]<0&&(y[P]+=10,y[P-1]-=1);for(;0===y[R];)R++}0===X&&0===k&&null!=t[q]&&w++,E+=k}var Q=y.join(""),V=j(N,E,O),Z=j(u,Q,a);if("0"!==Z){(b=x(b,N,u,k))===U&&A("INEXACT",n+"/"+r);var $=b===D;if(b===B||b===F){var z=v(f(2,Q),p);$=b===B?z>=0:z>0}$&&(V=i(V,j(N,"1",O-X+1)),Z=o(Z,j(u,p,a-X+1)))}return[V,Z]}function l(n,r,t){return a(n,r,t)[1]}function v(n,r){var t=_(n),e=t[0],u=t[1],i=t[2],o=t[3],f=_(r),c=f[0],a=f[1],l=f[2],v=f[3];return e?c&&e===c?s(u,i,o,a,l,v)*e|0:e:0|-c}function s(n,r,t,e,u,i){if(r!==u)return r>u?1:-1;for(var o=-1,f=t<i?t:i;++o<f;)if(n[o]!==e[o])return n[o]>e[o]?1:-1;return t===i?0:t>i?1:-1}function d(n){var r=_(n);return j(-r[0],r[1],r[2])}function p(n,r){var t=g(r,0,G),e=_(n),u=e[0],o=e[1],f=e[2],c=e[3],a=t[C],l=T(t,f),v=j(u,o.slice(0,l>0?l:0),f);if(c>l){(a=x(a,u,u,+(o[l-1]||0)))===U&&A("INEXACT","round("+n+")");var s=+(o[l]||0);(a===B?s>4:a===F?s>5||5===s&&c>l+1:a===D&&u)&&(v=i(v,j(u,"1",f-l+1)))}return v}function m(){return N(arguments,1)}function h(){return N(arguments,-1)}function N(n,t){for(var e=r(n[0]),u=1;u<n.length;u++){var i=r(n[u]);v(i,e)===t&&(e=i)}return e}function g(n,r,t){var e,u=n&&n[q],i=n&&n[R],o=n&&n[C]||t,f=[D,M,X,k,Q,B,F,G,H,P,U];for(var c in null!=u?(null!=i&&A("NOT_BOTH",R+": "+i+", "+q+": "+u),u=S(q,u)):i=null!=i?S(R,i):r,f)e|=f[c]==o;return e||A("NOT_MODE",o),{precision:u,places:i,mode:o}}function T(n,r){return null!=n[q]?O(n[q]):O(n[R]||0)+r+1}function x(n,r,t,e){return n===X?r<0?M:D:n===k?r<0?D:M:n===Q?t<0?D:M:n===G?r<0?F:B:n===H?r<0?B:F:n===P?e%2?B:F:n}function O(n,t){var e=r(n);return t&&0==t.exact||r(+e)===e||A("INEXACT","toNumber("+n+")"),+e}function b(n,r,t){var e=_(t?p(r,t):r),u=e[0],i=e[1],o=e[2],f=e[3];return w(u,i,f,t?T(t,o):f,n?1:o+1)+(n?(o<0?"e":"e+")+o:"")}function w(n,r,t,e,u){for(var i=n<0?"-":"";t<e;)r+="0",t++;if(u<1){for(i+="0.";u++;)i+="0";i+=r}else if(u<e)i+=r.slice(0,u)+"."+r.slice(u);else for(i+=r;u-- >t;)i+="0";return i}function E(n){return I.exec(String(!0===n||!1===n?+n:Object(n).valueOf()))}var I=/^([-+])?(\d+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i;function _(n){var r=E(n);r||A("NOT_NUM",n);var t=r[1],e=r[2],u=r[3];return y("-"===t?-1:1,u?e+u:e,+(r[4]||0)+e.length-1)}function j(n,r,t){var e=y(n,r,t),u=e[0],i=e[1],o=e[2],f=e[3];return w(u,i,f,f,o+1)}function y(n,r,t){for(var e=r.length,u=0,i=0;"0"===r[u];)u++,t--;if(u===e)return[0,"",0,0];for(;"0"===r[e-1-i];)i++;return(u||i)&&(r=r.slice(u,e-i)),[n,r,t,e-u-i]}function S(n,r){return u(r)||A("NOT_INT",n+": "+r),O(r)}function A(n,r){var t=new Error("https://decimali.sh/#"+n+" "+r);throw t.code=n,t}var R="places",q="precision",C="mode",D="up",M="down",X="ceil",k="floor",B="half up",F="half down",G="half ceil",H="half floor",P="half even",Q="euclidean",U="exact";n.abs=function(n){var r=_(n);return j(1,r[1],r[2])},n.add=i,n.ceil=function(n){return p(n,{mode:X})},n.clamp=function(n,r,t){return h(t,m(r,n))},n.cmp=v,n.construct=j,n.decimal=r,n.deconstruct=_,n.div=c,n.divInt=function(n,r,t){return a(n,r,t)[0]},n.divRem=a,n.eq=function(n,r){return 0===v(n,r)},n.exponent=function(n){return _(n)[2]},n.floor=function(n){return p(n,{mode:k})},n.gt=function(n,r){return 1===v(n,r)},n.gte=function(n,r){return-1!==v(n,r)},n.int=function(n){return p(n,{mode:M})},n.intRem=function(n){var t=r(n).split(".");return[t[0],t[1]?"0."+t[1]:"0"]},n.isDecimal=function(n){return e(n)&&r(n)===n},n.isInteger=u,n.isNumeric=t,n.isNumericString=e,n.lt=function(n,r){return-1===v(n,r)},n.lte=function(n,r){return 1!==v(n,r)},n.max=m,n.min=h,n.mod=function(n,r){return l(n,r,{mode:k})},n.mul=f,n.neg=d,n.places=function(n){var r=_(n),t=r[2],e=r[3]-t-1;return e>0?e:0},n.pow=function(n,t){var e=r(n),u="1";for((t=S("exponent",t))<0&&A("NOT_POS","exponent: "+t);t;)1&t&&(u=f(u,e)),(t>>=1)&&(e=f(e,e));return u},n.precision=function(n){return _(n)[3]},n.rem=l,n.round=p,n.scale=function(n,r){var t=_(n);return j(t[0],t[1],t[2]+S("power",r))},n.sign=function(n){return _(n)[0]},n.sqrt=function(n,r){var t=_(n),e=t[0],u=t[1],o=t[2],a=t[3];e<0&&A("SQRT_NEG",n);var l=T(r=g(r,20,P),o),v="0";if(e){var s=Math.sqrt(+(u+(a+o&1?"":"0")));v=j(1,u=(s==1/0?"5":_(s)[1]).slice(0,l),((o+1)/2|0)-+(o<0||1&o));var d=u;do{d=u,u=_(v=f(.5,i(v,c(n,v,{precision:l+4}))))[1].slice(0,l)}while(d!==u)}return p(v,r)},n.sub=o,n.toExponential=function(n,r){return b(!0,n,r&&null!=r[R]?{precision:O(r[R])+1,mode:r[C]}:r)},n.toFixed=function(n,r){return b(!1,n,r)},n.toNumber=O,n.toString=function(n){return r(n)}}));</script>
   </head>
   <body>
     <div class="theme-toggle">
@@ -606,7 +612,7 @@ a.string:before {
     </div>
     <header>
       <nav>
-        <a href="#getstarted">Get started</a><a href="#api">API</a><a href="#faq">FAQ</a><a href="https://github.com/leebyron/decimalish" target="_blank">Github</a>
+        <a href="#intro" class="skip-nav">Skip nav</a><a href="#getstarted">Get started</a><a href="#api">API</a><a href="#faq">FAQ</a><a href="https://github.com/leebyron/decimalish" target="_blank">Github</a>
       </nav>
       <div id="split-flap">
         <style>#split-flap {
@@ -1994,7 +2000,8 @@ strings, but not all numeric strings are decimals.
               Converts any numeric value to a <code><a href="#decimal" class="type">decimal</a></code>.
             </p>
             <p>
-              Throws an Error if the provided value cannot be translated to decimal.
+              Throws an &quot;NOT_NUM&quot; Error if the provided value is not numeric and cannot be
+translated to decimal.
             </p>
             <p>
               Note: unlike number, decimal cannot represent <code><span class="keyword">Infinity</span></code>, <code><span class="keyword">NaN</span></code>, or <code>-<span class="number">0</span></code>.
@@ -2026,8 +2033,8 @@ strings, but not all numeric strings are decimals.
           <div>
             <code class="decl"><span class="keyword">type</span> <span class="type">Numeric</span></code>
             <p>
-              The Numeric type represents all numeric values: numbers, bigint, and
-numeric strings (including <code><a href="#decimal" class="type">decimal</a></code>).
+              The Numeric type represents all numeric values which could be coerced to
+a number: numbers, bigint, boolean and numeric strings (including <code><a href="#decimal" class="type">decimal</a></code>).
             </p>
           </div>
         </div>
@@ -2081,7 +2088,7 @@ notation, and leading or trailing zeros or decimal points.
             <a href="#isInteger()">Integer?</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">isInteger</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">boolean</span></code>
+            <code class="decl"><span class="function">isInteger</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="type">boolean</span></code>
             <p>
               Returns true if the provided value is an integer numeric value.
             </p>
