@@ -17,5 +17,8 @@ describe("isInteger", () => {
     expect(isInteger(1.23e1)).toBe(false)
     expect(isInteger("1.23")).toBe(false)
     expect(isInteger(1.23)).toBe(false)
+    expect(isInteger("abc")).toBe(false)
+    expect(isInteger(true)).toBe(true)
+    expect(isInteger(false)).toBe(true)
   })
 })

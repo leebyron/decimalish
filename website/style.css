@@ -141,6 +141,7 @@ body {
   font-size: var(--font-size);
   letter-spacing: var(--letter-spacing);
   line-height: 1.6;
+  scroll-behavior: smooth;
 }
 
 * {
@@ -405,7 +406,6 @@ header nav {
   max-width: var(--max-width);
   list-style: none;
   padding: 0 20px;
-  margin: 0;
   display: flex;
   flex-wrap: wrap;
   white-space: nowrap;
@@ -423,18 +423,24 @@ header nav a:before {
 }
 
 header nav a:first-child {
-  padding-left: 0;
-}
-header nav a:first-child:before {
-  margin-left: 0;
+  margin-left: -1em;
 }
 
 header nav a:last-child {
   margin-left: auto;
-  padding-right: 0;
+  margin-right: -1em;
 }
-header nav a:last-child:before {
-  margin-right: 0;
+
+.skip-nav {
+  overflow: hidden;
+  width: fit-content;
+  transition: all 0.2s ease-in-out;
+}
+
+.skip-nav:not(:focus) {
+  width: 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 #intro h3 {

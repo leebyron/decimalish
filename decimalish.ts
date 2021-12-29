@@ -26,7 +26,9 @@
  *  - sqrt
  *  - build outputs
  *  - int/intRem/isInteger - needs tests
- *
+ *  - github ci/cd
+ *  - prettier
+
  * Todo:
  *  - should rounding from a negative result in -0? Reintroduce -0?
  *  - unit tests
@@ -40,8 +42,6 @@
  *
  *  - rest of decimal.js lib?
  *
- *  - github ci/cd
- *  - prettier
  *  - eslint
  *  - optimized for build size?
  *  - build size testing
@@ -97,7 +97,8 @@ declare const $$decimal: unique symbol
  *
  * Converts any numeric value to a `decimal`.
  *
- * Throws an Error if the provided value cannot be translated to decimal.
+ * Throws an "NOT_NUM" Error if the provided value is not numeric and cannot be
+ * translated to decimal.
  *
  * Note: unlike number, decimal cannot represent `Infinity`, `NaN`, or `-0`.
  *
@@ -124,12 +125,12 @@ export function isDecimal(value: unknown): value is decimal {
 /**
  * Numeric value
  *
- * The Numeric type represents all numeric values: numbers, bigint, and
- * numeric strings (including `decimal`).
+ * The Numeric type represents all numeric values which could be coerced to
+ * a number: numbers, bigint, boolean and numeric strings (including `decimal`).
  *
  * @category Types
  */
-export type Numeric = NumericString | number | bigint
+export type Numeric = NumericString | number | bigint | boolean
 
 /**
  * Numeric value?
@@ -141,7 +142,7 @@ export type Numeric = NumericString | number | bigint
  * @category Types
  */
 export function isNumeric(value: unknown): value is Numeric {
-  return decimalRegex.test("" + value)
+  return !!parse(value)
 }
 
 /**
@@ -164,7 +165,7 @@ export type NumericString = `${number}`
  * @category Types
  */
 export function isNumericString(value: unknown): value is NumericString {
-  return value === "" + value && isNumeric(value)
+  return isNumeric(value) && value === String(value)
 }
 
 /**
@@ -177,11 +178,16 @@ export function isNumericString(value: unknown): value is NumericString {
  * where converting to a JavaScript number might lose precision, inadvertently
  * removing fractional information.
  *
+ * @equivalent Number.isInteger(value)
  * @category Types
  */
-export function isInteger(value: Numeric): boolean {
-  const [, , exponent, precision] = deconstruct(value)
-  return exponent + 1 >= precision
+export function isInteger(value: unknown): boolean {
+  let exponent, precision
+  return (
+    isNumeric(value) &&
+    (([, , exponent, precision] = deconstruct(value)),
+    exponent + 1 >= precision)
+  )
 }
 
 // Arithmetic
@@ -1446,7 +1452,32 @@ function print(
   return result as NumericString
 }
 
-const decimalRegex = /^([-+])?(?:(\d+)|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
+/**
+ * Given an arbitrary value, attempt to convert it to a numeric string and
+ * then match it against decimal numeric regex.
+ *
+ * Importantly, this function should not throw but instead return null (by
+ * failing to match) for non-numeric values.
+ *
+ * @internal
+ */
+function parse(value: unknown): DecimalParts | null {
+  return decimalRegex.exec(
+    // Similar to ToNumeric() and ToPrimitive(), converts value to a primitive,
+    // and booleans to a number, before converting it all to a string.
+    String(value === true || value === false ? +value : Object(value).valueOf())
+  ) as any
+}
+
+const decimalRegex = /^([-+])?(\d+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
+
+type DecimalParts = [
+  decimal: string,
+  sign: string | undefined,
+  integer: string,
+  fractional: string | undefined,
+  exponent: string | undefined
+]
 
 type Sign = 1 | -1 | 0
 
@@ -1480,12 +1511,9 @@ export function deconstruct(
   exponent: number,
   precision: number
 ] {
-  const match = decimalRegex.exec("" + value)
-  if (!match) error("NOT_NUM", value)
-  let [, sign, integer, fractional, exponent] = match
-  if (!integer) {
-    integer = ""
-  }
+  const parts = parse(value)
+  if (!parts) error("NOT_NUM", value)
+  let [, sign, integer, fractional, exponent] = parts
   return normalizeRepresentation(
     sign === "-" ? -1 : 1,
     fractional ? integer + fractional : integer,

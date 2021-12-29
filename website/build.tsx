@@ -244,6 +244,9 @@ const ThemeToggle = () => (
 const Header = () => (
   <header>
     <nav>
+      <a href="#intro" class="skip-nav">
+        Skip nav
+      </a>
       <a href="#getstarted">Get started</a>
       <a href="#api">API</a>
       <a href="#faq">FAQ</a>
