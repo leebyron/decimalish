@@ -30,6 +30,8 @@
  *  - prettier
 
  * Todo:
+ *  - change division defaults from 20 decimals to 20 precision
+ *  - try changing `scale` to factor in precision, such that `num = digits * 10^scale`
  *  - should rounding from a negative result in -0? Reintroduce -0?
  *  - unit tests
  *  - toEngineering ? (or argument to toExponential?)
