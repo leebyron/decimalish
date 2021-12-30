@@ -28,9 +28,9 @@
  *  - int/intRem/isInteger - needs tests
  *  - github ci/cd
  *  - prettier
+ *  - change division defaults from 20 decimals to 34 precision (IEEE 754R Dec128 default)
 
  * Todo:
- *  - change division defaults from 20 decimals to 20 precision
  *  - try changing `scale` to factor in precision, such that `num = digits * 10^scale`
  *  - should rounding from a negative result in -0? Reintroduce -0?
  *  - unit tests
@@ -327,7 +327,7 @@ export function mul(a: Numeric, b: Numeric): decimal {
  *
  * Returns the result of dividing `dividend` by `divisor`.
  *
- * Defaults to 20 decimal places of precision and the `"half even"` rounding
+ * Defaults to 34 digits of precision and the `"half even"` rounding
  * mode, configurable by providing rounding `rules`.
  *
  * @equivalent a / b
@@ -341,7 +341,7 @@ export function div(
   const [quotient] = divRem(
     dividend,
     divisor,
-    normalizeRules(rules, 20, HALF_EVEN)
+    normalizeRules(rules, HALF_EVEN, 34)
   )
   return quotient
 }
@@ -387,7 +387,7 @@ export function divRem(
 ): [quotient: decimal, remainder: decimal] {
   const [signA, digitsA, scaleA, precisionA] = deconstruct(dividend)
   const [signB, digitsB, scaleB, precisionB] = deconstruct(divisor)
-  rules = normalizeRules(rules, 0, DOWN)
+  rules = normalizeRules(rules, DOWN)
 
   // The resulting scale of a division is the difference between the
   // scales of the dividend and divisor.
@@ -614,7 +614,7 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
  *
  * Returns the square root of `value`.
  *
- * Defaults to 20 decimal places of precision using the `"half even"` rounding
+ * Defaults to 34 digits of precision using the `"half even"` rounding
  * mode, configurable by providing rounding `rules`.
  *
  * @equivalent Math.sqrt(value)
@@ -628,7 +628,7 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
     error("SQRT_NEG", value)
   }
 
-  rules = normalizeRules(rules, 20, HALF_EVEN)
+  rules = normalizeRules(rules, HALF_EVEN, 34)
   const iterationPrecision = getRoundingPrecision(rules, scale)
 
   // Sqrt 0 -> 0
@@ -906,7 +906,7 @@ export function roundRem(
   rules?: RoundingRules
 ): [rounded: decimal, remainder: decimal] {
   let [sign, digits, scale, precision] = deconstruct(value)
-  let roundingRules = normalizeRules(rules, 0, HALF_EVEN)
+  let roundingRules = normalizeRules(rules, HALF_EVEN)
 
   // Determine the desired rounding mode and precision.
   let roundingMode = roundingRules[MODE]
@@ -1097,8 +1097,7 @@ export interface RoundingRules {
    * places or significant digits, the rounding mode determines which direction
    * to round towards.
    *
-   * The default value depends on the function called. `round()` defaults to
-   * `"half ceil"` while `div()` and `sqrt()` defaults to `"half even"`.
+   * The default rounding mode, unless stated otherwise, is `"half even"`.
    */
   mode?: RoundingMode
 }
@@ -1134,7 +1133,7 @@ export type RoundingMode =
   | "ceil"
 
   /**
-   * Floor (Truncate)
+   * Floor
    *
    * Rounds a result down, towards `-Infinity`, to the value with the smaller
    * signed value.
@@ -1219,8 +1218,8 @@ export type RoundingMode =
  */
 function normalizeRules(
   rules: RoundingRules | undefined,
-  defaultPlaces: number,
-  defaultMode: RoundingMode
+  defaultMode: RoundingMode,
+  defaultPrecision?: number
 ): RoundingRules {
   let precision = rules && rules[PRECISION]
   let places = rules && rules[PLACES]
@@ -1240,13 +1239,14 @@ function normalizeRules(
     EXACT,
   ]
 
-  if (precision != null) {
-    if (places != null) {
+  if (places != null) {
+    if (precision != null) {
       error("NOT_BOTH", `${PLACES}: ${places}, ${PRECISION}: ${precision}`)
     }
-    precision = expectInt(PRECISION, precision)
+    places = expectInt(PLACES, places)
   } else {
-    places = places != null ? expectInt(PLACES, places) : defaultPlaces
+    precision =
+      precision != null ? expectInt(PRECISION, precision) : defaultPrecision
   }
 
   // Note: indexOf() or find() would work, however neither are available in ES3.
