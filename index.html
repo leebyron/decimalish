@@ -604,7 +604,7 @@ a.string:before {
   --text-color: var(--comment-color);
 }
 </style>
-    <script>!function(n,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((n="undefined"!=typeof globalThis?globalThis:n||self).decimalish={})}(this,(function(n){"use strict";function r(n){var r=_(n);return j(r[0],r[1],r[2])}function t(n){return!!E(n)}function e(n){return t(n)&&n===String(n)}function u(n){var r;return t(n)&&(r=_(n))[2]+1>=r[3]}function i(n,r){var t=_(n),e=t[0],u=t[1],i=t[2],o=t[3],f=_(r),c=f[0],a=f[1],l=f[2],v=f[3];if(!e)return j(c,a,l);if(!c)return j(e,u,i);var d,p=e,m=i>l?i:l,h=o-i>v-l?o-i:v-l,N=new Array(h+m),g=0;if(e===c){for(;h-- >-m;)g+=+(u[h+i]||0)+ +(a[h+l]||0),N[h+m]=g%10,g=g>9?1:0;d=N.join(""),g&&(d=g+d,m++)}else{var T=s(u,i,o,a,l,v);if(T)for(p*=T;h-- >-m;)g+=10+T*(+(u[h+i]||0)-+(a[h+l]||0)),N[h+m]=g%10,g=g>9?0:-1;d=N.join("")}return j(p,d,m)}function o(n,r){return i(n,d(r))}function f(n,r){for(var t=_(n),e=t[0],u=t[1],i=t[2],o=t[3],f=_(r),c=f[0],a=f[1],l=f[2],v=f[3],s=new Array(o+v),d=0,p=o;p--;){d=0;for(var m=v;m--;)d+=(s[p+m+1]||0)+ +(u[p]||0)*+(a[m]||0),s[p+m+1]=d%10,d=d/10|0;s[p]=d}return j(e*c,s.join(""),i+l+1)}function c(n,r,t){return a(n,r,g(t,20,P))[0]}function a(n,r,t){var e=_(n),u=e[0],c=e[1],a=e[2],l=e[3],s=_(r),d=s[0],p=s[1],m=s[2],h=s[3],N=u*d,O=a-m,b=(t=g(t,0,M))[C],w=T(t,O);p||A("DIV_ZERO",n+"/"+r);for(var E="",I=h>l?h:l,y=[],S=I;S--;)y[S]=+(c[S]||0);for(var R=0,X=0,k=0;X<w&&(X<=l-h||R<X+h-1);X++){I<X+h&&(y[I++]=0),k=-1;n:for(;k++<9;){if(R>=X)for(var G=-1,H=0;!H&&++G<h;)if((H=y[X+G]-+p[G])<0)break n;for(var P=X+h;P-- >X;)y[P]-=+(p[P-X]||0),y[P]<0&&(y[P]+=10,y[P-1]-=1);for(;0===y[R];)R++}0===X&&0===k&&null!=t[q]&&w++,E+=k}var Q=y.join(""),V=j(N,E,O),Z=j(u,Q,a);if("0"!==Z){(b=x(b,N,u,k))===U&&A("INEXACT",n+"/"+r);var $=b===D;if(b===B||b===F){var z=v(f(2,Q),p);$=b===B?z>=0:z>0}$&&(V=i(V,j(N,"1",O-X+1)),Z=o(Z,j(u,p,a-X+1)))}return[V,Z]}function l(n,r,t){return a(n,r,t)[1]}function v(n,r){var t=_(n),e=t[0],u=t[1],i=t[2],o=t[3],f=_(r),c=f[0],a=f[1],l=f[2],v=f[3];return e?c&&e===c?s(u,i,o,a,l,v)*e|0:e:0|-c}function s(n,r,t,e,u,i){if(r!==u)return r>u?1:-1;for(var o=-1,f=t<i?t:i;++o<f;)if(n[o]!==e[o])return n[o]>e[o]?1:-1;return t===i?0:t>i?1:-1}function d(n){var r=_(n);return j(-r[0],r[1],r[2])}function p(n,r){var t=g(r,0,G),e=_(n),u=e[0],o=e[1],f=e[2],c=e[3],a=t[C],l=T(t,f),v=j(u,o.slice(0,l>0?l:0),f);if(c>l){(a=x(a,u,u,+(o[l-1]||0)))===U&&A("INEXACT","round("+n+")");var s=+(o[l]||0);(a===B?s>4:a===F?s>5||5===s&&c>l+1:a===D&&u)&&(v=i(v,j(u,"1",f-l+1)))}return v}function m(){return N(arguments,1)}function h(){return N(arguments,-1)}function N(n,t){for(var e=r(n[0]),u=1;u<n.length;u++){var i=r(n[u]);v(i,e)===t&&(e=i)}return e}function g(n,r,t){var e,u=n&&n[q],i=n&&n[R],o=n&&n[C]||t,f=[D,M,X,k,Q,B,F,G,H,P,U];for(var c in null!=u?(null!=i&&A("NOT_BOTH",R+": "+i+", "+q+": "+u),u=S(q,u)):i=null!=i?S(R,i):r,f)e|=f[c]==o;return e||A("NOT_MODE",o),{precision:u,places:i,mode:o}}function T(n,r){return null!=n[q]?O(n[q]):O(n[R]||0)+r+1}function x(n,r,t,e){return n===X?r<0?M:D:n===k?r<0?D:M:n===Q?t<0?D:M:n===G?r<0?F:B:n===H?r<0?B:F:n===P?e%2?B:F:n}function O(n,t){var e=r(n);return t&&0==t.exact||r(+e)===e||A("INEXACT","toNumber("+n+")"),+e}function b(n,r,t){var e=_(t?p(r,t):r),u=e[0],i=e[1],o=e[2],f=e[3];return w(u,i,f,t?T(t,o):f,n?1:o+1)+(n?(o<0?"e":"e+")+o:"")}function w(n,r,t,e,u){for(var i=n<0?"-":"";t<e;)r+="0",t++;if(u<1){for(i+="0.";u++;)i+="0";i+=r}else if(u<e)i+=r.slice(0,u)+"."+r.slice(u);else for(i+=r;u-- >t;)i+="0";return i}function E(n){return I.exec(String(!0===n||!1===n?+n:Object(n).valueOf()))}var I=/^([-+])?(\d+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i;function _(n){var r=E(n);r||A("NOT_NUM",n);var t=r[1],e=r[2],u=r[3];return y("-"===t?-1:1,u?e+u:e,+(r[4]||0)+e.length-1)}function j(n,r,t){var e=y(n,r,t),u=e[0],i=e[1],o=e[2],f=e[3];return w(u,i,f,f,o+1)}function y(n,r,t){for(var e=r.length,u=0,i=0;"0"===r[u];)u++,t--;if(u===e)return[0,"",0,0];for(;"0"===r[e-1-i];)i++;return(u||i)&&(r=r.slice(u,e-i)),[n,r,t,e-u-i]}function S(n,r){return u(r)||A("NOT_INT",n+": "+r),O(r)}function A(n,r){var t=new Error("https://decimali.sh/#"+n+" "+r);throw t.code=n,t}var R="places",q="precision",C="mode",D="up",M="down",X="ceil",k="floor",B="half up",F="half down",G="half ceil",H="half floor",P="half even",Q="euclidean",U="exact";n.abs=function(n){var r=_(n);return j(1,r[1],r[2])},n.add=i,n.ceil=function(n){return p(n,{mode:X})},n.clamp=function(n,r,t){return h(t,m(r,n))},n.cmp=v,n.construct=j,n.decimal=r,n.deconstruct=_,n.div=c,n.divInt=function(n,r,t){return a(n,r,t)[0]},n.divRem=a,n.eq=function(n,r){return 0===v(n,r)},n.exponent=function(n){return _(n)[2]},n.floor=function(n){return p(n,{mode:k})},n.gt=function(n,r){return 1===v(n,r)},n.gte=function(n,r){return-1!==v(n,r)},n.int=function(n){return p(n,{mode:M})},n.intRem=function(n){var t=r(n).split(".");return[t[0],t[1]?"0."+t[1]:"0"]},n.isDecimal=function(n){return e(n)&&r(n)===n},n.isInteger=u,n.isNumeric=t,n.isNumericString=e,n.lt=function(n,r){return-1===v(n,r)},n.lte=function(n,r){return 1!==v(n,r)},n.max=m,n.min=h,n.mod=function(n,r){return l(n,r,{mode:k})},n.mul=f,n.neg=d,n.places=function(n){var r=_(n),t=r[2],e=r[3]-t-1;return e>0?e:0},n.pow=function(n,t){var e=r(n),u="1";for((t=S("exponent",t))<0&&A("NOT_POS","exponent: "+t);t;)1&t&&(u=f(u,e)),(t>>=1)&&(e=f(e,e));return u},n.precision=function(n){return _(n)[3]},n.rem=l,n.round=p,n.scale=function(n,r){var t=_(n);return j(t[0],t[1],t[2]+S("power",r))},n.sign=function(n){return _(n)[0]},n.sqrt=function(n,r){var t=_(n),e=t[0],u=t[1],o=t[2],a=t[3];e<0&&A("SQRT_NEG",n);var l=T(r=g(r,20,P),o),v="0";if(e){var s=Math.sqrt(+(u+(a+o&1?"":"0")));v=j(1,u=(s==1/0?"5":_(s)[1]).slice(0,l),((o+1)/2|0)-+(o<0||1&o));var d=u;do{d=u,u=_(v=f(.5,i(v,c(n,v,{precision:l+4}))))[1].slice(0,l)}while(d!==u)}return p(v,r)},n.sub=o,n.toExponential=function(n,r){return b(!0,n,r&&null!=r[R]?{precision:O(r[R])+1,mode:r[C]}:r)},n.toFixed=function(n,r){return b(!1,n,r)},n.toNumber=O,n.toString=function(n){return r(n)}}));</script>
+    <script>!function(n,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((n="undefined"!=typeof globalThis?globalThis:n||self).decimalish={})}(this,(function(n){"use strict";function r(n){var r=I(n);return _(r[0],r[1],r[2])}function e(n){return!!E(n)}function t(n){var r;return e(n)&&(r=I(n))[2]+1>=r[3]}function u(n,r){var e=I(n),t=e[0],u=e[1],o=e[2],i=e[3],f=I(r),c=f[0],a=f[1],l=f[2],s=f[3];if(!t)return _(c,a,l);if(!c)return _(t,u,o);var d,m=t,p=o>l?o:l,h=i-o>s-l?i-o:s-l,N=new Array(h+p),T=0;if(t===c){for(;h-- >-p;)T+=+(u[h+o]||0)+ +(a[h+l]||0),N[h+p]=T%10,T=T>9?1:0;d=N.join(""),T&&(d=T+d,p++)}else{var g=v(u,o,i,a,l,s);if(g)for(m*=g;h-- >-p;)T+=10+g*(+(u[h+o]||0)-+(a[h+l]||0)),N[h+p]=T%10,T=T>9?0:-1;d=N.join("")}return _(m,d,p)}function o(n,r){return u(n,s(r))}function i(n,r){for(var e=I(n),t=e[0],u=e[1],o=e[2],i=e[3],f=I(r),c=f[0],a=f[1],l=f[2],v=f[3],s=new Array(i+v),d=0,m=i;m--;){d=0;for(var p=v;p--;)d+=(s[m+p+1]||0)+ +(u[m]||0)*+(a[p]||0),s[m+p+1]=d%10,d=d/10|0;s[m]=d}return _(t*c,s.join(""),o+l+1)}function f(n,r,e){return c(n,r,T(e,20,P))[0]}function c(n,r,e){var t=I(n),f=t[0],c=t[1],a=t[2],v=t[3],s=I(r),d=s[0],m=s[1],p=s[2],h=s[3],N=f*d,x=a-p,b=(e=T(e,0,S))[D],w=g(e,x);m||R("DIV_ZERO",n+"/"+r);for(var E="",y=h>v?h:v,j=[],A=y;A--;)j[A]=+(c[A]||0);for(var q=0,X=0,B=0;X<w&&(X<=v-h||q<X+h-1);X++){y<X+h&&(j[y++]=0),B=-1;n:for(;B++<9;){if(q>=X)for(var G=-1,H=0;!H&&++G<h;)if((H=j[X+G]-+m[G])<0)break n;for(var P=X+h;P-- >X;)j[P]-=+(m[P-X]||0),j[P]<0&&(j[P]+=10,j[P-1]-=1);for(;0===j[q];)q++}0===X&&0===B&&null!=e[C]&&w++,E+=B}var Q=j.join(""),V=_(N,E,x),Z=_(f,Q,a);if("0"!==Z){(b=O(b,N,f,B))===U&&R("INEXACT",n+"/"+r);var $=b===M;if(b===F||b===k){var z=l(i(2,Q),m);$=b===F?z>=0:z>0}$&&(V=u(V,_(N,"1",x-X+1)),Z=o(Z,_(f,m,a-X+1)))}return[V,Z]}function a(n,r,e){return c(n,r,e)[1]}function l(n,r){var e=I(n),t=e[0],u=e[1],o=e[2],i=e[3],f=I(r),c=f[0],a=f[1],l=f[2],s=f[3];return t?c&&t===c?v(u,o,i,a,l,s)*t|0:t:0|-c}function v(n,r,e,t,u,o){if(r!==u)return r>u?1:-1;for(var i=-1,f=e<o?e:o;++i<f;)if(n[i]!==t[i])return n[i]>t[i]?1:-1;return e===o?0:e>o?1:-1}function s(n){var r=I(n);return _(-r[0],r[1],r[2])}function d(n,r){return m(n,r)[0]}function m(n,r){var e=I(n),t=e[0],i=e[1],f=e[2],c=e[3],a=T(r,0,P),l=a[D],v=g(a,f),s=v>0?v:0,d=_(t,i.slice(0,s),f),m=_(t,i.slice(s),f-s);if(v<c){(l=O(l,t,t,+(i[v-1]||0)))===U&&R("INEXACT","round "+n);var p=+(i[v]||0);if(l===F?p>4:l===k?p>5||5===p&&c>v+1:l===M&&t){var h=_(t,"1",f-v+1);d=u(d,h),m=o(m,h)}}return[d,m]}function p(){return N(arguments,1)}function h(){return N(arguments,-1)}function N(n,e){for(var t=r(n[0]),u=1;u<n.length;u++){var o=r(n[u]);l(o,t)===e&&(t=o)}return t}function T(n,r,e){var t,u=n&&n[C],o=n&&n[q],i=n&&n[D]||e,f=[M,S,X,B,Q,F,k,G,H,P,U];for(var c in null!=u?(null!=o&&R("NOT_BOTH",q+": "+o+", "+C+": "+u),u=A(C,u)):o=null!=o?A(q,o):r,f)t|=f[c]==i;return t||R("NOT_MODE",i),{precision:u,places:o,mode:i}}function g(n,r){return null!=n[C]?x(n[C]):x(n[q]||0)+r+1}function O(n,r,e,t){return n===X?r<0?S:M:n===B?r<0?M:S:n===Q?e<0?M:S:n===G?r<0?k:F:n===H?r<0?F:k:n===P?t%2?F:k:n}function x(n){var e=r(n);return r(+e)!==e&&R("INEXACT","toNumber("+n+")"),+e}function b(n,r,e){var t=I(e?d(r,e):r),u=t[0],o=t[1],i=t[2],f=t[3];return w(u,o,f,e?g(e,i):f,n?1:i+1)+(n?(i<0?"e":"e+")+i:"")}function w(n,r,e,t,u){for(var o=n<0?"-":"";e<t;)r+="0",e++;if(u<1){for(o+="0.";u++;)o+="0";o+=r}else if(u<t)o+=r.slice(0,u)+"."+r.slice(u);else for(o+=r;u-- >e;)o+="0";return o}function E(n){return y.exec(String(!0===n||!1===n?+n:Object(n).valueOf()))}var y=/^([-+])?(\d+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i;function I(n){var r=E(n);r||R("NOT_NUM",n);var e=r[1],t=r[2],u=r[3];return j("-"===e?-1:1,u?t+u:t,+(r[4]||0)+t.length-1)}function _(n,r,e){var t=j(n,r,e),u=t[0],o=t[1],i=t[2],f=t[3];return w(u,o,f,f,i+1)}function j(n,r,e){for(var t=r.length,u=0,o=0;"0"===r[u];)u++,e--;if(u===t)return[0,"",0,0];for(;"0"===r[t-1-o];)o++;return(u||o)&&(r=r.slice(u,t-o)),[n,r,e,t-u-o]}function A(n,r){return t(r)||R("NOT_INT",n+": "+r),x(r)}function R(n,r){var e=new Error("https://decimali.sh/#"+n+" "+r);throw e.code=n,e}var q="places",C="precision",D="mode",M="up",S="down",X="ceil",B="floor",F="half up",k="half down",G="half ceil",H="half floor",P="half even",Q="euclidean",U="exact";n.abs=function(n){var r=I(n);return _(1,r[1],r[2])},n.add=u,n.ceil=function(n){return d(n,{mode:X})},n.clamp=function(n,r,e){return h(e,p(r,n))},n.cmp=l,n.construct=_,n.decimal=r,n.deconstruct=I,n.div=f,n.divInt=function(n,r,e){return c(n,r,e)[0]},n.divRem=c,n.eq=function(n,r){return 0===l(n,r)},n.floor=function(n){return d(n,{mode:B})},n.gt=function(n,r){return 1===l(n,r)},n.gte=function(n,r){return-1!==l(n,r)},n.int=function(n){return d(n,{mode:S})},n.intFrac=function(n){return m(n,{mode:S})},n.isDecimal=function(n){return e(n)&&r(n)===n},n.isInteger=t,n.isNumeric=e,n.lt=function(n,r){return-1===l(n,r)},n.lte=function(n,r){return 1!==l(n,r)},n.max=p,n.min=h,n.mod=function(n,r){return a(n,r,{mode:B})},n.mul=i,n.neg=s,n.places=function(n){var r=I(n),e=r[2],t=r[3]-e-1;return t>0?t:0},n.pow=function(n,e){var t=r(n),u="1",o=A("exponent",e);for(o<0&&R("NOT_POS","exponent: "+e);o;)1&o&&(u=i(u,t)),(o>>=1)&&(t=i(t,t));return u},n.precision=function(n){return I(n)[3]},n.rem=a,n.round=d,n.roundRem=m,n.scaleBy=function(n,r){var e=I(n);return _(e[0],e[1],e[2]+A("power",r))},n.sign=function(n){return I(n)[0]},n.sqrt=function(n,r){var e=I(n),t=e[0],o=e[1],c=e[2],a=e[3];t<0&&R("SQRT_NEG",n);var l=g(r=T(r,20,P),c),v="0";if(t){var s=Math.sqrt(+(o+(a+c&1?"":"0")));v=_(1,o=(s==1/0?"5":I(s)[1]).slice(0,l),((c+1)/2|0)-+(c<0||1&c));var m=o;do{m=o,o=I(v=i(.5,u(v,f(n,v,{precision:l+4}))))[1].slice(0,l)}while(m!==o)}return d(v,r)},n.sub=o,n.toExponential=function(n,r){return b(!0,n,r&&null!=r[q]?{precision:x(r[q])+1,mode:r[D]}:r)},n.toFixed=function(n,r){return b(!1,n,r)},n.toNumber=x}));</script>
   </head>
   <body>
     <div class="theme-toggle">
@@ -1668,7 +1668,7 @@ function sleep(ms) {
             <strong>So what’s the catch?</strong> Well speed for one, computers are specifically designed to make working with floating point numbers fast. While nowhere close to native speed, Decimalish is unlikely to be your program’s bottleneck.
           </p>
           <p>
-            Then there's how you use them. While regular numbers can use the familiar operators (<code>+</code>, <code>*</code>, <code>=</code>), Decimalish cannot and offers equivalent functions in their place (<code><a href="#add()" class="function">add()</a></code>, <code><a href="#mul()" class="function">mul()</a></code>, <code><a href="#eq()" class="function">eq()</a></code>).
+            Then there's how you use them. While regular numbers can use the familiar operators (<code>+</code>, <code>*</code>, <code>==</code>), Decimalish cannot and offers equivalent functions in their place (<code><a href="#add()" class="function">add()</a></code>, <code><a href="#mul()" class="function">mul()</a></code>, <code><a href="#eq()" class="function">eq()</a></code>).
           </p>
           <p>
             Finally there's how they’re represented. Like regular numbers, Decimalish offers an <em>immutable primitive</em>. However …it’s a string… hence the <strong>–ish</strong>. Decimalish decimals are a specific format of <a href="#NumericString">numeric string</a>. While this has its advantages, ideally decimal could be its own primitive; but that’s just not JavaScript.
@@ -1806,22 +1806,22 @@ function sleep(ms) {
               <a href="#decimal()"><span>Convert to decimal</span><code class="function">decimal()</code></a>
             </li>
             <li>
-              <a href="#isDecimal()"><span>Decimal?</span><code class="function">isDecimal()</code></a>
+              <a href="#isDecimal()"><span>Is decimal?</span><code class="function">isDecimal()</code></a>
             </li>
             <li>
               <a href="#Numeric"><span>Numeric value</span><code class="type">Numeric</code></a>
             </li>
             <li>
-              <a href="#isNumeric()"><span>Numeric value?</span><code class="function">isNumeric()</code></a>
-            </li>
-            <li>
               <a href="#NumericString"><span>Numeric string</span><code class="type">NumericString</code></a>
             </li>
             <li>
-              <a href="#isNumericString()"><span>Numeric string?</span><code class="function">isNumericString()</code></a>
+              <a href="#NumericObject"><span>Numeric object</span><code class="type">NumericObject</code></a>
             </li>
             <li>
-              <a href="#isInteger()"><span>Integer?</span><code class="function">isInteger()</code></a>
+              <a href="#isNumeric()"><span>Is numeric value?</span><code class="function">isNumeric()</code></a>
+            </li>
+            <li>
+              <a href="#isInteger()"><span>Is integer?</span><code class="function">isInteger()</code></a>
             </li>
           </ul>
         </div>
@@ -1896,16 +1896,13 @@ function sleep(ms) {
               <a href="#sign()"><span>Sign</span><code class="function">sign()</code></a>
             </li>
             <li>
-              <a href="#places()"><span>Decimal Places</span><code class="function">places()</code></a>
+              <a href="#places()"><span>Number of decimal places</span><code class="function">places()</code></a>
             </li>
             <li>
-              <a href="#precision()"><span>Significant digits</span><code class="function">precision()</code></a>
+              <a href="#precision()"><span>Number of digits</span><code class="function">precision()</code></a>
             </li>
             <li>
-              <a href="#exponent()"><span>Most significant digit</span><code class="function">exponent()</code></a>
-            </li>
-            <li>
-              <a href="#scale()"><span>Scale exponent</span><code class="function">scale()</code></a>
+              <a href="#scaleBy()"><span>Move decimal point</span><code class="function">scaleBy()</code></a>
             </li>
           </ul>
         </div>
@@ -1914,6 +1911,9 @@ function sleep(ms) {
           <ul>
             <li>
               <a href="#round()"><span>Round</span><code class="function">round()</code></a>
+            </li>
+            <li>
+              <a href="#roundRem()"><span>Round and remainder</span><code class="function">roundRem()</code></a>
             </li>
             <li>
               <a href="#floor()"><span>Floor</span><code class="function">floor()</code></a>
@@ -1925,7 +1925,7 @@ function sleep(ms) {
               <a href="#int()"><span>Truncate to integer</span><code class="function">int()</code></a>
             </li>
             <li>
-              <a href="#intRem()"><span>Integer and remainder</span><code class="function">intRem()</code></a>
+              <a href="#intFrac()"><span>Integer and fractional parts</span><code class="function">intFrac()</code></a>
             </li>
             <li>
               <a href="#max()"><span>Maximum</span><code class="function">max()</code></a>
@@ -1949,9 +1949,6 @@ function sleep(ms) {
           <ul>
             <li>
               <a href="#toNumber()"><span>Numeric → number</span><code class="function">toNumber()</code></a>
-            </li>
-            <li>
-              <a href="#toString()"><span>Numeric → string</span><code class="function">toString()</code></a>
             </li>
             <li>
               <a href="#toFixed()"><span>Fixed notation</span><code class="function">toFixed()</code></a>
@@ -2000,7 +1997,7 @@ strings, but not all numeric strings are decimals.
               Converts any numeric value to a <code><a href="#decimal" class="type">decimal</a></code>.
             </p>
             <p>
-              Throws an &quot;NOT_NUM&quot; Error if the provided value is not numeric and cannot be
+              Throws a &quot;NOT_NUM&quot; Error if the provided value is not numeric and cannot be
 translated to decimal.
             </p>
             <p>
@@ -2012,7 +2009,7 @@ translated to decimal.
       <section id="isDecimal()" class="api">
         <div>
           <h3>
-            <a href="#isDecimal()">Decimal?</a>
+            <a href="#isDecimal()">Is decimal?</a>
           </h3>
           <div>
             <code class="decl"><span class="function">isDecimal</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#decimal" class="type">decimal</a></code>
@@ -2034,7 +2031,41 @@ translated to decimal.
             <code class="decl"><span class="keyword">type</span> <span class="type">Numeric</span></code>
             <p>
               The Numeric type represents all numeric values which could be coerced to
-a number: numbers, bigint, boolean and numeric strings (including <code><a href="#decimal" class="type">decimal</a></code>).
+a number: numbers, bigint, boolean, <code><a href="#NumericString" class="type">NumericString</a></code> (including <code><a href="#decimal" class="type">decimal</a></code>),
+and <code><a href="#NumericObject" class="type">NumericObject</a></code> which have a numeric primitive value.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section id="NumericString" class="api">
+        <div>
+          <h3>
+            <a href="#NumericString">Numeric string</a>
+          </h3>
+          <div>
+            <code class="decl"><span class="keyword">type</span> <span class="type">NumericString</span></code>
+            <p>
+              The NumericString type represents strings that can be parsed as a decimal
+number.
+            </p>
+            <p>
+              This does not include hex, octal, binary, or any other non-decimal base
+numeric strings.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section id="NumericObject" class="api">
+        <div>
+          <h3>
+            <a href="#NumericObject">Numeric object</a>
+          </h3>
+          <div>
+            <code class="decl"><span class="keyword">type</span> <span class="type">NumericObject</span></code>
+            <p>
+              The <code><a href="#NumericObject" class="type">NumericObject</a></code> type represents objects with a <code><a href="#Numeric" class="type">Numeric</a></code> primitive
+value, either by providing a <code><span class="function">valueOf</span>()</code> method which returns <code><span class="param">number</span></code> or
+a <code><span class="function">toString</span>()</code> method which returns <code><a href="#NumericString" class="type">NumericString</a></code>.
             </p>
           </div>
         </div>
@@ -2042,7 +2073,7 @@ a number: numbers, bigint, boolean and numeric strings (including <code><a href=
       <section id="isNumeric()" class="api">
         <div>
           <h3>
-            <a href="#isNumeric()">Numeric value?</a>
+            <a href="#isNumeric()">Is numeric value?</a>
           </h3>
           <div>
             <code class="decl"><span class="function">isNumeric</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#Numeric" class="type">Numeric</a></code>
@@ -2055,37 +2086,10 @@ a number: numbers, bigint, boolean and numeric strings (including <code><a href=
           </div>
         </div>
       </section>
-      <section id="NumericString" class="api">
-        <div>
-          <h3>
-            <a href="#NumericString">Numeric string</a>
-          </h3>
-          <div>
-            <code class="decl"><span class="keyword">type</span> <span class="type">NumericString</span></code>The NumericString type represents strings that can be parsed as a number.
-          </div>
-        </div>
-      </section>
-      <section id="isNumericString()" class="api">
-        <div>
-          <h3>
-            <a href="#isNumericString()">Numeric string?</a>
-          </h3>
-          <div>
-            <code class="decl"><span class="function">isNumericString</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#NumericString" class="type">NumericString</a></code>
-            <p>
-              Returns true if the provided value is a (finite) numeric string.
-            </p>
-            <p>
-              A numeric string allows more variation than <code><a href="#decimal" class="type">decimal</a></code>, such as scientific
-notation, and leading or trailing zeros or decimal points.
-            </p>
-          </div>
-        </div>
-      </section>
       <section id="isInteger()" class="api">
         <div>
           <h3>
-            <a href="#isInteger()">Integer?</a>
+            <a href="#isInteger()">Is integer?</a>
           </h3>
           <div>
             <code class="decl"><span class="function">isInteger</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="type">boolean</span></code>
@@ -2469,7 +2473,7 @@ positive values, <code>-<span class="number">1</span></code> for negative, or <c
       <section id="places()" class="api">
         <div>
           <h3>
-            <a href="#places()">Decimal Places</a>
+            <a href="#places()">Number of decimal places</a>
           </h3>
           <div>
             <code class="decl"><span class="function">places</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code>Returns the number of significant digits after the decimal point.
@@ -2479,37 +2483,23 @@ positive values, <code>-<span class="number">1</span></code> for negative, or <c
       <section id="precision()" class="api">
         <div>
           <h3>
-            <a href="#precision()">Significant digits</a>
+            <a href="#precision()">Number of digits</a>
           </h3>
           <div>
             <code class="decl"><span class="function">precision</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code>Returns the number of significant digits of the provided value.
           </div>
         </div>
       </section>
-      <section id="exponent()" class="api">
+      <section id="scaleBy()" class="api">
         <div>
           <h3>
-            <a href="#exponent()">Most significant digit</a>
+            <a href="#scaleBy()">Move decimal point</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">exponent</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code>
+            <code class="decl"><span class="function">scaleBy</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">power</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
-              Returns a number indicating the exponent of the provided value, which is also
-the most significant digit.
-            </p>
-          </div>
-        </div>
-      </section>
-      <section id="scale()" class="api">
-        <div>
-          <h3>
-            <a href="#scale()">Scale exponent</a>
-          </h3>
-          <div>
-            <code class="decl"><span class="function">scale</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">power</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
-            <p>
-              Returns the <code><span class="param">value</span></code> with the exponent scaled up or down by <code><span class="param">power</span></code>. In other
-words, this moves the decimal point to the right <code><span class="param">power</span></code> places.
+              Returns the <code><span class="param">value</span></code> scaled up or down by <code><span class="param">power</span></code>. In other words, this
+moves the decimal point to the right <code><span class="param">power</span></code> places.
             </p>
             <p>
               Note: This is equivalent to, but much faster than, <code><a href="#mul()" class="function">mul</a>(<span class="param">value</span>, <a href="#pow()" class="function">pow</a>(<span class="number">10</span>, <span class="param">power</span>))</code>.
@@ -2529,13 +2519,29 @@ words, this moves the decimal point to the right <code><span class="param">power
             <code class="decl"><span class="function">round</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Rounds a numeric value according to the provided <code><a href="#RoundingRules" class="type">RoundingRules</a></code>, defaulting
-to <code>{ <a href="#places" class="label">places</a>: <span class="number">0</span>, <a href="#mode" class="label">mode</a>: <a href="#half ceil" class="string">&quot;half ceil&quot;</a> }</code>.
+to <code>{ <a href="#places" class="label">places</a>: <span class="number">0</span>, <a href="#mode" class="label">mode</a>: <a href="#half even" class="string">&quot;half even&quot;</a> }</code>.
             </p>
             <p>
-              Note: The default <code><a href="#half ceil" class="string">&quot;half ceil&quot;</a></code> rounding mode is different from the behavior
-of round() in many other libraries and programming languages (many of which
-use <code><a href="#half up" class="string">&quot;half up&quot;</a></code> or <code><a href="#half even" class="string">&quot;half even&quot;</a></code>), but this matches the behavior of
-JavaScript's Math.round().
+              The default <code><a href="#half even" class="string">&quot;half even&quot;</a></code> rounding mode is different from the behavior
+of JavaScript's <code><span class="type">Math</span>.<a href="#round()" class="function">round</a>()</code> which uses <code><a href="#half ceil" class="string">&quot;half ceil&quot;</a></code>. It is also
+different from many other languages round() function which most typically
+use <code><a href="#half up" class="string">&quot;half up&quot;</a></code>. These or any other rounding mode may be provided to match
+this behavior. For example, to match <code><span class="type">Math</span>.<a href="#round()" class="function">round</a>()</code>:
+            </p>
+            <pre><code><a href="#round()" class="function">round</a>(<span class="param">value</span>, { <span class="param">mode:</span> <a href="#half ceil" class="string">&quot;half ceil&quot;</a> })</code></pre>
+          </div>
+        </div>
+      </section>
+      <section id="roundRem()" class="api">
+        <div>
+          <h3>
+            <a href="#roundRem()">Round and remainder</a>
+          </h3>
+          <div>
+            <code class="decl"><span class="function">roundRem</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): [<wbr><span class="label">rounded</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">remainder</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
+            <p>
+              Rounds a numeric value according to the provided <code><a href="#RoundingRules" class="type">RoundingRules</a></code>, defaulting
+to <code>{ <a href="#places" class="label">places</a>: <span class="number">0</span>, <a href="#mode" class="label">mode</a>: <a href="#half even" class="string">&quot;half even&quot;</a> }</code>.
             </p>
           </div>
         </div>
@@ -2581,7 +2587,7 @@ JavaScript's Math.round().
             <code class="decl"><span class="function">int</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns the integer part of a number by rounding to the nearest whole number
-in the direction of 0.
+in the direction of 0, also known as truncation.
             </p>
             <p>
               Note: Equivalent to <code><a href="#round()" class="function">round</a>(<span class="param">value</span>, { <span class="param">mode:</span> <a href="#down" class="string">&quot;down&quot;</a> })</code>
@@ -2589,18 +2595,16 @@ in the direction of 0.
           </div>
         </div>
       </section>
-      <section id="intRem()" class="api">
+      <section id="intFrac()" class="api">
         <div>
           <h3>
-            <a href="#intRem()">Integer and remainder</a>
+            <a href="#intFrac()">Integer and fractional parts</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">intRem</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): [<wbr><span class="label">integer</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">fraction</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
+            <code class="decl"><span class="function">intFrac</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): [<wbr><span class="label">integer</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">fractional</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
             <p>
-              Returns both the integer part and the remaining fractional part of a number.
-            </p>
-            <p>
-              Note: This is equivalent to, but much faster than <code><a href="#divRem()" class="function">divRem</a>(<span class="param">value</span>, <span class="number">1</span>)</code>.
+              Returns the integer and fractional parts of a number by rounding to the nearest
+whole number in the direction of 0 and including the remainder.
             </p>
           </div>
         </div>
@@ -2900,30 +2904,14 @@ in a non-terminating repeating decimal.
             <a href="#toNumber()">Numeric → number</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">toNumber</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">options</span>?: { <span class="label">exact</span>?: <span class="type">boolean</span> }<wbr>): <span class="type">number</span></code>
+            <code class="decl"><span class="function">toNumber</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="type">number</span></code>
             <p>
               Converts a <code><a href="#Numeric" class="type">Numeric</a></code> value (including <code><a href="#decimal" class="type">decimal</a></code>) to a JavaScript number.
             </p>
             <p>
-              Throws an Error if the converting the value would lead to a loss of precision
-unless <code>{ <a href="#exact" class="label">exact</a>: <span class="keyword">false</span> }</code> is provided to the <code><span class="param">options</span></code> argument.
-            </p>
-          </div>
-        </div>
-      </section>
-      <section id="toString()" class="api">
-        <div>
-          <h3>
-            <a href="#toString()">Numeric → string</a>
-          </h3>
-          <div>
-            <code class="decl"><span class="function">toString</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code>
-            <p>
-              A string representation of the provided Numeric <code><span class="param">value</span></code> using canonical
-decimal format.
-            </p>
-            <p>
-              This is equivalent to the <code><a href="#decimal()" class="function">decimal()</a></code> function.
+              Throws an &quot;INEXACT&quot; Error if the converting the value would lead to a loss
+of precision. To convert to a number while allowing precision loss, use the
+native <code><span class="type">Number</span>(<span class="param">value</span>)</code> function.
             </p>
           </div>
         </div>
@@ -2964,10 +2952,10 @@ rounding <code><a href="#mode" class="label">mode</a></code> should that result 
             <a href="#deconstruct()">Numeric elements</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">deconstruct</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): [<wbr><span class="label">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="label">significand</span>: <span class="type">string</span>, <span class="label">exponent</span>: <span class="type">number</span>, <span class="label">precision</span>: <span class="type">number</span><wbr>]</code>
+            <code class="decl"><span class="function">deconstruct</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): [<wbr><span class="label">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="label">digits</span>: <span class="type">string</span>, <span class="label">scale</span>: <span class="type">number</span>, <span class="label">precision</span>: <span class="type">number</span><wbr>]</code>
             <p>
               Given a numeric value, deconstruct to normalized representation of a decimal:
-a <code>[<span class="param">significand</span>, <span class="param">exponent</span>, <span class="param">sign</span>, <a href="#precision" class="param">precision</a>]</code> tuple.
+a <code>[<span class="param">sign</span>, <span class="param">digits</span>, <span class="param">scale</span>, <a href="#precision" class="param">precision</a>]</code> tuple.
             </p>
             <p>
               Functions within this library internally operate on the normalized
@@ -2980,16 +2968,16 @@ mathematical functions on the decimal type.
                 <code><span class="param">sign</span></code>: Either 1 for a positive number, -1 for a negative number, or 0 for 0.
               </li>
               <li>
-                <code><span class="param">significand</span></code>: A string of significant digits expressed in scientific
+                <code><span class="param">digits</span></code>: A string of significant digits expressed in scientific
 notation, where the first digit is the ones place, or an empty string for 0.
               </li>
               <li>
-                <code><span class="param">exponent</span></code>: The power of ten the significand is multiplied by, or 0 for 0.
+                <code><span class="param">scale</span></code>: The power of ten the digits is multiplied by, or 0 for 0.
               </li>
               <li>
-                <code><a href="#precision" class="label">precision</a></code>: The number of digits found in significand (e.g. number of
-significant digits). Yes this is redundant information with the length of
-<code><span class="param">significand</span></code> but it is convenient to access directly.
+                <code><a href="#precision" class="label">precision</a></code>: The number of digits found in digits (e.g. number of
+significant digits). Yes this is redundant information with
+<code><span class="param">digits</span>.<span class="param">length</span></code> but it is convenient to access directly.
               </li>
             </ul>
           </div>
@@ -3001,7 +2989,7 @@ significant digits). Yes this is redundant information with the length of
             <a href="#construct()">Elements → decimal</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">construct</span>(<wbr><span class="param">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="param">significand</span>: <span class="type">string</span>, <span class="param">exponent</span>: <span class="type">number</span><wbr>): <a href="#decimal" class="type">decimal</a></code>
+            <code class="decl"><span class="function">construct</span>(<wbr><span class="param">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="param">digits</span>: <span class="type">string</span>, <span class="param">scale</span>: <span class="type">number</span><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Construct a decimal from an internal representation
             </p>
@@ -3129,7 +3117,7 @@ simutaneously provided. Only one of these fields may be provided per use.
               </p>
               <p>
                 Also thrown by <code><a href="#toNumber()" class="function">toNumber()</a></code> when converting a <code><a href="#Numeric" class="type">Numeric</a></code> would result in
-loss of precision. Provide <code>{ <a href="#exact" class="label">exact</a>: <span class="keyword">false</span> }</code> to allow the inexact result.
+loss of precision.
               </p>
             </div>
           </div>
