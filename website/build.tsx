@@ -322,7 +322,8 @@ const IntroSection = () => (
         </p>
         <p>
           Then there's how you use them. While regular numbers can use the
-          familiar operators (<Code>+</Code>, <Code>*</Code>, <Code>{"="}</Code>
+          familiar operators (<Code>+</Code>, <Code>*</Code>,{" "}
+          <Code>{"=="}</Code>
           ), Decimalish cannot and offers equivalent functions in their place (
           <Code>add()</Code>, <Code>mul()</Code>, <Code>eq()</Code>).
         </p>

@@ -19,8 +19,9 @@ describe("round", () => {
     )
   })
 
-  it("rounds with defaults similar to Math.round()", () => {
-    expect(round(0.5)).toBe("1")
+  it("rounds with 'half even' default", () => {
+    expect(round(0.5)).toBe("0")
+    expect(round(1.5)).toBe("2")
     expect(round(-0.5)).toBe("0")
     expect(round(-0.5)).toBe("0")
     expect(round(0.5001)).toBe("1")
@@ -192,7 +193,7 @@ describe("round", () => {
     // exact
     expect(round(1, { mode: "exact" })).toBe("1")
     expect(() => round(0.5, { mode: "exact" })).toThrow(
-      "https://decimali.sh/#INEXACT round(0.5)"
+      "https://decimali.sh/#INEXACT round 0.5"
     )
     expect(round(0, { mode: "exact" })).toBe("0")
   })

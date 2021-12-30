@@ -16,14 +16,6 @@ describe("toNumber", () => {
     expect(() => toNumber("12345678901234567890")).toThrow(
       "https://decimali.sh/#INEXACT toNumber(12345678901234567890)"
     )
-    expect(() => toNumber("12345678901234567890", { exact: true })).toThrow(
-      "https://decimali.sh/#INEXACT toNumber(12345678901234567890)"
-    )
-    expect(() => toNumber("12345678901234567890", {})).toThrow(
-      "https://decimali.sh/#INEXACT toNumber(12345678901234567890)"
-    )
-    expect(toNumber("12345678901234567890", { exact: false })).toBe(
-      12345678901234567000
-    )
+    expect(Number("12345678901234567890")).toBe(12345678901234567000)
   })
 })
