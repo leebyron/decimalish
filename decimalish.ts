@@ -160,6 +160,15 @@ export type NumericString = `${number}`
 export type NumericObject =
   | { valueOf(): NumericString | number | bigint }
   | { toString(): NumericString }
+  | BigJS
+
+/**
+ * Since the DefinitelyTyped Big.js type doesn't satisfy NumericObject, we
+ * explicitly include a type which matches that interface.
+ *
+ * @internal
+ */
+type BigJS = { valueOf(): string; c: readonly number[]; e: number; s: number }
 
 /**
  * Is numeric value?
@@ -1477,7 +1486,7 @@ export function deconstruct(
 ): [sign: 1 | -1 | 0, digits: string, scale: number, precision: number] {
   const parts = parse(value)
   if (!parts) {
-    error("NOT_NUM", value)
+    error("NOT_NUM", String(value))
   }
   let [, sign, integer, fractional, exponent] = parts
   return normalizeRepresentation(
