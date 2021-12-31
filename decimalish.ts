@@ -168,7 +168,7 @@ export type NumericObject =
  *
  * @internal
  */
-type BigJS = { valueOf(): string; c: readonly number[]; e: number; s: number }
+type BigJS = { valueOf(): string; readonly e: number; readonly s: number }
 
 /**
  * Is numeric value?

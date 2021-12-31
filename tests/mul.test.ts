@@ -9,4 +9,10 @@ describe("mul", () => {
     expect(mul(0, 1234)).toBe("0")
     expect(mul(0, 0)).toBe("0")
   })
+
+  it("Multiplies different signs and scales", () => {
+    expect(mul("-2000", "-0.003")).toBe("6")
+    expect(mul("2000", "900")).toBe("1800000")
+    expect(mul("0.005", "-0.0004")).toBe("-0.000002")
+  })
 })
