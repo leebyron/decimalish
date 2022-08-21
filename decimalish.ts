@@ -1444,7 +1444,7 @@ function parse(value: unknown): DecimalParts | null {
     // Similar to ToNumeric() and ToPrimitive(), converts value to a primitive,
     // and booleans to a number, before converting it all to a string.
     String(value === true || value === false ? +value : Object(value).valueOf())
-  ) as any
+  ) as DecimalParts | null
 }
 
 const decimalRegex = /^([-+])?(\d+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i

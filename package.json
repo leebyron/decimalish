@@ -32,7 +32,7 @@
     "test": "run-p -slc test:*",
     "test:prettier": "prettier --ignore-path .gitignore -c '**/*.{js,ts,tsx,css}'",
     "test:typecheck": "tsc",
-    "test:unit": "jest",
+    "test:unit": "jest --collectCoverage",
     "build": "npm-run-all --silent -sl build:clean -p build:files:* -s build:size-report",
     "build:clean": "rm -vrf dist && mkdir -v dist",
     "build:files": "run-p -slc build:files:*",
