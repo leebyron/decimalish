@@ -91,7 +91,7 @@
  * @category Types
  * @see isDecimal
  */
-export type decimal = NumericString & { [$$decimal]: true }
+export type decimal = NumericString & { [$$decimal]: typeof $$decimal }
 declare const $$decimal: unique symbol
 
 /**
@@ -489,7 +489,7 @@ export function divRem(
   let remainder = construct(signA, remainderDigits, scaleA)
 
   // If there is a remainder, consider the provided rounding rule.
-  if (remainder !== "0") {
+  if (remainder !== ("0" as decimal)) {
     roundingMode = normalizeRoundingMode(roundingMode, sign, signA, digit)
 
     if (roundingMode === EXACT) {
