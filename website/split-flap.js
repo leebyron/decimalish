@@ -171,14 +171,55 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+// Given the host node of the split flap, return an async function which returns
+// immediately if the split flap is visible, otherwise waits until the split
+// flap becomes visible to return.
+//
+// This allows blocking in the main loop on the display being in view. This
+// ensures the page does not consume rendering resources when unnecessary.
+function createOnscreenObserver(host) {
+  const resolvers = []
+  let isOnscreen = true
+  // Observes when the split flap is at all visible.
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      // Update local state
+      isOnscreen = entry.isIntersecting
+      if (isIntersecting) {
+        // Also, if this is an observation of the split flap coming into view,
+        // then if we have any resolve functions in the queue, flush and call.
+        while (resolvers.length > 0) {
+          const resolve = resolvers.shift()
+          resolve()
+        }
+      }
+    }
+  })
+  observer.observe(host)
+  // Return an async function.
+  return () =>
+    new Promise(resolve => {
+      if (isOnscreen) {
+        // If the split flap is visible onscreen, resolve immediately
+        resolve()
+      } else {
+        // Otherwise, queue resolve to be called when it becomes visible.
+        resolvers.push(resolve)
+      }
+    })
+}
+
 ;(async () => {
+  const onscreen = createOnscreenObserver(host)
   sfDisplay("decimalish", true)
 
   // during development
-  return
+  // return
 
   while (true) {
     // TODO: check on screen before continuing loop?
+    await onscreen()
+    await sleep(1000)
     await sfDisplay([
       { char: "d", extra: 0 },
       { char: "e", extra: 0 },
@@ -191,12 +232,14 @@ function sleep(ms) {
       { char: "s", extra: 9 },
       { char: "h", extra: 22 },
     ])
-    await sleep(3000)
+    await sleep(2000)
     // await sleep(2000);
     // await sfDisplay("0.1+0.2= ?");
     // await sleep(2000);
     // await sfDisplay("0.30000004");
+    await onscreen()
+    await sleep(1000)
     await sfDisplay("0123456789")
-    await sleep(2000)
+    await sleep(1000)
   }
 })()
