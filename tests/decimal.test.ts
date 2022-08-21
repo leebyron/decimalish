@@ -58,7 +58,7 @@ describe("decimal", () => {
   })
 
   it("converts various object types to decimal values", () => {
-    expect(decimal(new Date("May 6, 2017"))).toBe("1494054000000")
+    expect(decimal(new Date("May 6, 2017 UTC"))).toBe("1494028800000")
     expect(
       decimal({
         valueOf() {
