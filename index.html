@@ -1723,7 +1723,7 @@ function sleep(ms) {
             <a href="#functional">Functional API</a>
           </h3>
           <p>
-            All methods in Decimalish's API are provided as top level functions, not prototype methods. This maintains similarity to the built-in <code><span class="type">Math</span></code> module, enables tree-shaking, and works well with functional utility libraries like <a target="_blank" href="https://ramdajs.com/">ramda</a> or <a target="_blank" href="https://lodash.com/">lodash</a>.
+            All methods in Decimalish's API are provided as top level functions, not prototype methods. This maintains similarity to the built-in <code><span class="param">Math</span></code> module, enables tree-shaking, and works well with functional utility libraries like <a target="_blank" href="https://ramdajs.com/">ramda</a> or <a target="_blank" href="https://lodash.com/">lodash</a>.
           </p>
         </div>
         <div id="primitive-type">
@@ -2097,7 +2097,7 @@ a <code><span class="function">toString</span>()</code> method which returns <co
               Returns true if the provided value is an integer numeric value.
             </p>
             <p>
-              Similar to <code><span class="type">Number</span>.<a href="#isInteger()" class="function">isInteger</a>()</code>, however operates on <code><a href="#decimal" class="type">decimal</a></code> or any other
+              Similar to <code><span class="param">Number</span>.<a href="#isInteger()" class="function">isInteger</a>()</code>, however operates on <code><a href="#decimal" class="type">decimal</a></code> or any other
 <code><a href="#Numeric" class="type">Numeric</a></code> value. This is most useful when working with high precision values
 where converting to a JavaScript number might lose precision, inadvertently
 removing fractional information.
@@ -2523,10 +2523,10 @@ to <code>{ <a href="#places" class="label">places</a>: <span class="number">0</s
             </p>
             <p>
               The default <code><a href="#half even" class="string">&quot;half even&quot;</a></code> rounding mode is different from the behavior
-of JavaScript's <code><span class="type">Math</span>.<a href="#round()" class="function">round</a>()</code> which uses <code><a href="#half ceil" class="string">&quot;half ceil&quot;</a></code>. It is also
+of JavaScript's <code><span class="param">Math</span>.<a href="#round()" class="function">round</a>()</code> which uses <code><a href="#half ceil" class="string">&quot;half ceil&quot;</a></code>. It is also
 different from many other languages round() function which most typically
 use <code><a href="#half up" class="string">&quot;half up&quot;</a></code>. These or any other rounding mode may be provided to match
-this behavior. For example, to match <code><span class="type">Math</span>.<a href="#round()" class="function">round</a>()</code>:
+this behavior. For example, to match <code><span class="param">Math</span>.<a href="#round()" class="function">round</a>()</code>:
             </p>
             <pre><code><a href="#round()" class="function">round</a>(<span class="param">value</span>, { <span class="param">mode:</span> <a href="#half ceil" class="string">&quot;half ceil&quot;</a> })</code></pre>
           </div>
@@ -2910,7 +2910,7 @@ in a non-terminating repeating decimal.
             <p>
               Throws an &quot;INEXACT&quot; Error if the converting the value would lead to a loss
 of precision. To convert to a number while allowing precision loss, use the
-native <code><span class="type">Number</span>(<span class="param">value</span>)</code> function.
+native <code><span class="function">Number</span>(<span class="param">value</span>)</code> function.
             </p>
           </div>
         </div>
