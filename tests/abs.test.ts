@@ -5,6 +5,7 @@ describe("abs", () => {
     expect(abs("-123")).toBe("123")
     expect(abs("123")).toBe("123")
     expect(abs("0")).toBe("0")
+    expect(abs("-12345678901234567890")).toBe("12345678901234567890")
   })
 
   it("implicitly casts to decimal", () => {
