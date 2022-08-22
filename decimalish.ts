@@ -207,9 +207,10 @@ type BigJS = { valueOf(): string; readonly e: number; readonly s: number }
 // Arithmetic
 
 /**
- * Add (Plus)
+ * Add (+)
  *
- * Adds two numeric values as a decimal result.
+ * Adds two numeric values as a `decimal` result. Used as the replacement of the
+ * plus (+) operator.
  *
  * @equivalent a + b
  * @category Arithmetic
@@ -286,9 +287,10 @@ export function add(a: Numeric, b: Numeric): decimal {
 }
 
 /**
- * Subtract (Minus)
+ * Subtract (-)
  *
- * Subtracts the numeric b from the numeric a, returning a decimal result.
+ * Subtracts the numeric b from the numeric a, returning a `decimal` result.
+ * Used as the replacement of the minus (-) operator.
  *
  * @equivalent a - b
  * @category Arithmetic
@@ -299,9 +301,10 @@ export function sub(a: Numeric, b: Numeric): decimal {
 }
 
 /**
- * Multiply (Times)
+ * Multiply (*)
  *
- * Multiplies two numeric values as a decimal result.
+ * Multiplies two numeric values as a `decimal` result. Used as the replacement
+ * of the times (*) operator.
  *
  * @equivalent a * b
  * @category Arithmetic
@@ -332,9 +335,10 @@ export function mul(a: Numeric, b: Numeric): decimal {
 }
 
 /**
- * Divide
+ * Divide (/)
  *
- * Returns the result of dividing `dividend` by `divisor`.
+ * Returns the result of dividing `dividend` by `divisor` as a `decimal`. Used
+ * as the replacement of the division (/) operator.
  *
  * Defaults to 34 digits of precision and the `"half even"` rounding
  * mode, configurable by providing rounding `rules`.
@@ -365,10 +369,12 @@ export function div(
  *   - `abs(remainder) < abs(divisor)`.
  *
  * However there is not only one quotient and remainder which satisfies these
- * conditions. A choice of the sign of the remainder (via rounding mode) and
+ * conditions. A choice of the sign of the remainder (via `RoundingMode`) and
  * precision of the quotient can be provided via `rules`.
  *
- * Result of dividing 10 by 3 with different signs and rounding modes:
+ * All rounding modes may be used and these conditions will be satisfied.
+ *
+ * Result of dividing 10 by 3 with different signs and some rounding modes:
  *
  * | Example            | Note
  * | ------------------ | ---------------
@@ -384,8 +390,6 @@ export function div(
  * | `divRem(10, -3, { mode: "euclidean" }) === [ "-3", "1" ]` |
  * | `divRem(-10, 3, { mode: "euclidean" }) === [ "-4", "2" ]` |
  * | `divRem(-10, -3, { mode: "euclidean" }) === [ "4", "2" ]` |
- *
- * All rounding modes may be used and these conditions will be satisfied.
  *
  * @category Arithmetic
  */
@@ -527,7 +531,8 @@ export function divRem(
  * Returns the integer result of dividing `dividend` by `divisor` using
  * truncated (round `"down"`) division by default.
  *
- * Note: The remainder can be found using `rem()`, or better yet use `divRem()`.
+ * The remainder can be found using `rem()`. If you need both the quotient and
+ * the remainder, use `divRem()`.
  *
  * @see rem
  * @see divRem
@@ -543,15 +548,16 @@ export function divInt(
 }
 
 /**
- * Remainder
+ * Remainder (%)
  *
  * Returns the remainder of dividing `dividend` by `divisor` using truncated
- * (round "down") division by default. The result always has the same sign as
- * the first argument (or 0).
+ * (round `"down"`) division by default. The result always has the same sign as
+ * the first argument (or 0). Used as the replacement of the remainder (%), aka
+ * modulo, operator.
  *
- * Note: `rem()` and `div()` use different default division rounding rules and
- * should not be used together. The quotient can be found using `divInt()`, or
- * better yet use `divRem()`.
+ * Note that `rem()` and `div()` use different default division rounding rules
+ * and should not be used together. The quotient can be found using `divInt()`
+ * instead. If you need both the quotient and the remainder, use `divRem()`.
  *
  * @equivalent dividend % divisor
  * @see divInt
@@ -621,7 +627,7 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
 /**
  * Square root
  *
- * Returns the square root of `value`.
+ * Returns the square root of `value` as a `decimal`.
  *
  * Defaults to 34 digits of precision using the `"half even"` rounding
  * mode, configurable by providing rounding `rules`.

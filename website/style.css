@@ -240,6 +240,26 @@ details {
   padding-left: var(--gutter-size);
 }
 
+summary {
+  list-style: none;
+  position: relative;
+}
+
+summary::before {
+  content: "⯈";
+  cursor: pointer;
+  opacity: 40%;
+  padding: 0 1ch;
+  position: absolute;
+  right: 100%;
+  transform: rotate(0);
+  transition: transform 0.2s;
+}
+
+details[open] summary::before {
+  transform: rotate(90deg);
+}
+
 li {
   max-width: calc(40em - var(--gutter-size));
 }
@@ -576,26 +596,6 @@ section.odd {
 
 .api.member details:not([open]) .decl {
   margin-bottom: 0;
-}
-
-.api.member summary {
-  list-style: none;
-  position: relative;
-}
-
-.api.member summary::before {
-  content: "⯈";
-  cursor: pointer;
-  opacity: 40%;
-  padding: 0 1ch;
-  position: absolute;
-  right: 100%;
-  transform: rotate(0);
-  transition: transform 0.2s;
-}
-
-.api.member details[open] summary::before {
-  transform: rotate(90deg);
 }
 
 .decl {

@@ -685,18 +685,7 @@ const TypeMemberSection = ({ member, id }: { member: ts.Node; id: string }) => (
   <section id={id} class="api member">
     <div>
       <div />
-      <details>
-        <script
-          innerHTML={`{
-              const details = document.currentScript.parentElement
-              const update = () => {
-                const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === ${JSON.stringify(id)}) details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }`}
-        />
+      <Details forId={id}>
         <summary>
           <code class="decl">
             <Source node={member} />
@@ -706,9 +695,26 @@ const TypeMemberSection = ({ member, id }: { member: ts.Node; id: string }) => (
           <a href={"#" + id}>{getJSDoc(member)?.title}</a>
         </h4>
         <Markdown>{getJSDoc(member)?.comment}</Markdown>
-      </details>
+      </Details>
     </div>
   </section>
+)
+
+const Details = ({ children, forId }: any) => (
+  <details>
+    <script
+      innerHTML={`{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === ${JSON.stringify(forId)}) details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }`}
+    />
+    {children}
+  </details>
 )
 
 const Source = ({ node }: { node: ts.Node }) =>
@@ -824,6 +830,18 @@ const FAQSection = () => (
         <a href="#faq">FAQ</a>
       </h2>
       <p>Who knows</p>
+    </div>
+    <div class="two-grid">
+      <div id="faq-why-modulo">
+        <Details forId="faq-why-modulo">
+          <summary>
+            <h3>
+              <a href="#faq-why-modulo">Why modulo?</a>
+            </h3>
+          </summary>
+          <P>Testing</P>
+        </Details>
+      </div>
     </div>
   </section>
 )
