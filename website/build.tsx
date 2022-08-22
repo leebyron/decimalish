@@ -79,7 +79,7 @@ function getTypedefByCategory(): Typedefs {
     if (isExportedDeclaration(node)) {
       const name = node.name!.text
       const kind = ts.isFunctionDeclaration(node) ? "function" : "type"
-      const id = name + (kind === "function" ? "()" : "")
+      const id = safeId(name + (kind === "function" ? "()" : ""))
       const category = getJSDoc(node)?.tags.category || OTHER_CATEGORY
       if (!ids[id]) {
         ;(categories[category] || (categories[category] = [])).push(
@@ -90,7 +90,7 @@ function getTypedefByCategory(): Typedefs {
         if (ts.isInterfaceDeclaration(node)) {
           for (const member of node.members) {
             const memberName = member.name!.getText()
-            const id = `${name}.${memberName}`
+            const id = `${name}.${safeId(memberName)}`
             ids[id] = { id, name: memberName, kind: "label", node: member }
           }
         }
@@ -105,7 +105,7 @@ function getTypedefByCategory(): Typedefs {
           )
         ) {
           for (const member of node.type.types) {
-            const id = member.getText().slice(1, -1)
+            const id = safeId(member.getText().slice(1, -1))
             ids[id] = { id, name: id, kind: "string", node: member }
           }
         }
@@ -125,6 +125,10 @@ function isExportedDeclaration(node: ts.Node): node is ts.Declaration {
 
 function last<T>(arr: T[] | undefined): T | undefined {
   return arr?.[arr?.length - 1]
+}
+
+function safeId(id: string): string {
+  return id.replace(/[^a-zA-Z()]/g, "-")
 }
 
 const jsDocCache = new WeakMap<ts.Node, JSDoc | undefined>()
@@ -628,8 +632,12 @@ const Code = ({
       {line.map(({ content, color }, index) => {
         const className = color && colorClass[color.toLowerCase()]
         const typeDef = content.startsWith('"')
-          ? ids[content.slice(1, -1)]
-          : ids[content + (line[index + 1]?.content[0] === "(" ? "()" : "")]
+          ? ids[safeId(content.slice(1, -1))]
+          : ids[
+              safeId(
+                content + (line[index + 1]?.content[0] === "(" ? "()" : "")
+              )
+            ]
         return typeDef ? (
           <a href={"#" + typeDef.id} class={className}>
             {content}
@@ -667,7 +675,7 @@ const APIItemSection = ({ item }: { item: Typedef }) => (
       item.node.members.map(member => (
         <TypeMemberSection
           member={member}
-          id={`${item.id}.${member.name!.getText()}`}
+          id={`${item.id}.${safeId(member.name!.getText())}`}
         />
       ))}
     {ts.isTypeAliasDeclaration(item.node) &&
@@ -676,7 +684,10 @@ const APIItemSection = ({ item }: { item: Typedef }) => (
         type => ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal)
       ) &&
       item.node.type.types.map(member => (
-        <TypeMemberSection member={member} id={member.getText().slice(1, -1)} />
+        <TypeMemberSection
+          member={member}
+          id={safeId(member.getText().slice(1, -1))}
+        />
       ))}
   </section>
 )
@@ -702,12 +713,13 @@ const TypeMemberSection = ({ member, id }: { member: ts.Node; id: string }) => (
 
 const Details = ({ children, forId }: any) => (
   <details>
+    {children}
     <script
       innerHTML={`{
               const details = document.currentScript.parentElement
               document.currentScript.remove()
               const update = () => {
-                const hash = decodeURIComponent(window.location.hash.slice(1))
+                const hash = window.location.hash.slice(1)
                 if (hash && hash === ${JSON.stringify(
                   forId
                 )}) details.open = true
@@ -716,7 +728,6 @@ const Details = ({ children, forId }: any) => (
               update()
             }`}
     />
-    {children}
   </details>
 )
 

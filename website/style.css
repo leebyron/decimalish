@@ -241,13 +241,18 @@ details {
 }
 
 summary {
+  cursor: pointer;
   list-style: none;
   position: relative;
 }
 
+summary::marker,
+summary::-webkit-details-marker {
+  display: none;
+}
+
 summary::before {
-  content: "⯈";
-  cursor: pointer;
+  content: "▶";
   opacity: 40%;
   padding: 0 1ch;
   position: absolute;
