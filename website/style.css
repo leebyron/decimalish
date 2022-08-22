@@ -225,8 +225,27 @@ p {
   max-width: 40em;
 }
 
-p:not(:last-child) {
+p:not(:last-child),
+ol:not(:last-child),
+ul:not(:last-child) {
   margin-bottom: 1rem;
+}
+
+ol,
+ul {
+  padding-left: var(--gutter-size);
+}
+
+details {
+  padding-left: var(--gutter-size);
+}
+
+li {
+  max-width: calc(40em - var(--gutter-size));
+}
+
+li:not(:last-child) {
+  margin-bottom: 0.5rem;
 }
 
 pre {
@@ -259,7 +278,8 @@ a {
 a,
 a > span {
   color: var(--text-color);
-  text-shadow: 2px 0 var(--bg-color), -2px 0 var(--bg-color);
+  /* this helps link underlines not clash with text, but causes other issues */
+  /* text-shadow: 2px 0 var(--bg-color), -2px 0 var(--bg-color); */
   position: relative;
   z-index: 0;
   text-decoration: none;
@@ -289,25 +309,25 @@ a:hover > span:before {
 
 section:not(:target) > h2 > a:not(:hover),
 section:not(:target) > div > h2 > a:not(:hover),
-section:not(:target) > div > div > h2 > a:not(:hover),
+section:not(:target) > div > * > h2 > a:not(:hover),
 section:not(:target) > h3 > a:not(:hover),
 section:not(:target) > div > h3 > a:not(:hover),
-section:not(:target) > div > div > h3 > a:not(:hover),
+section:not(:target) > div > * > h3 > a:not(:hover),
 section:not(:target) > h4 > a:not(:hover),
 section:not(:target) > div > h4 > a:not(:hover),
-section:not(:target) > div > div > h4 > a:not(:hover) {
+section:not(:target) > div > * > h4 > a:not(:hover) {
   --underline-color: transparent;
 }
 
 section:target > h2 > a:before,
 section:target > div > h2 > a:before,
-section:target > div > div > h2 > a:before,
+section:target > div > * > h2 > a:before,
 section:target > h3 > a:before,
 section:target > div > h3 > a:before,
-section:target > div > div > h3 > a:before,
+section:target > div > * > h3 > a:before,
 section:target > h4 > a:before,
 section:target > div > h4 > a:before,
-section:target > div > div > h4 > a:before,
+section:target > div > * > h4 > a:before,
 a:hover:before {
   transform: translateY(0.08em) scaleY(2);
 }
@@ -478,6 +498,11 @@ header nav a:last-child {
 
 .api-toc-sec ul {
   list-style: none;
+  padding: 0;
+}
+
+.api-toc-sec li {
+  margin: 0;
 }
 
 .api-toc-sec li a {
@@ -537,11 +562,40 @@ section.odd {
   }
 }
 
-@media not all and (min-width: 700px) {
-  .api.member > * {
-    margin-left: calc(2 * var(--gutter-size));
-    width: calc(100% - 3 * var(--gutter-size));
-  }
+:not(.api.member) + .api.member {
+  margin-top: calc(-1 * var(--gutter-size));
+}
+
+.api.member:not(:last-child) > * {
+  margin-bottom: 0;
+}
+
+.api.member:not(:last-child) details[open] {
+  margin-bottom: calc(0.5 * var(--gutter-size));
+}
+
+.api.member details:not([open]) .decl {
+  margin-bottom: 0;
+}
+
+.api.member summary {
+  list-style: none;
+  position: relative;
+}
+
+.api.member summary::before {
+  content: "⯈";
+  cursor: pointer;
+  opacity: 40%;
+  padding: 0 1ch;
+  position: absolute;
+  right: 100%;
+  transform: rotate(0);
+  transition: transform 0.2s;
+}
+
+.api.member details[open] summary::before {
+  transform: rotate(90deg);
 }
 
 .decl {

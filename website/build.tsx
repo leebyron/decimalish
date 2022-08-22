@@ -89,8 +89,9 @@ function getTypedefByCategory(): Typedefs {
         // Interface field ids
         if (ts.isInterfaceDeclaration(node)) {
           for (const member of node.members) {
-            const id = member.name!.getText()
-            ids[id] = { id, name: id, kind: "label", node: member }
+            const memberName = member.name!.getText()
+            const id = `${name}.${memberName}`
+            ids[id] = { id, name: memberName, kind: "label", node: member }
           }
         }
 
@@ -475,11 +476,11 @@ const WhySection = () => (
           `1`?), and sometimes operations such as multiple result in surprising
           results and thus, you guessed it, another source of bugs.
         </P>
-        <p>
+        <P>
           Decimalish's `decimal()` constructor, and all other math functions
           always return canonical normalized decimal values without any leading
           or trailing zeros.
-        </p>
+        </P>
       </div>
       <div id="places-or-precision">
         <h3>
@@ -659,13 +660,15 @@ const APIItemSection = ({ item }: { item: Typedef }) => (
         <code class="decl">
           <Source node={item.node} />
         </code>
-
         <Markdown>{getJSDoc(item.node)?.comment}</Markdown>
       </div>
     </div>
     {ts.isInterfaceDeclaration(item.node) &&
       item.node.members.map(member => (
-        <TypeMemberSection member={member} id={member.name!.getText()} />
+        <TypeMemberSection
+          member={member}
+          id={`${item.id}.${member.name!.getText()}`}
+        />
       ))}
     {ts.isTypeAliasDeclaration(item.node) &&
       ts.isUnionTypeNode(item.node.type) &&
@@ -682,17 +685,28 @@ const TypeMemberSection = ({ member, id }: { member: ts.Node; id: string }) => (
   <section id={id} class="api member">
     <div>
       <div />
-      <div>
-        <pre>
-          <code>
+      <details>
+        <script
+          innerHTML={`{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === ${JSON.stringify(id)}) details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }`}
+        />
+        <summary>
+          <code class="decl">
             <Source node={member} />
           </code>
-        </pre>
+        </summary>
         <h4>
           <a href={"#" + id}>{getJSDoc(member)?.title}</a>
         </h4>
         <Markdown>{getJSDoc(member)?.comment}</Markdown>
-      </div>
+      </details>
     </div>
   </section>
 )
@@ -724,7 +738,8 @@ const Source = ({ node }: { node: ts.Node }) =>
         </>
       ))}
       <wbr />
-      {"):\u00A0"}
+      {"):"}
+      {ts.isTupleTypeNode(node.type!) ? <br /> : "\u00A0"}
       <Source node={node.type!} />
     </>
   ) : ts.isToken(node) ? (
