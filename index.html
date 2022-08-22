@@ -237,8 +237,27 @@ p {
   max-width: 40em;
 }
 
-p:not(:last-child) {
+p:not(:last-child),
+ol:not(:last-child),
+ul:not(:last-child) {
   margin-bottom: 1rem;
+}
+
+ol,
+ul {
+  padding-left: var(--gutter-size);
+}
+
+details {
+  padding-left: var(--gutter-size);
+}
+
+li {
+  max-width: calc(40em - var(--gutter-size));
+}
+
+li:not(:last-child) {
+  margin-bottom: 0.5rem;
 }
 
 pre {
@@ -271,7 +290,8 @@ a {
 a,
 a > span {
   color: var(--text-color);
-  text-shadow: 2px 0 var(--bg-color), -2px 0 var(--bg-color);
+  /* this helps link underlines not clash with text, but causes other issues */
+  /* text-shadow: 2px 0 var(--bg-color), -2px 0 var(--bg-color); */
   position: relative;
   z-index: 0;
   text-decoration: none;
@@ -301,25 +321,25 @@ a:hover > span:before {
 
 section:not(:target) > h2 > a:not(:hover),
 section:not(:target) > div > h2 > a:not(:hover),
-section:not(:target) > div > div > h2 > a:not(:hover),
+section:not(:target) > div > * > h2 > a:not(:hover),
 section:not(:target) > h3 > a:not(:hover),
 section:not(:target) > div > h3 > a:not(:hover),
-section:not(:target) > div > div > h3 > a:not(:hover),
+section:not(:target) > div > * > h3 > a:not(:hover),
 section:not(:target) > h4 > a:not(:hover),
 section:not(:target) > div > h4 > a:not(:hover),
-section:not(:target) > div > div > h4 > a:not(:hover) {
+section:not(:target) > div > * > h4 > a:not(:hover) {
   --underline-color: transparent;
 }
 
 section:target > h2 > a:before,
 section:target > div > h2 > a:before,
-section:target > div > div > h2 > a:before,
+section:target > div > * > h2 > a:before,
 section:target > h3 > a:before,
 section:target > div > h3 > a:before,
-section:target > div > div > h3 > a:before,
+section:target > div > * > h3 > a:before,
 section:target > h4 > a:before,
 section:target > div > h4 > a:before,
-section:target > div > div > h4 > a:before,
+section:target > div > * > h4 > a:before,
 a:hover:before {
   transform: translateY(0.08em) scaleY(2);
 }
@@ -490,6 +510,11 @@ header nav a:last-child {
 
 .api-toc-sec ul {
   list-style: none;
+  padding: 0;
+}
+
+.api-toc-sec li {
+  margin: 0;
 }
 
 .api-toc-sec li a {
@@ -549,11 +574,40 @@ section.odd {
   }
 }
 
-@media not all and (min-width: 700px) {
-  .api.member > * {
-    margin-left: calc(2 * var(--gutter-size));
-    width: calc(100% - 3 * var(--gutter-size));
-  }
+:not(.api.member) + .api.member {
+  margin-top: calc(-1 * var(--gutter-size));
+}
+
+.api.member:not(:last-child) > * {
+  margin-bottom: 0;
+}
+
+.api.member:not(:last-child) details[open] {
+  margin-bottom: calc(0.5 * var(--gutter-size));
+}
+
+.api.member details:not([open]) .decl {
+  margin-bottom: 0;
+}
+
+.api.member summary {
+  list-style: none;
+  position: relative;
+}
+
+.api.member summary::before {
+  content: "⯈";
+  cursor: pointer;
+  opacity: 40%;
+  padding: 0 1ch;
+  position: absolute;
+  right: 100%;
+  transform: rotate(0);
+  transition: transform 0.2s;
+}
+
+.api.member details[open] summary::before {
+  transform: rotate(90deg);
 }
 
 .decl {
@@ -1623,7 +1677,7 @@ function createOnscreenObserver(host) {
     for (const entry of entries) {
       // Update local state
       isOnscreen = entry.isIntersecting
-      if (isIntersecting) {
+      if (isOnscreen) {
         // Also, if this is an observation of the split flap coming into view,
         // then if we have any resolve functions in the queue, flush and call.
         while (resolvers.length > 0) {
@@ -1810,7 +1864,7 @@ function createOnscreenObserver(host) {
             Some BigDecimal libraries attempt to visually preserve precision after an operation by adding trailing zeros. While this can be useful for quick number formatting, this conflates mathematical value with presentation, require multiple kinds of equality (is <code><span class="number">1.0</span></code> equal to <code><span class="number">1</span></code>?), and sometimes operations such as multiple result in surprising results and thus, you guessed it, another source of bugs.
           </p>
           <p>
-            Decimalish's `decimal()` constructor, and all other math functions always return canonical normalized decimal values without any leading or trailing zeros.
+            Decimalish's <code><a href="#decimal()" class="function">decimal()</a></code> constructor, and all other math functions always return canonical normalized decimal values without any leading or trailing zeros.
           </p>
         </div>
         <div id="places-or-precision">
@@ -1852,6 +1906,12 @@ function createOnscreenObserver(host) {
               <a href="#isDecimal()"><span>Is decimal?</span><code class="function">isDecimal()</code></a>
             </li>
             <li>
+              <a href="#isNumeric()"><span>Is numeric value?</span><code class="function">isNumeric()</code></a>
+            </li>
+            <li>
+              <a href="#isInteger()"><span>Is integer?</span><code class="function">isInteger()</code></a>
+            </li>
+            <li>
               <a href="#Numeric"><span>Numeric value</span><code class="type">Numeric</code></a>
             </li>
             <li>
@@ -1859,12 +1919,6 @@ function createOnscreenObserver(host) {
             </li>
             <li>
               <a href="#NumericObject"><span>Numeric object</span><code class="type">NumericObject</code></a>
-            </li>
-            <li>
-              <a href="#isNumeric()"><span>Is numeric value?</span><code class="function">isNumeric()</code></a>
-            </li>
-            <li>
-              <a href="#isInteger()"><span>Is integer?</span><code class="function">isInteger()</code></a>
             </li>
           </ul>
         </div>
@@ -2000,7 +2054,7 @@ function createOnscreenObserver(host) {
               <a href="#toExponential()"><span>Scientific notation</span><code class="function">toExponential()</code></a>
             </li>
             <li>
-              <a href="#deconstruct()"><span>Numeric elements</span><code class="function">deconstruct()</code></a>
+              <a href="#deconstruct()"><span>decimal → Elements</span><code class="function">deconstruct()</code></a>
             </li>
             <li>
               <a href="#construct()"><span>Elements → decimal</span><code class="function">construct()</code></a>
@@ -2040,7 +2094,7 @@ strings, but not all numeric strings are decimals.
               Converts any numeric value to a <code><a href="#decimal" class="type">decimal</a></code>.
             </p>
             <p>
-              Throws a &quot;NOT_NUM&quot; Error if the provided value is not numeric and cannot be
+              Throws a <code><a href="#NOT_NUM" class="string">&quot;NOT_NUM&quot;</a></code> Error if the provided value is not numeric and cannot be
 translated to decimal.
             </p>
             <p>
@@ -2061,6 +2115,41 @@ translated to decimal.
             </p>
             <p>
               A value is <code><a href="#decimal" class="type">decimal</a></code> if it is a numeric string in a canonical decimal form.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section id="isNumeric()" class="api">
+        <div>
+          <h3>
+            <a href="#isNumeric()">Is numeric value?</a>
+          </h3>
+          <div>
+            <code class="decl"><span class="function">isNumeric</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#Numeric" class="type">Numeric</a></code>
+            <p>
+              Returns true if the provided value is a (finite) <code><a href="#Numeric" class="type">Numeric</a></code> value.
+            </p>
+            <p>
+              A value is considered numeric if it can be coerced to a numeric string.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section id="isInteger()" class="api">
+        <div>
+          <h3>
+            <a href="#isInteger()">Is integer?</a>
+          </h3>
+          <div>
+            <code class="decl"><span class="function">isInteger</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="type">boolean</span></code>
+            <p>
+              Returns true if the provided value is an integer numeric value.
+            </p>
+            <p>
+              Similar to <code><span class="param">Number</span>.<a href="#isInteger()" class="function">isInteger</a>()</code>, but works with <code><a href="#decimal" class="type">decimal</a></code> or any other
+<code><a href="#Numeric" class="type">Numeric</a></code> value. This is most useful when working with high precision values
+where <code><span class="param">Number</span>.<a href="#isInteger()" class="function">isInteger</a>()</code> could lose precision, inadvertently remove
+fractional information, and then come to an incorrect result.
             </p>
           </div>
         </div>
@@ -2109,41 +2198,6 @@ numeric strings.
               The <code><a href="#NumericObject" class="type">NumericObject</a></code> type represents objects with a <code><a href="#Numeric" class="type">Numeric</a></code> primitive
 value, either by providing a <code><span class="function">valueOf</span>()</code> method which returns <code><span class="param">number</span></code> or
 a <code><span class="function">toString</span>()</code> method which returns <code><a href="#NumericString" class="type">NumericString</a></code>.
-            </p>
-          </div>
-        </div>
-      </section>
-      <section id="isNumeric()" class="api">
-        <div>
-          <h3>
-            <a href="#isNumeric()">Is numeric value?</a>
-          </h3>
-          <div>
-            <code class="decl"><span class="function">isNumeric</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="param">value</span> <span class="keyword">is</span> <a href="#Numeric" class="type">Numeric</a></code>
-            <p>
-              Returns true if the provided value is a (finite) numeric value.
-            </p>
-            <p>
-              A value is considered numeric if it can be coerced to a numeric string.
-            </p>
-          </div>
-        </div>
-      </section>
-      <section id="isInteger()" class="api">
-        <div>
-          <h3>
-            <a href="#isInteger()">Is integer?</a>
-          </h3>
-          <div>
-            <code class="decl"><span class="function">isInteger</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): <span class="type">boolean</span></code>
-            <p>
-              Returns true if the provided value is an integer numeric value.
-            </p>
-            <p>
-              Similar to <code><span class="param">Number</span>.<a href="#isInteger()" class="function">isInteger</a>()</code>, however operates on <code><a href="#decimal" class="type">decimal</a></code> or any other
-<code><a href="#Numeric" class="type">Numeric</a></code> value. This is most useful when working with high precision values
-where converting to a JavaScript number might lose precision, inadvertently
-removing fractional information.
             </p>
           </div>
         </div>
@@ -2204,7 +2258,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
             <a href="#divRem()">Divide and remainder</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">divRem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): [<wbr><span class="label">quotient</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">remainder</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
+            <code class="decl"><span class="function">divRem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>):<br>[<wbr><span class="label">quotient</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">remainder</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
             <p>
               Divides two numeric values to a given places or precision returning both the
 quotient and the remainder while satisfying the two conditions:
@@ -2562,7 +2616,7 @@ moves the decimal point to the right <code><span class="param">power</span></cod
             <code class="decl"><span class="function">round</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Rounds a numeric value according to the provided <code><a href="#RoundingRules" class="type">RoundingRules</a></code>, defaulting
-to <code>{ <a href="#places" class="label">places</a>: <span class="number">0</span>, <a href="#mode" class="label">mode</a>: <a href="#half even" class="string">&quot;half even&quot;</a> }</code>.
+to <code>{ <span class="label">places</span>: <span class="number">0</span>, <span class="label">mode</span>: <a href="#half even" class="string">&quot;half even&quot;</a> }</code>.
             </p>
             <p>
               The default <code><a href="#half even" class="string">&quot;half even&quot;</a></code> rounding mode is different from the behavior
@@ -2581,10 +2635,10 @@ this behavior. For example, to match <code><span class="param">Math</span>.<a hr
             <a href="#roundRem()">Round and remainder</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">roundRem</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): [<wbr><span class="label">rounded</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">remainder</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
+            <code class="decl"><span class="function">roundRem</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>):<br>[<wbr><span class="label">rounded</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">remainder</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
             <p>
               Rounds a numeric value according to the provided <code><a href="#RoundingRules" class="type">RoundingRules</a></code>, defaulting
-to <code>{ <a href="#places" class="label">places</a>: <span class="number">0</span>, <a href="#mode" class="label">mode</a>: <a href="#half even" class="string">&quot;half even&quot;</a> }</code>.
+to <code>{ <span class="label">places</span>: <span class="number">0</span>, <span class="label">mode</span>: <a href="#half even" class="string">&quot;half even&quot;</a> }</code>.
             </p>
           </div>
         </div>
@@ -2644,7 +2698,7 @@ in the direction of 0, also known as truncation.
             <a href="#intFrac()">Integer and fractional parts</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">intFrac</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): [<wbr><span class="label">integer</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">fractional</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
+            <code class="decl"><span class="function">intFrac</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>):<br>[<wbr><span class="label">integer</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">fractional</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
             <p>
               Returns the integer and fractional parts of a number by rounding to the nearest
 whole number in the direction of 0 and including the remainder.
@@ -2691,46 +2745,73 @@ whole number in the direction of 0 and including the remainder.
             <code class="decl"><span class="keyword">interface</span> <span class="type">RoundingRules</span></code>
           </div>
         </div>
-        <section id="places" class="api member">
+        <section id="RoundingRules.places" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="label">places</span>?: <a href="#Numeric" class="type">Numeric</a></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "RoundingRules.places") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="label">places</span>?: <a href="#Numeric" class="type">Numeric</a></code></summary>
               <h4>
-                <a href="#places">Decimal places</a>
+                <a href="#RoundingRules.places">Decimal places</a>
               </h4>
               <p>
                 The number of decimal places to round to. Negative places rounds to higher
-integer places. Only one of <code><a href="#places" class="label">places</a></code> or <code><a href="#precision" class="label">precision</a></code> can be provided.
+integer places. Only one of <code><span class="param">places</span></code> or <code><span class="param">precision</span></code> can be provided.
               </p>
               <p>
                 For most functions, the default is <code><span class="number">0</span></code>, rounding to an integer whole number.
               </p>
-            </div>
+            </details>
           </div>
         </section>
-        <section id="precision" class="api member">
+        <section id="RoundingRules.precision" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="label">precision</span>?: <a href="#Numeric" class="type">Numeric</a></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "RoundingRules.precision") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="label">precision</span>?: <a href="#Numeric" class="type">Numeric</a></code></summary>
               <h4>
-                <a href="#precision">Significant figures</a>
+                <a href="#RoundingRules.precision">Significant figures</a>
               </h4>
               <p>
                 Rounds a result to contain this number of significant digits. Only one of
-<code><a href="#places" class="label">places</a></code> or <code><a href="#precision" class="label">precision</a></code> can be provided.
+<code><span class="param">places</span></code> or <code><span class="param">precision</span></code> can be provided.
               </p>
-            </div>
+            </details>
           </div>
         </section>
-        <section id="mode" class="api member">
+        <section id="RoundingRules.mode" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="label">mode</span>?: <a href="#RoundingMode" class="type">RoundingMode</a></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "RoundingRules.mode") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="label">mode</span>?: <a href="#RoundingMode" class="type">RoundingMode</a></code></summary>
               <h4>
-                <a href="#mode">Rounding mode</a>
+                <a href="#RoundingRules.mode">Rounding mode</a>
               </h4>
               <p>
                 If a result needs to be rounded to meet the expected number of decimal
@@ -2740,7 +2821,7 @@ to round towards.
               <p>
                 The default rounding mode, unless stated otherwise, is <code><a href="#half even" class="string">&quot;half even&quot;</a></code>.
               </p>
-            </div>
+            </details>
           </div>
         </section>
       </section>
@@ -2750,14 +2831,23 @@ to round towards.
             <a href="#RoundingMode">Round method</a>
           </h3>
           <div>
-            <code class="decl"><span class="keyword">type</span> <span class="type">RoundingMode</span></code>
+            <code class="decl"><span class="keyword">type</span> <span class="type">RoundingMode</span></code>An enum of possible ways to perform rounding.
           </div>
         </div>
         <section id="up" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;up&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "up") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;up&quot;</span></code></summary>
               <h4>
                 <a href="#up">Round up</a>
               </h4>
@@ -2765,14 +2855,23 @@ to round towards.
                 Rounds a result up, away from zero, to the value with a larger
 absolute value.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="down" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;down&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "down") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;down&quot;</span></code></summary>
               <h4>
                 <a href="#down">Round down</a>
               </h4>
@@ -2780,14 +2879,23 @@ absolute value.
                 Rounds a result down, towards zero, to the value with a smaller
 absolute value.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="ceil" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;ceil&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "ceil") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;ceil&quot;</span></code></summary>
               <h4>
                 <a href="#ceil">Ceiling</a>
               </h4>
@@ -2795,14 +2903,23 @@ absolute value.
                 Rounds a result up, towards <code><span class="keyword">Infinity</span></code>, to the value with the larger
 signed value.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="floor" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;floor&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "floor") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;floor&quot;</span></code></summary>
               <h4>
                 <a href="#floor">Floor</a>
               </h4>
@@ -2810,14 +2927,23 @@ signed value.
                 Rounds a result down, towards <code>-<span class="keyword">Infinity</span></code>, to the value with the smaller
 signed value.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="half up" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;half up&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "half up") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;half up&quot;</span></code></summary>
               <h4>
                 <a href="#half up">Round half up</a>
               </h4>
@@ -2825,14 +2951,23 @@ signed value.
                 Rounds a result towards the nearest neighboring value, otherwise <code><a href="#up" class="string">&quot;up&quot;</a></code> if
 exactly between the two.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="half down" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;half down&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "half down") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;half down&quot;</span></code></summary>
               <h4>
                 <a href="#half down">Round half down</a>
               </h4>
@@ -2840,14 +2975,23 @@ exactly between the two.
                 Rounds a result towards the nearest neighboring value, otherwise <code><a href="#down" class="string">&quot;down&quot;</a></code>
 if exactly between the two.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="half ceil" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;half ceil&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "half ceil") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;half ceil&quot;</span></code></summary>
               <h4>
                 <a href="#half ceil">Round half ceiling</a>
               </h4>
@@ -2855,14 +2999,23 @@ if exactly between the two.
                 Rounds a result towards the nearest neighboring value, otherwise <code><a href="#ceil" class="string">&quot;ceil&quot;</a></code>
 if exactly between the two.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="half floor" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;half floor&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "half floor") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;half floor&quot;</span></code></summary>
               <h4>
                 <a href="#half floor">Round half floor</a>
               </h4>
@@ -2870,14 +3023,23 @@ if exactly between the two.
                 Rounds a result towards the nearest neighboring value, otherwise <code><a href="#floor" class="string">&quot;floor&quot;</a></code>
 if exactly between the two.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="half even" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;half even&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "half even") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;half even&quot;</span></code></summary>
               <h4>
                 <a href="#half even">Round half towards even</a>
               </h4>
@@ -2889,14 +3051,23 @@ the value with an even least significant digit if exactly between the two.
                 This is particularly useful to avoid aggregated bias when adding together
 multiple rounded values as there is an equal chance of rounding up or down.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="euclidean" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;euclidean&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "euclidean") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;euclidean&quot;</span></code></summary>
               <h4>
                 <a href="#euclidean">Euclidean division</a>
               </h4>
@@ -2913,14 +3084,23 @@ even though most programming languages offer different definitions.
               <p>
                 When used with rounding, this is an alias for <code><a href="#floor" class="string">&quot;floor&quot;</a></code>.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="exact" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;exact&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "exact") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;exact&quot;</span></code></summary>
               <h4>
                 <a href="#exact">Assert exact result</a>
               </h4>
@@ -2933,7 +3113,7 @@ rounded value, otherwise throws a <code><a href="#INEXACT" class="string">&quot;
 an expected precision or decimal places, or that division does not result
 in a non-terminating repeating decimal.
               </p>
-            </div>
+            </details>
           </div>
         </section>
       </section>
@@ -2951,7 +3131,7 @@ in a non-terminating repeating decimal.
               Converts a <code><a href="#Numeric" class="type">Numeric</a></code> value (including <code><a href="#decimal" class="type">decimal</a></code>) to a JavaScript number.
             </p>
             <p>
-              Throws an &quot;INEXACT&quot; Error if the converting the value would lead to a loss
+              Throws an <code><a href="#INEXACT" class="string">&quot;INEXACT&quot;</a></code> Error if the converting the value would lead to a loss
 of precision. To convert to a number while allowing precision loss, use the
 native <code><span class="function">Number</span>(<span class="param">value</span>)</code> function.
             </p>
@@ -2967,7 +3147,7 @@ native <code><span class="function">Number</span>(<span class="param">value</spa
             <code class="decl"><span class="function">toFixed</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code>
             <p>
               A string representation of the provided Numeric <code><span class="param">value</span></code> using fixed notation.
-Uses rules to specify <code><a href="#precision" class="label">precision</a></code> or <code><a href="#places" class="label">places</a></code> and the rounding <code><a href="#mode" class="label">mode</a></code> should
+Uses rules to specify <code><span class="param">precision</span></code> or <code><span class="param">places</span></code> and the rounding <code><span class="param">mode</span></code> should
 that result in fewer digits.
             </p>
           </div>
@@ -2982,8 +3162,8 @@ that result in fewer digits.
             <code class="decl"><span class="function">toExponential</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code>
             <p>
               A string representation of the provided Numeric <code><span class="param">value</span></code> using exponential
-scientific notation. Uses rules to specify <code><a href="#precision" class="label">precision</a></code> or <code><a href="#places" class="label">places</a></code> and the
-rounding <code><a href="#mode" class="label">mode</a></code> should that result in fewer digits.
+scientific notation. Uses rules to specify <code><span class="param">precision</span></code> or <code><span class="param">places</span></code> and the
+rounding <code><span class="param">mode</span></code> should that result in fewer digits.
             </p>
           </div>
         </div>
@@ -2991,13 +3171,13 @@ rounding <code><a href="#mode" class="label">mode</a></code> should that result 
       <section id="deconstruct()" class="api">
         <div>
           <h3>
-            <a href="#deconstruct()">Numeric elements</a>
+            <a href="#deconstruct()">decimal → Elements</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">deconstruct</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>): [<wbr><span class="label">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="label">digits</span>: <span class="type">string</span>, <span class="label">scale</span>: <span class="type">number</span>, <span class="label">precision</span>: <span class="type">number</span><wbr>]</code>
+            <code class="decl"><span class="function">deconstruct</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>):<br>[<wbr><span class="label">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="label">digits</span>: <span class="type">string</span>, <span class="label">scale</span>: <span class="type">number</span>, <span class="label">precision</span>: <span class="type">number</span><wbr>]</code>
             <p>
               Given a numeric value, deconstruct to normalized representation of a decimal:
-a <code>[<span class="param">sign</span>, <span class="param">digits</span>, <span class="param">scale</span>, <a href="#precision" class="param">precision</a>]</code> tuple.
+a <code>[<span class="param">sign</span>, <span class="param">digits</span>, <span class="param">scale</span>, <span class="param">precision</span>]</code> tuple.
             </p>
             <p>
               Functions within this library internally operate on the normalized
@@ -3017,7 +3197,7 @@ notation, where the first digit is the ones place, or an empty string for 0.
                 <code><span class="param">scale</span></code>: The power of ten the digits is multiplied by, or 0 for 0.
               </li>
               <li>
-                <code><a href="#precision" class="label">precision</a></code>: The number of digits found in digits (e.g. number of
+                <code><span class="param">precision</span></code>: The number of digits found in digits (e.g. number of
 significant digits). Yes this is redundant information with
 <code><span class="param">digits</span>.<span class="param">length</span></code> but it is convenient to access directly.
               </li>
@@ -3071,8 +3251,17 @@ behavior. For example, to re-introduce <code><span class="keyword">Infinity</spa
         <section id="NOT_NUM" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;NOT_NUM&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "NOT_NUM") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;NOT_NUM&quot;</span></code></summary>
               <h4>
                 <a href="#NOT_NUM">Not a number</a>
               </h4>
@@ -3080,30 +3269,48 @@ behavior. For example, to re-introduce <code><span class="keyword">Infinity</spa
                 Thrown by any function when a value provided to a <code><a href="#Numeric" class="type">Numeric</a></code> argument is not
 numeric or finite; providing <code><span class="keyword">Infinity</span></code> or <code><span class="keyword">NaN</span></code> will throw this error.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="NOT_INT" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;NOT_INT&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "NOT_INT") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;NOT_INT&quot;</span></code></summary>
               <h4>
                 <a href="#NOT_INT">Not an integer</a>
               </h4>
               <p>
                 Thrown when an integer was expected in an argument or property but not
-received. For instance, the <code><a href="#places" class="label">places</a></code> and <code><a href="#precision" class="label">precision</a></code> fields of
-<code><a href="#RoundingRules" class="type">RoundingRules</a></code> require integers.
+received. For instance, the <code><a href="#RoundingRules.places" class="label">RoundingRules.places</a></code> and
+<code><a href="#RoundingRules.precision" class="label">RoundingRules.precision</a></code> fields require integers.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="NOT_POS" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;NOT_POS&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "NOT_POS") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;NOT_POS&quot;</span></code></summary>
               <h4>
                 <a href="#NOT_POS">Not positive</a>
               </h4>
@@ -3112,44 +3319,72 @@ received. For instance, the <code><a href="#places" class="label">places</a></co
 not received. For instance, the <code><span class="param">exponent</span></code> in <code><a href="#pow()" class="function">pow()</a></code> must be a positive
 integer.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="NOT_MODE" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;NOT_MODE&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "NOT_MODE") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;NOT_MODE&quot;</span></code></summary>
               <h4>
                 <a href="#NOT_MODE">Unknown rounding mode</a>
               </h4>
               <p>
-                Thrown when a value provided to <code><a href="#mode" class="label">mode</a></code> of <code><a href="#RoundingRules" class="type">RoundingRules</a></code> is not one of the
+                Thrown when a value provided to <code><span class="param">mode</span></code> of <code><a href="#RoundingRules" class="type">RoundingRules</a></code> is not one of the
 expected options of <code><a href="#RoundingMode" class="type">RoundingMode</a></code>.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="NOT_BOTH" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;NOT_BOTH&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "NOT_BOTH") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;NOT_BOTH&quot;</span></code></summary>
               <h4>
                 <a href="#NOT_BOTH">Cannot provide both</a>
               </h4>
               <p>
-                Thrown when both <code><a href="#places" class="label">places</a></code> and <code><a href="#precision" class="label">precision</a></code> fields of <code><a href="#RoundingRules" class="type">RoundingRules</a></code> are
-simutaneously provided. Only one of these fields may be provided per use.
+                Thrown when both <code><a href="#RoundingRules.places" class="label">RoundingRules.places</a></code> and <code><a href="#RoundingRules.precision" class="label">RoundingRules.precision</a></code>
+fields are simutaneously provided. Only one of these fields may be provided
+per use.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="INEXACT" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;INEXACT&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "INEXACT") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;INEXACT&quot;</span></code></summary>
               <h4>
                 <a href="#INEXACT">Inexact result</a>
               </h4>
@@ -3161,14 +3396,23 @@ simutaneously provided. Only one of these fields may be provided per use.
                 Also thrown by <code><a href="#toNumber()" class="function">toNumber()</a></code> when converting a <code><a href="#Numeric" class="type">Numeric</a></code> would result in
 loss of precision.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="DIV_ZERO" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;DIV_ZERO&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "DIV_ZERO") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;DIV_ZERO&quot;</span></code></summary>
               <h4>
                 <a href="#DIV_ZERO">Divide by zero</a>
               </h4>
@@ -3178,14 +3422,23 @@ defined result. This behavior is different from JavaScript which may return
 <code><span class="keyword">Infinity</span></code> or <code><span class="keyword">NaN</span></code>, however Decimalish does not support these non-finite
 special values.
               </p>
-            </div>
+            </details>
           </div>
         </section>
         <section id="SQRT_NEG" class="api member">
           <div>
             <div></div>
-            <div>
-              <pre><code><span class="string">&quot;SQRT_NEG&quot;</span></code></pre>
+            <details>
+              <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "SQRT_NEG") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+              <summary><code class="decl"><span class="string">&quot;SQRT_NEG&quot;</span></code></summary>
               <h4>
                 <a href="#SQRT_NEG">Square root of negative</a>
               </h4>
@@ -3194,7 +3447,7 @@ special values.
 there is no real number result. This behavior is different from JavaScript
 which returns <code><span class="keyword">NaN</span></code>, however Decimalish does not support this special value.
               </p>
-            </div>
+            </details>
           </div>
         </section>
       </section>
