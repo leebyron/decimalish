@@ -252,6 +252,26 @@ details {
   padding-left: var(--gutter-size);
 }
 
+summary {
+  list-style: none;
+  position: relative;
+}
+
+summary::before {
+  content: "⯈";
+  cursor: pointer;
+  opacity: 40%;
+  padding: 0 1ch;
+  position: absolute;
+  right: 100%;
+  transform: rotate(0);
+  transition: transform 0.2s;
+}
+
+details[open] summary::before {
+  transform: rotate(90deg);
+}
+
 li {
   max-width: calc(40em - var(--gutter-size));
 }
@@ -588,26 +608,6 @@ section.odd {
 
 .api.member details:not([open]) .decl {
   margin-bottom: 0;
-}
-
-.api.member summary {
-  list-style: none;
-  position: relative;
-}
-
-.api.member summary::before {
-  content: "⯈";
-  cursor: pointer;
-  opacity: 40%;
-  padding: 0 1ch;
-  position: absolute;
-  right: 100%;
-  transform: rotate(0);
-  transition: transform 0.2s;
-}
-
-.api.member details[open] summary::before {
-  transform: rotate(90deg);
 }
 
 .decl {
@@ -1926,16 +1926,16 @@ function createOnscreenObserver(host) {
           <h3>Arithmetic</h3>
           <ul>
             <li>
-              <a href="#add()"><span>Add (Plus)</span><code class="function">add()</code></a>
+              <a href="#add()"><span>Add (+)</span><code class="function">add()</code></a>
             </li>
             <li>
-              <a href="#sub()"><span>Subtract (Minus)</span><code class="function">sub()</code></a>
+              <a href="#sub()"><span>Subtract (-)</span><code class="function">sub()</code></a>
             </li>
             <li>
-              <a href="#mul()"><span>Multiply (Times)</span><code class="function">mul()</code></a>
+              <a href="#mul()"><span>Multiply (*)</span><code class="function">mul()</code></a>
             </li>
             <li>
-              <a href="#div()"><span>Divide</span><code class="function">div()</code></a>
+              <a href="#div()"><span>Divide (/)</span><code class="function">div()</code></a>
             </li>
             <li>
               <a href="#divRem()"><span>Divide and remainder</span><code class="function">divRem()</code></a>
@@ -1944,7 +1944,7 @@ function createOnscreenObserver(host) {
               <a href="#divInt()"><span>Divide to integer</span><code class="function">divInt()</code></a>
             </li>
             <li>
-              <a href="#rem()"><span>Remainder</span><code class="function">rem()</code></a>
+              <a href="#rem()"><span>Remainder (%)</span><code class="function">rem()</code></a>
             </li>
             <li>
               <a href="#mod()"><span>Modulo</span><code class="function">mod()</code></a>
@@ -2211,42 +2211,55 @@ a <code><span class="function">toString</span>()</code> method which returns <co
       <section id="add()" class="api">
         <div>
           <h3>
-            <a href="#add()">Add (Plus)</a>
+            <a href="#add()">Add (+)</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">add</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>Adds two numeric values as a decimal result.
+            <code class="decl"><span class="function">add</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
+            <p>
+              Adds two numeric values as a <code><a href="#decimal" class="type">decimal</a></code> result. Used as the replacement of the
+plus (+) operator.
+            </p>
           </div>
         </div>
       </section>
       <section id="sub()" class="api">
         <div>
           <h3>
-            <a href="#sub()">Subtract (Minus)</a>
+            <a href="#sub()">Subtract (-)</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">sub</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>Subtracts the numeric b from the numeric a, returning a decimal result.
+            <code class="decl"><span class="function">sub</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
+            <p>
+              Subtracts the numeric b from the numeric a, returning a <code><a href="#decimal" class="type">decimal</a></code> result.
+Used as the replacement of the minus (-) operator.
+            </p>
           </div>
         </div>
       </section>
       <section id="mul()" class="api">
         <div>
           <h3>
-            <a href="#mul()">Multiply (Times)</a>
+            <a href="#mul()">Multiply (*)</a>
           </h3>
           <div>
-            <code class="decl"><span class="function">mul</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>Multiplies two numeric values as a decimal result.
+            <code class="decl"><span class="function">mul</span>(<wbr><span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
+            <p>
+              Multiplies two numeric values as a <code><a href="#decimal" class="type">decimal</a></code> result. Used as the replacement
+of the times (*) operator.
+            </p>
           </div>
         </div>
       </section>
       <section id="div()" class="api">
         <div>
           <h3>
-            <a href="#div()">Divide</a>
+            <a href="#div()">Divide (/)</a>
           </h3>
           <div>
             <code class="decl"><span class="function">div</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
-              Returns the result of dividing <code><span class="param">dividend</span></code> by <code><span class="param">divisor</span></code>.
+              Returns the result of dividing <code><span class="param">dividend</span></code> by <code><span class="param">divisor</span></code> as a <code><a href="#decimal" class="type">decimal</a></code>. Used
+as the replacement of the division (/) operator.
             </p>
             <p>
               Defaults to 34 digits of precision and the <code><a href="#half even" class="string">&quot;half even&quot;</a></code> rounding
@@ -2276,11 +2289,14 @@ quotient and the remainder while satisfying the two conditions:
             </ul>
             <p>
               However there is not only one quotient and remainder which satisfies these
-conditions. A choice of the sign of the remainder (via rounding mode) and
+conditions. A choice of the sign of the remainder (via <code><a href="#RoundingMode" class="type">RoundingMode</a></code>) and
 precision of the quotient can be provided via <code><span class="param">rules</span></code>.
             </p>
             <p>
-              Result of dividing 10 by 3 with different signs and rounding modes:
+              All rounding modes may be used and these conditions will be satisfied.
+            </p>
+            <p>
+              Result of dividing 10 by 3 with different signs and some rounding modes:
             </p>
             <table>
               <thead>
@@ -2368,9 +2384,6 @@ precision of the quotient can be provided via <code><span class="param">rules</s
                 </tr>
               </tbody>
             </table>
-            <p>
-              All rounding modes may be used and these conditions will be satisfied.
-            </p>
           </div>
         </div>
       </section>
@@ -2386,7 +2399,8 @@ precision of the quotient can be provided via <code><span class="param">rules</s
 truncated (round <code><a href="#down" class="string">&quot;down&quot;</a></code>) division by default.
             </p>
             <p>
-              Note: The remainder can be found using <code><a href="#rem()" class="function">rem()</a></code>, or better yet use <code><a href="#divRem()" class="function">divRem()</a></code>.
+              The remainder can be found using <code><a href="#rem()" class="function">rem()</a></code>. If you need both the quotient and
+the remainder, use <code><a href="#divRem()" class="function">divRem()</a></code>.
             </p>
           </div>
         </div>
@@ -2394,19 +2408,20 @@ truncated (round <code><a href="#down" class="string">&quot;down&quot;</a></code
       <section id="rem()" class="api">
         <div>
           <h3>
-            <a href="#rem()">Remainder</a>
+            <a href="#rem()">Remainder (%)</a>
           </h3>
           <div>
             <code class="decl"><span class="function">rem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
               Returns the remainder of dividing <code><span class="param">dividend</span></code> by <code><span class="param">divisor</span></code> using truncated
-(round &quot;down&quot;) division by default. The result always has the same sign as
-the first argument (or 0).
+(round <code><a href="#down" class="string">&quot;down&quot;</a></code>) division by default. The result always has the same sign as
+the first argument (or 0). Used as the replacement of the remainder (%), aka
+modulo, operator.
             </p>
             <p>
-              Note: <code><a href="#rem()" class="function">rem()</a></code> and <code><a href="#div()" class="function">div()</a></code> use different default division rounding rules and
-should not be used together. The quotient can be found using <code><a href="#divInt()" class="function">divInt()</a></code>, or
-better yet use <code><a href="#divRem()" class="function">divRem()</a></code>.
+              Note that <code><a href="#rem()" class="function">rem()</a></code> and <code><a href="#div()" class="function">div()</a></code> use different default division rounding rules
+and should not be used together. The quotient can be found using <code><a href="#divInt()" class="function">divInt()</a></code>
+instead. If you need both the quotient and the remainder, use <code><a href="#divRem()" class="function">divRem()</a></code>.
             </p>
           </div>
         </div>
@@ -2451,7 +2466,7 @@ whole number.
           <div>
             <code class="decl"><span class="function">sqrt</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
-              Returns the square root of <code><span class="param">value</span></code>.
+              Returns the square root of <code><span class="param">value</span></code> as a <code><a href="#decimal" class="type">decimal</a></code>.
             </p>
             <p>
               Defaults to 34 digits of precision using the <code><a href="#half even" class="string">&quot;half even&quot;</a></code> rounding
@@ -3476,6 +3491,29 @@ which returns <code><span class="keyword">NaN</span></code>, however Decimalish 
           <a href="#faq">FAQ</a>
         </h2>
         <p>Who knows</p>
+      </div>
+      <div class="two-grid">
+        <div id="faq-why-modulo">
+          <details>
+            <script>{
+              const details = document.currentScript.parentElement
+              const update = () => {
+                const hash = decodeURIComponent(window.location.hash.slice(1))
+                if (hash === "faq-why-modulo") details.open = true
+              }
+              window.addEventListener('hashchange', update)
+              update()
+            }</script>
+            <summary>
+              <h3>
+                <a href="#faq-why-modulo">Why modulo?</a>
+              </h3>
+            </summary>
+            <p>
+              Testing
+            </p>
+          </details>
+        </div>
       </div>
     </section>
     <footer>
