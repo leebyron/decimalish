@@ -861,19 +861,33 @@ export function precision(value: Numeric): number {
 }
 
 /**
- * Move decimal point
+ * Order of magnitude
  *
- * Returns the `value` scaled up or down by `power`. In other words, this
- * moves the decimal point to the right `power` places.
+ * Returns the scale, or order of magnitude, of the provided value.
+ * Equivalent to the exponent when the value is printed with `toExponential()`.
  *
- * Note: This is equivalent to, but much faster than, `mul(value, pow(10, power))`.
- *
- * @equivalent value * Math.pow(10, power)
  * @category Magnitude
  */
-export function scaleBy(value: Numeric, power: Numeric): decimal {
+export function scale(value: Numeric): number {
+  const [, , scale] = deconstruct(value)
+  return scale
+}
+
+/**
+ * Move decimal point
+ *
+ * Returns the `value` with the decimal point to the right a relative number of
+ * `places`. Negative values of `places` moves the decimal point to the left.
+ *
+ * Note: This is equivalent to, but much faster than,
+ * `mul(value, pow(10, places))`.
+ *
+ * @equivalent value * Math.pow(10, places)
+ * @category Magnitude
+ */
+export function movePoint(value: Numeric, places: Numeric): decimal {
   const [sign, digits, scale] = deconstruct(value)
-  return construct(sign, digits, scale + expectInt("power", power))
+  return construct(sign, digits, scale + expectInt("places", places))
 }
 
 // Rounding
