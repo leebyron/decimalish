@@ -2784,9 +2784,10 @@ whole number in the direction of 0 and including the remainder.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "RoundingRules.places") details.open = true
+                if (hash && hash === "RoundingRules.places") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -2811,9 +2812,10 @@ integer places. Only one of <code><span class="param">places</span></code> or <c
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "RoundingRules.precision") details.open = true
+                if (hash && hash === "RoundingRules.precision") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -2835,9 +2837,10 @@ integer places. Only one of <code><span class="param">places</span></code> or <c
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "RoundingRules.mode") details.open = true
+                if (hash && hash === "RoundingRules.mode") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -2873,9 +2876,10 @@ to round towards.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "up") details.open = true
+                if (hash && hash === "up") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -2897,9 +2901,10 @@ absolute value.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "down") details.open = true
+                if (hash && hash === "down") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -2921,9 +2926,10 @@ absolute value.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "ceil") details.open = true
+                if (hash && hash === "ceil") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -2945,9 +2951,10 @@ signed value.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "floor") details.open = true
+                if (hash && hash === "floor") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -2969,9 +2976,10 @@ signed value.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "half up") details.open = true
+                if (hash && hash === "half up") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -2993,9 +3001,10 @@ exactly between the two.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "half down") details.open = true
+                if (hash && hash === "half down") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3017,9 +3026,10 @@ if exactly between the two.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "half ceil") details.open = true
+                if (hash && hash === "half ceil") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3041,9 +3051,10 @@ if exactly between the two.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "half floor") details.open = true
+                if (hash && hash === "half floor") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3065,9 +3076,10 @@ if exactly between the two.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "half even") details.open = true
+                if (hash && hash === "half even") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3093,9 +3105,10 @@ multiple rounded values as there is an equal chance of rounding up or down.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "euclidean") details.open = true
+                if (hash && hash === "euclidean") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3126,9 +3139,10 @@ even though most programming languages offer different definitions.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "exact") details.open = true
+                if (hash && hash === "exact") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3287,9 +3301,10 @@ behavior. For example, to re-introduce <code><span class="keyword">Infinity</spa
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "NOT_NUM") details.open = true
+                if (hash && hash === "NOT_NUM") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3311,9 +3326,10 @@ numeric or finite; providing <code><span class="keyword">Infinity</span></code> 
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "NOT_INT") details.open = true
+                if (hash && hash === "NOT_INT") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3336,9 +3352,10 @@ received. For instance, the <code><a href="#RoundingRules.places" class="label">
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "NOT_POS") details.open = true
+                if (hash && hash === "NOT_POS") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3361,9 +3378,10 @@ integer.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "NOT_MODE") details.open = true
+                if (hash && hash === "NOT_MODE") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3385,9 +3403,10 @@ expected options of <code><a href="#RoundingMode" class="type">RoundingMode</a><
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "NOT_BOTH") details.open = true
+                if (hash && hash === "NOT_BOTH") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3410,9 +3429,10 @@ per use.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "INEXACT") details.open = true
+                if (hash && hash === "INEXACT") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3438,9 +3458,10 @@ loss of precision.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "DIV_ZERO") details.open = true
+                if (hash && hash === "DIV_ZERO") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3464,9 +3485,10 @@ special values.
             <details>
               <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "SQRT_NEG") details.open = true
+                if (hash && hash === "SQRT_NEG") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
@@ -3497,9 +3519,10 @@ which returns <code><span class="keyword">NaN</span></code>, however Decimalish 
           <details>
             <script>{
               const details = document.currentScript.parentElement
+              document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash === "faq-why-modulo") details.open = true
+                if (hash && hash === "faq-why-modulo") details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
