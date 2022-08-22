@@ -708,7 +708,9 @@ const Details = ({ children, forId }: any) => (
               document.currentScript.remove()
               const update = () => {
                 const hash = decodeURIComponent(window.location.hash.slice(1))
-                if (hash && hash === ${JSON.stringify(forId)}) details.open = true
+                if (hash && hash === ${JSON.stringify(
+                  forId
+                )}) details.open = true
               }
               window.addEventListener('hashchange', update)
               update()
