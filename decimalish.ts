@@ -99,7 +99,7 @@ declare const $$decimal: unique symbol
  *
  * Converts any numeric value to a `decimal`.
  *
- * Throws a "NOT_NUM" Error if the provided value is not numeric and cannot be
+ * Throws a `"NOT_NUM"` Error if the provided value is not numeric and cannot be
  * translated to decimal.
  *
  * Note: unlike number, decimal cannot represent `Infinity`, `NaN`, or `-0`.
@@ -122,6 +122,40 @@ export function decimal(value: unknown): decimal {
  */
 export function isDecimal(value: unknown): value is decimal {
   return isNumeric(value) && decimal(value) === value
+}
+
+/**
+ * Is numeric value?
+ *
+ * Returns true if the provided value is a (finite) `Numeric` value.
+ *
+ * A value is considered numeric if it can be coerced to a numeric string.
+ *
+ * @category Types
+ */
+export function isNumeric(value: unknown): value is Numeric {
+  return !!parse(value)
+}
+
+/**
+ * Is integer?
+ *
+ * Returns true if the provided value is an integer numeric value.
+ *
+ * Similar to `Number.isInteger()`, but works with `decimal` or any other
+ * `Numeric` value. This is most useful when working with high precision values
+ * where `Number.isInteger()` could lose precision, inadvertently remove
+ * fractional information, and then come to an incorrect result.
+ *
+ * @equivalent Number.isInteger(value)
+ * @category Types
+ */
+export function isInteger(value: unknown): boolean {
+  let scale, precision
+  return (
+    isNumeric(value) &&
+    (([, , scale, precision] = deconstruct(value)), scale + 1 >= precision)
+  )
 }
 
 /**
@@ -169,40 +203,6 @@ export type NumericObject =
  * @internal
  */
 type BigJS = { valueOf(): string; readonly e: number; readonly s: number }
-
-/**
- * Is numeric value?
- *
- * Returns true if the provided value is a (finite) numeric value.
- *
- * A value is considered numeric if it can be coerced to a numeric string.
- *
- * @category Types
- */
-export function isNumeric(value: unknown): value is Numeric {
-  return !!parse(value)
-}
-
-/**
- * Is integer?
- *
- * Returns true if the provided value is an integer numeric value.
- *
- * Similar to `Number.isInteger()`, however operates on `decimal` or any other
- * `Numeric` value. This is most useful when working with high precision values
- * where converting to a JavaScript number might lose precision, inadvertently
- * removing fractional information.
- *
- * @equivalent Number.isInteger(value)
- * @category Types
- */
-export function isInteger(value: unknown): boolean {
-  let scale, precision
-  return (
-    isNumeric(value) &&
-    (([, , scale, precision] = deconstruct(value)), scale + 1 >= precision)
-  )
-}
 
 // Arithmetic
 
@@ -1114,6 +1114,8 @@ export interface RoundingRules {
 /**
  * Round method
  *
+ * An enum of possible ways to perform rounding.
+ *
  * @category Rounding
  */
 export type RoundingMode =
@@ -1320,7 +1322,7 @@ function normalizeRoundingMode(
  *
  * Converts a `Numeric` value (including `decimal`) to a JavaScript number.
  *
- * Throws an "INEXACT" Error if the converting the value would lead to a loss
+ * Throws an `"INEXACT"` Error if the converting the value would lead to a loss
  * of precision. To convert to a number while allowing precision loss, use the
  * native `Number(value)` function.
  *
@@ -1460,7 +1462,7 @@ type DecimalParts = [
 type Sign = 1 | -1 | 0
 
 /**
- * Numeric elements
+ * decimal → Elements
  *
  * Given a numeric value, deconstruct to normalized representation of a decimal:
  * a `[sign, digits, scale, precision]` tuple.
@@ -1616,8 +1618,8 @@ export type ErrorCode =
    * Not an integer
    *
    * Thrown when an integer was expected in an argument or property but not
-   * received. For instance, the `places` and `precision` fields of
-   * `RoundingRules` require integers.
+   * received. For instance, the `RoundingRules.places` and
+   * `RoundingRules.precision` fields require integers.
    */
   | "NOT_INT"
 
@@ -1641,8 +1643,9 @@ export type ErrorCode =
   /**
    * Cannot provide both
    *
-   * Thrown when both `places` and `precision` fields of `RoundingRules` are
-   * simutaneously provided. Only one of these fields may be provided per use.
+   * Thrown when both `RoundingRules.places` and `RoundingRules.precision`
+   * fields are simutaneously provided. Only one of these fields may be provided
+   * per use.
    */
   | "NOT_BOTH"
 

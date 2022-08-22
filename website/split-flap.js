@@ -185,7 +185,7 @@ function createOnscreenObserver(host) {
     for (const entry of entries) {
       // Update local state
       isOnscreen = entry.isIntersecting
-      if (isIntersecting) {
+      if (isOnscreen) {
         // Also, if this is an observation of the split flap coming into view,
         // then if we have any resolve functions in the queue, flush and call.
         while (resolvers.length > 0) {
