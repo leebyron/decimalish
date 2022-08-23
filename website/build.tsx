@@ -1,7 +1,7 @@
 /**
  * TODO:
  *
- * disable splitflap when not visible
+ * fix splitflap rendering on mobile
  * share opengraph
  *
  * Docs:
@@ -61,6 +61,52 @@ type JSDoc = {
   title?: string
   comment: string
   tags: { [name: string]: string | undefined }
+}
+
+type ReadmeSection = {
+  header: JSX.Element[]
+  body: JSX.Element[]
+}
+
+type ReadmeSections = {
+  [name: string]: ReadmeSection
+}
+
+function getReadmeSections(): ReadmeSections {
+  const file = path.resolve(ROOT_DIR, "../README.md")
+  const content = fs.readFileSync(file, "utf8")
+  const compiled: JSX.Element[] = compiler(content, {
+    wrapper: null,
+    overrides: { a: Link, code: Code },
+    createElement: jsx.h as any,
+  }) as any
+  return markdownSections(compiled, "h1")
+}
+
+function markdownSections(nodes: JSX.Element[], level: string): ReadmeSections {
+  const sections: ReadmeSections = {}
+  let sectionName: string | undefined
+  let sectionHeader: JSX.Element[] = []
+  let sectionBody: JSX.Element[] = []
+  for (let i = 0; i <= nodes.length; i++) {
+    if ((i === nodes.length || nodes[i].type === level) && sectionName) {
+      sections[sectionName] = {
+        header: sectionHeader,
+        body: sectionBody,
+      }
+      sectionBody = []
+    }
+    if (i < nodes.length) {
+      const node = nodes[i]
+      if (node.type === "h1") {
+        sectionName = node.props.id
+        sectionHeader = node.props.children
+      } else {
+        sectionBody.push(node)
+      }
+    }
+  }
+  return sections
 }
 
 function getTypedefByCategory(): Typedefs {
@@ -172,6 +218,14 @@ function getJSDoc(node: ts.Node): JSDoc | undefined {
   }
   jsDocCache.set(node, jsDoc)
   return jsDoc
+}
+
+const ReadmeSectionsContext = jsx.createContext<ReadmeSections | null>(null)
+
+function useReadmeSection(name: string): ReadmeSection {
+  const section = jsx.useContext(ReadmeSectionsContext)![name]
+  if (!section) throw new Error(`Missing readme section: ${name}`)
+  return section
 }
 
 const TypedefsContext = jsx.createContext<Typedefs | null>(null)
@@ -286,61 +340,9 @@ const IntroSection = () => (
   <section id="intro">
     <div>
       <h3>
-        <a href="#intro">Decimalish</a>
+        <a href="#intro">{useReadmeSection("decimalish").header}</a>
       </h3>
-      <div class="two-col">
-        <p>
-          &nbsp;is an arbitrary-precision decimal{" "}
-          <em>(aka &ldquo;BigNumber&rdquo;)</em> library for JavaScript and
-          TypeScript. How is this different from regular numbers and why would
-          you need such a thing? Consider this surprising fact about regular
-          numbers:
-        </p>
-        <pre>
-          <Code>
-            {"0.1 + 0.2 != 0.3\n" + "0.1 + 0.2 == 0.30000000000000004"}
-          </Code>
-        </pre>
-        <p>
-          This isn&apos;t yet another JavaScript quirk, but an unfortunate
-          pitfall of nearly all numbers represented by computers.
-        </p>
-        <p>
-          While we read numbers in decimal, computers read binary and must
-          convert. Information can be lost when converting a fixed number of
-          bits and yield confusing results. In finance or engineering these
-          errors are simply unacceptable.
-        </p>
-        <p>
-          Decimalish addresses exactly this concern. It removes the need to
-          convert by directly representing numbers in decimal.
-        </p>
-        <p>
-          It's also unconstrained by size so it can represent exact numbers with
-          arbitrarily high precision (significant digits or decimal places).
-        </p>
-        <p>
-          <strong>So what’s the catch?</strong> Well speed for one, computers
-          are specifically designed to make working with floating point numbers
-          fast. While nowhere close to native speed, Decimalish is unlikely to
-          be your program’s bottleneck.
-        </p>
-        <p>
-          Then there's how you use them. While regular numbers can use the
-          familiar operators (<Code>+</Code>, <Code>*</Code>,{" "}
-          <Code>{"=="}</Code>
-          ), Decimalish cannot and offers equivalent functions in their place (
-          <Code>add()</Code>, <Code>mul()</Code>, <Code>eq()</Code>).
-        </p>
-        <p>
-          Finally there's how they’re represented. Like regular numbers,
-          Decimalish offers an <em>immutable primitive</em>. However …it’s a
-          string… hence the <strong>&ndash;ish</strong>. Decimalish decimals are
-          a specific format of <a href="#NumericString">numeric string</a>.
-          While this has its advantages, ideally decimal could be its own
-          primitive; but that’s just not JavaScript.
-        </p>
-      </div>
+      <div class="two-col">{useReadmeSection("decimalish").body}</div>
     </div>
   </section>
 )
@@ -349,25 +351,9 @@ const GetStarted = () => (
   <section id="get-started" class="odd">
     <div>
       <h2>
-        <a href="#get-started">Get started</a>
+        <a href="#get-started">{useReadmeSection("get-started").header}</a>
       </h2>
-      <Markdown>
-        {`
-Decimalish can be used anywhere you use JavaScript. It supports decades-old browsers, modern module-aware Node.js, and web compilers like [Webpack](https://webpack.js.org/). It comes with TypeScript definitions in the box.
-
-For most, install decimalish via npm:
-
-\`\`\`shell
-npm install decimalish
-\`\`\`
-
-Otherwise, find a UMD module on your CDN of choice:
-
-\`\`\`html
-<script src="https://unpkg.com/decimalish"></script>
-\`\`\`
-        `}
-      </Markdown>
+      {useReadmeSection("get-started").body}
     </div>
   </section>
 )
@@ -716,17 +702,15 @@ const Details = ({ children, forId }: any) => (
     {children}
     <script
       innerHTML={`{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === ${JSON.stringify(
-                  forId
-                )}) details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }`}
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === ${JSON.stringify(forId)}) details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }`}
     />
   </details>
 )
@@ -863,15 +847,18 @@ const FAQSection = () => (
 // Run
 ;(async () => {
   const highlighter = await shiki.getHighlighter({
-    langs: ["typescript", "shell", "html"],
+    langs: ["typescript", "js", "shell", "html"],
     theme: "dark-plus",
   })
+  const readmeSections = getReadmeSections()
   const typeDefs = getTypedefByCategory()
   const page = (
     <HighlighterContext value={highlighter}>
-      <TypedefsContext value={typeDefs}>
-        <Index />
-      </TypedefsContext>
+      <ReadmeSectionsContext value={readmeSections}>
+        <TypedefsContext value={typeDefs}>
+          <Index />
+        </TypedefsContext>
+      </ReadmeSectionsContext>
     </HighlighterContext>
   )
   fs.writeFileSync(ROOT_DIR + "dist/index.html", jsx.render(page), "utf8")

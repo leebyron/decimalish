@@ -51,7 +51,7 @@
     "website:build:clean": "rm -vrf website/dist && mkdir -v website/dist",
     "website:build:static": "cp -v website/static/* website/dist",
     "website:build:index": "ts-node website/build.tsx",
-    "website:dev": "npm run website:build && chokidar \"decimalish.ts\" \"website/*\" -c \"npm run website:build:index\""
+    "website:dev": "npm run website:build && chokidar \"decimalish.ts\" \"README.md\" \"website/*\" -c \"npm run website:build:index\""
   },
   "devDependencies": {
     "@babel/preset-env": "^7.18.10",

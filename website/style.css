@@ -493,8 +493,9 @@ header nav a:last-child {
 }
 
 #intro p:first-child:before {
-  content: "Decimalish";
+  content: "Decimalish ";
   visibility: hidden;
+  font-weight: bold;
 }
 
 .two-grid {
