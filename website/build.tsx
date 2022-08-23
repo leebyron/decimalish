@@ -85,25 +85,24 @@ function getReadmeSections(): ReadmeSections {
 
 const PREAMBLE = Symbol("PREAMBLE")
 
-function markdownSections(nodes: JSX.Element[], level: string): ReadmeSections {
+function markdownSections(nodes: JSX.Element[], type: string): ReadmeSections {
   const sections: ReadmeSections = {}
   let sectionName: string | symbol = PREAMBLE
   let sectionHeader: JSX.Element[] = []
   let sectionBody: JSX.Element[] = []
   for (let i = 0; i <= nodes.length; i++) {
-    if (i === nodes.length || nodes[i].type === level) {
+    if (i === nodes.length || nodes[i].type === type) {
       sections[sectionName] = {
         header: sectionHeader,
         body: sectionBody,
       }
-      sectionHeader = []
-      sectionBody = []
     }
     if (i < nodes.length) {
       const node = nodes[i]
-      if (node.type === level) {
+      if (node.type === type) {
         sectionName = node.props.id
         sectionHeader = node.props.children
+        sectionBody = []
       } else {
         sectionBody.push(node)
       }
@@ -705,28 +704,34 @@ const Source = ({ node }: { node: ts.Node }) =>
     })()
   )
 
-const FAQSection = () => (
-  <section id="faq">
-    <div>
-      <h2>
-        <a href="#faq">FAQ</a>
-      </h2>
-      <p>Who knows</p>
-    </div>
-    <div class="two-grid">
-      <div id="faq-why-modulo">
-        <Details forId="faq-why-modulo">
-          <summary>
-            <h3>
-              <a href="#faq-why-modulo">Why modulo?</a>
-            </h3>
-          </summary>
-          <P>Testing</P>
-        </Details>
+const FAQSection = () => {
+  const faq = useReadmeSection("faq")
+  const faqSections = markdownSections(faq.body, "h3")
+  return (
+    <section id="faq">
+      <div>
+        <h2>
+          <a href="#faq">{faq.header}</a>
+        </h2>
+        {faqSections[PREAMBLE].body}
       </div>
-    </div>
-  </section>
-)
+      <div class="two-grid">
+        {Object.entries(faqSections).map(([id, faqSection]) => (
+          <div id={id}>
+            <Details forId={id}>
+              <summary>
+                <h3>
+                  <a href={`#${id}`}>{faqSection.header}</a>
+                </h3>
+              </summary>
+              {faqSection.body}
+            </Details>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
 
 // Run
 ;(async () => {

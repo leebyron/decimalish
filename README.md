@@ -148,3 +148,23 @@ Decimalish exposes the core functions it uses to convert between
 `decimal` string values and an internal normalized form, making it
 straightforward to introduce new operations and functionality on an
 equal footing to Decimalish’s own API.
+
+# FAQ
+
+TK
+
+### Why doesn't Decimalish support -0?
+
+Negative zero (`-0`) is a corner case of floating point numbers and frequent
+source of confusion...
+
+### What's the difference between remainder and modulo?
+
+Decimalish provides the `rem()` function as a `decimal` friendly version of `%`
+which uses the same behavior as JavaScript (round down truncation).
+While JavaScript officially calls this the "remainder" operator, it's often
+referred to as the modulus or modulo operator. However there are many potential
+ways to define modulo and standard math definitions and different programming
+languages differ in how they choose this definition.
+
+https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition
