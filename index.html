@@ -1821,10 +1821,18 @@ primitive; but that’s just not JavaScript.
           <a href="#why">Why use Decimalish?</a>
         </h2>
         <p>
-          &quot;BigDecimal&quot; arbitrary-precision decimal arithmetic libraries are nothing new. Some programming languages like Java and Python come with one built-in. There are decades-old standards to consult. In JavaScript there are many existing decimal libraries, such as the very popular <a target="_blank" href="https://mikemcl.github.io/big.js">Big.js</a>, as well as a <a target="_blank" href="https://github.com/tc39/proposal-decimal">proposal</a> to add a native BigDecimal type. So why choose Decimalish?
+          &quot;BigDecimal&quot; arbitrary-precision decimal arithmetic libraries are
+nothing new. Some programming languages like Java and Python come with
+one built-in. There are decades-old standards to consult. In JavaScript
+there are many existing decimal libraries, such as the very popular
+<a target="_blank" href="https://mikemcl.github.io/big.js">Big.js</a>, as well as a
+<a target="_blank" href="https://github.com/tc39/proposal-decimal">proposal</a> to add a native
+BigDecimal type. So why choose Decimalish?
         </p>
         <p>
-          Simply put, Decimalish is easy to use, runs everywhere without dependencies or polyfills, reduces common mistakes, and feels JavaScript native, all while keeping a light footprint.
+          Simply put, Decimalish is easy to use, runs everywhere without
+dependencies or polyfills, reduces common mistakes, and feels JavaScript
+native, all while keeping a light footprint.
         </p>
       </div>
       <div class="two-grid">
@@ -1833,29 +1841,42 @@ primitive; but that’s just not JavaScript.
             <a href="#lightweight">Lightweight</a>
           </h3>
           <p>
-            Decimalish is smaller than any library with comparable features. The entire library is 5KB minified and 2.3KB gzipped. Even better, Decimalish supports <em>tree shaking</em> so you only bundle what you use, as little as 0.45KB.
+            Decimalish is smaller than any library with comparable features. The
+entire library is 5KB minified and 2.3KB gzipped. Even better,
+Decimalish supports <em>tree shaking</em> so you only bundle what you
+use, as little as 0.45KB.
           </p>
           <p>
             See how this <a href="#comparison">compares</a> to other libraries.
           </p>
         </div>
-        <div id="functional">
+        <div id="functional-api">
           <h3>
-            <a href="#functional">Functional API</a>
+            <a href="#functional-api">Functional API</a>
           </h3>
           <p>
-            All methods in Decimalish's API are provided as top level functions, not prototype methods. This maintains similarity to the built-in <code><span class="param">Math</span></code> module, enables tree-shaking, and works well with functional utility libraries like <a target="_blank" href="https://ramdajs.com/">ramda</a> or <a target="_blank" href="https://lodash.com/">lodash</a>.
+            All methods in Decimalish's API are provided as top level functions,
+not prototype methods. This maintains similarity to the built-in
+<code><span class="param">Math</span></code> module, enables tree-shaking, and works well with functional
+utility libraries like <a target="_blank" href="https://ramdajs.com/">ramda</a> or
+<a target="_blank" href="https://lodash.com/">lodash</a>.
           </p>
         </div>
-        <div id="primitive-type">
+        <div id="native-primitive-type">
           <h3>
-            <a href="#primitive-type">Native primitive type</a>
+            <a href="#native-primitive-type">Native primitive type</a>
           </h3>
           <p>
-            Most BigDecimal libraries introduce a Decimal type as an Object, which is potentially mutable, not comparable, and often require writing bulky code with repeated calls to constructors. Decimalish’s <code><a href="#decimal" class="type">decimal</a></code> type, much like the built in <code><span class="param">number</span></code>, is an <em>immutable primitive</em> …because it is a string.
+            Most BigDecimal libraries introduce a Decimal type as an Object, which
+is potentially mutable, not comparable, and often require writing
+bulky code with repeated calls to constructors. Decimalish’s <code><a href="#decimal" class="type">decimal</a></code>
+type, much like the built in <code><span class="param">number</span></code>, is an <em>immutable primitive</em>
+…because it is a string.
           </p>
           <p>
-            A <code><a href="#decimal" class="type">decimal</a></code> can be used as an object key, compared for equality, safely cached, written to or read from a JSON file, printed to a console or debugger, or anything else you can do with a string.
+            A <code><a href="#decimal" class="type">decimal</a></code> can be used as an object key, compared for equality,
+safely cached, written to or read from a JSON file, printed to a
+console or debugger, or anything else you can do with a string.
           </p>
         </div>
         <div id="no-special-values">
@@ -1863,10 +1884,14 @@ primitive; but that’s just not JavaScript.
             <a href="#no-special-values">No special values</a>
           </h3>
           <p>
-            Unlike other BigDecimal libraries, Decimalish does not support the &quot;special values&quot; <code><span class="keyword">NaN</span></code>, <code><span class="keyword">Infinity</span></code>, or <code>-<span class="number">0</span></code>. Forgetting to handle these special values can be a common source of bugs, so that’s one less thing to worry about.
+            Unlike other BigDecimal libraries, Decimalish does not support the
+&quot;special values&quot; <code><span class="keyword">NaN</span></code>, <code><span class="keyword">Infinity</span></code>, or <code>-<span class="number">0</span></code>. Forgetting to handle
+these special values can be a common source of bugs, so that’s one
+less thing to worry about.
           </p>
           <p>
-            Operations that cannot return a finite <code><a href="#decimal" class="type">decimal</a></code> value will throw an error (such as <code><a href="#DIV-ZERO" class="string">&quot;DIV_ZERO&quot;</a></code>).
+            Operations that cannot return a finite <code><a href="#decimal" class="type">decimal</a></code> value will throw an
+error (such as <code><a href="#DIV-ZERO" class="string">&quot;DIV_ZERO&quot;</a></code>).
           </p>
         </div>
         <div id="no-implicit-rounding">
@@ -1874,10 +1899,15 @@ primitive; but that’s just not JavaScript.
             <a href="#no-implicit-rounding">No implicit rounding</a>
           </h3>
           <p>
-            Many BigDecimal libraries automatically round the result of every operation if too bigger, too smaller, or too high precision based on some globally defined config. This can be confusing, cumbersome to configure, and another common source of bugs.
+            Many BigDecimal libraries automatically round the result of every
+operation if too bigger, too smaller, or too high precision based on
+some globally defined config. This can be confusing, cumbersome to
+configure, and another common source of bugs.
           </p>
           <p>
-            Decimalish almost always returns exact results, only rounding when it must (such as non-terminating division) and always allowing locally configured behavior without any global state.
+            Decimalish almost always returns exact results, only rounding when it
+must (such as non-terminating division) and always allowing locally
+configured behavior without any global state.
           </p>
         </div>
         <div id="no-trailing-zeros">
@@ -1885,10 +1915,17 @@ primitive; but that’s just not JavaScript.
             <a href="#no-trailing-zeros">No trailing zeros</a>
           </h3>
           <p>
-            Some BigDecimal libraries attempt to visually preserve precision after an operation by adding trailing zeros. While this can be useful for quick number formatting, this conflates mathematical value with presentation, require multiple kinds of equality (is <code><span class="number">1.0</span></code> equal to <code><span class="number">1</span></code>?), and sometimes operations such as multiple result in surprising results and thus, you guessed it, another source of bugs.
+            Some BigDecimal libraries attempt to visually preserve precision after
+an operation by adding trailing zeros. While this can be useful for
+quick number formatting, this conflates mathematical value with
+presentation, require multiple kinds of equality (is <code><span class="number">1.0</span></code> equal to
+<code><span class="number">1</span></code>?), and sometimes operations such as multiple result in surprising
+results and thus, you guessed it, another source of bugs.
           </p>
           <p>
-            Decimalish's <code><a href="#decimal()" class="function">decimal()</a></code> constructor, and all other math functions always return canonical normalized decimal values without any leading or trailing zeros.
+            Decimalish's <code><a href="#decimal()" class="function">decimal()</a></code> constructor, and all other math functions
+always return canonical normalized decimal values without any leading
+or trailing zeros.
           </p>
         </div>
         <div id="places-or-precision">
@@ -1896,10 +1933,14 @@ primitive; but that’s just not JavaScript.
             <a href="#places-or-precision">Places or precision</a>
           </h3>
           <p>
-            When determining how many digits should be in a rounded value, most BigDecimal libraries only interpret this as either decimal places or precision (significant digits). It's not always clear which based on reading code alone.
+            When determining how many digits should be in a rounded value, most
+BigDecimal libraries only interpret this as either decimal places or
+precision (significant digits). It's not always clear which based on
+reading code alone.
           </p>
           <p>
-            Decimalish offers both for all methods that might round with an easy to read API, alongside a rich set of rounding and division modes.
+            Decimalish offers both for all methods that might round with an easy
+to read API, alongside a rich set of rounding and division modes.
           </p>
         </div>
         <div id="extensible">
@@ -1907,7 +1948,10 @@ primitive; but that’s just not JavaScript.
             <a href="#extensible">Extensible</a>
           </h3>
           <p>
-            Decimalish exposes the core functions it uses to convert between <code><a href="#decimal" class="type">decimal</a></code> string values and an internal normalized form, making it straightforward to introduce new operations and functionality on an equal footing to Decimalish’s own API.
+            Decimalish exposes the core functions it uses to convert between
+<code><a href="#decimal" class="type">decimal</a></code> string values and an internal normalized form, making it
+straightforward to introduce new operations and functionality on an
+equal footing to Decimalish’s own API.
           </p>
         </div>
       </div>
