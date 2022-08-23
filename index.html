@@ -505,8 +505,9 @@ header nav a:last-child {
 }
 
 #intro p:first-child:before {
-  content: "Decimalish";
+  content: "Decimalish ";
   visibility: hidden;
+  font-weight: bold;
 }
 
 .two-grid {
@@ -1750,30 +1751,48 @@ function createOnscreenObserver(host) {
         </h3>
         <div class="two-col">
           <p>
-             is an arbitrary-precision decimal <em>(aka “BigNumber”)</em> library for JavaScript and TypeScript. How is this different from regular numbers and why would you need such a thing? Consider this surprising fact about regular numbers:
+            is an arbitrary-precision decimal <em>(aka “BigNumber”)</em> library for JavaScript and
+TypeScript. How is this different from regular numbers and why would
+you need such a thing? Consider this surprising fact about regular
+numbers:
           </p>
           <pre><code><span class="number">0.1</span> + <span class="number">0.2</span> != <span class="number">0.3</span>
 <span class="number">0.1</span> + <span class="number">0.2</span> == <span class="number">0.30000000000000004</span></code></pre>
           <p>
-            This isn't yet another JavaScript quirk, but an unfortunate pitfall of nearly all numbers represented by computers.
+            This isn't yet another JavaScript quirk, but an unfortunate
+pitfall of nearly all numbers represented by computers.
           </p>
           <p>
-            While we read numbers in decimal, computers read binary and must convert. Information can be lost when converting a fixed number of bits and yield confusing results. In finance or engineering these errors are simply unacceptable.
+            While we read numbers in decimal, computers read binary and must
+convert. Information can be lost when converting a fixed number of
+bits and yield confusing results. In finance or engineering these
+errors are simply unacceptable.
           </p>
           <p>
-            Decimalish addresses exactly this concern. It removes the need to convert by directly representing numbers in decimal.
+            Decimalish addresses exactly this concern. It removes the need to
+convert by directly representing numbers in decimal.
           </p>
           <p>
-            It's also unconstrained by size so it can represent exact numbers with arbitrarily high precision (significant digits or decimal places).
+            It's also unconstrained by size so it can represent exact numbers with
+arbitrarily high precision (significant digits or decimal places).
           </p>
           <p>
-            <strong>So what’s the catch?</strong> Well speed for one, computers are specifically designed to make working with floating point numbers fast. While nowhere close to native speed, Decimalish is unlikely to be your program’s bottleneck.
+            <strong>So what’s the catch?</strong> Well speed for one, computers
+are specifically designed to make working with floating point numbers
+fast. While nowhere close to native speed, Decimalish is unlikely to
+be your program’s bottleneck.
           </p>
           <p>
-            Then there's how you use them. While regular numbers can use the familiar operators (<code>+</code>, <code>*</code>, <code>==</code>), Decimalish cannot and offers equivalent functions in their place (<code><a href="#add()" class="function">add()</a></code>, <code><a href="#mul()" class="function">mul()</a></code>, <code><a href="#eq()" class="function">eq()</a></code>).
+            Then there's how you use them. While regular numbers can use the
+familiar operators (<code>+</code>, <code>*</code>, <code>==</code>), Decimalish cannot and offers equivalent functions in their place (<code><a href="#add()" class="function">add()</a></code>, <code><a href="#mul()" class="function">mul()</a></code>, <code><a href="#eq()" class="function">eq()</a></code>).
           </p>
           <p>
-            Finally there's how they’re represented. Like regular numbers, Decimalish offers an <em>immutable primitive</em>. However …it’s a string… hence the <strong>–ish</strong>. Decimalish decimals are a specific format of <a href="#NumericString">numeric string</a>. While this has its advantages, ideally decimal could be its own primitive; but that’s just not JavaScript.
+            Finally there's how they’re represented. Like regular numbers,
+Decimalish offers an <em>immutable primitive</em>. However …it’s a
+string… hence the <strong>–ish</strong>. Decimalish decimals are
+a specific format of <a href="#NumericString">numeric string</a>.
+While this has its advantages, ideally decimal could be its own
+primitive; but that’s just not JavaScript.
           </p>
         </div>
       </div>
@@ -1784,7 +1803,7 @@ function createOnscreenObserver(host) {
           <a href="#get-started">Get started</a>
         </h2>
         <p>
-          Decimalish can be used anywhere you use JavaScript. It supports decades-old browsers, modern module-aware Node.js, and web compilers like <a target="_blank" href="https://webpack.js.org/">Webpack</a>. It comes with TypeScript definitions in the box.
+          Decimalish can be used anywhere you use JavaScript. It supports decades-old browsers, modern module-aware Node.js, and web compilers like Webpack. It comes with TypeScript definitions in the box.
         </p>
         <p>
           For most, install decimalish via npm:
@@ -2799,15 +2818,15 @@ integer places. Only one of <code><span class="param">places</span></code> or <c
                 For most functions, the default is <code><span class="number">0</span></code>, rounding to an integer whole number.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "RoundingRules.places") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "RoundingRules.places") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -2824,15 +2843,15 @@ integer places. Only one of <code><span class="param">places</span></code> or <c
 <code><span class="param">places</span></code> or <code><span class="param">precision</span></code> can be provided.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "RoundingRules.precision") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "RoundingRules.precision") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -2853,15 +2872,15 @@ to round towards.
                 The default rounding mode, unless stated otherwise, is <code><a href="#half-even" class="string">&quot;half even&quot;</a></code>.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "RoundingRules.mode") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "RoundingRules.mode") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -2888,15 +2907,15 @@ to round towards.
 absolute value.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "up") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "up") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -2913,15 +2932,15 @@ absolute value.
 absolute value.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "down") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "down") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -2938,15 +2957,15 @@ absolute value.
 signed value.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "ceil") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "ceil") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -2963,15 +2982,15 @@ signed value.
 signed value.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "floor") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "floor") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -2988,15 +3007,15 @@ signed value.
 exactly between the two.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "half-up") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "half-up") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3013,15 +3032,15 @@ exactly between the two.
 if exactly between the two.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "half-down") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "half-down") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3038,15 +3057,15 @@ if exactly between the two.
 if exactly between the two.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "half-ceil") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "half-ceil") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3063,15 +3082,15 @@ if exactly between the two.
 if exactly between the two.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "half-floor") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "half-floor") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3092,15 +3111,15 @@ the value with an even least significant digit if exactly between the two.
 multiple rounded values as there is an equal chance of rounding up or down.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "half-even") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "half-even") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3126,15 +3145,15 @@ even though most programming languages offer different definitions.
                 When used with rounding, this is an alias for <code><a href="#floor" class="string">&quot;floor&quot;</a></code>.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "euclidean") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "euclidean") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3156,15 +3175,15 @@ an expected precision or decimal places, or that division does not result
 in a non-terminating repeating decimal.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "exact") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "exact") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3313,15 +3332,15 @@ behavior. For example, to re-introduce <code><span class="keyword">Infinity</spa
 numeric or finite; providing <code><span class="keyword">Infinity</span></code> or <code><span class="keyword">NaN</span></code> will throw this error.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "NOT-NUM") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "NOT-NUM") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3339,15 +3358,15 @@ received. For instance, the <code><a href="#RoundingRules.places" class="label">
 <code><a href="#RoundingRules.precision" class="label">RoundingRules.precision</a></code> fields require integers.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "NOT-INT") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "NOT-INT") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3365,15 +3384,15 @@ not received. For instance, the <code><span class="param">exponent</span></code>
 integer.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "NOT-POS") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "NOT-POS") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3390,15 +3409,15 @@ integer.
 expected options of <code><a href="#RoundingMode" class="type">RoundingMode</a></code>.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "NOT-MODE") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "NOT-MODE") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3416,15 +3435,15 @@ fields are simutaneously provided. Only one of these fields may be provided
 per use.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "NOT-BOTH") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "NOT-BOTH") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3445,15 +3464,15 @@ per use.
 loss of precision.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "INEXACT") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "INEXACT") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3472,15 +3491,15 @@ defined result. This behavior is different from JavaScript which may return
 special values.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "DIV-ZERO") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "DIV-ZERO") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3498,15 +3517,15 @@ there is no real number result. This behavior is different from JavaScript
 which returns <code><span class="keyword">NaN</span></code>, however Decimalish does not support this special value.
               </p>
               <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "SQRT-NEG") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "SQRT-NEG") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
             </details>
           </div>
         </section>
@@ -3531,15 +3550,15 @@ which returns <code><span class="keyword">NaN</span></code>, however Decimalish 
               Testing
             </p>
             <script>{
-              const details = document.currentScript.parentElement
-              document.currentScript.remove()
-              const update = () => {
-                const hash = window.location.hash.slice(1)
-                if (hash && hash === "faq-why-modulo") details.open = true
-              }
-              window.addEventListener('hashchange', update)
-              update()
-            }</script>
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "faq-why-modulo") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
           </details>
         </div>
       </div>
