@@ -3580,24 +3580,57 @@ which returns <code><span class="keyword">NaN</span></code>, however Decimalish 
         <h2>
           <a href="#faq">FAQ</a>
         </h2>
-        <p>Who knows</p>
+        <p>
+          TK
+        </p>
       </div>
       <div class="two-grid">
-        <div id="faq-why-modulo">
+        <div id="why-doesnt-decimalish-support--0">
           <details>
             <summary>
               <h3>
-                <a href="#faq-why-modulo">Why modulo?</a>
+                <a href="#why-doesnt-decimalish-support--0">Why doesn't Decimalish support -0?</a>
               </h3>
             </summary>
             <p>
-              Testing
+              Negative zero (<code>-<span class="number">0</span></code>) is a corner case of floating point numbers and frequent
+source of confusion...
             </p>
             <script>{
         const script = document.currentScript, details = script.parentElement
         const update = () => {
           const hash = window.location.hash.slice(1)
-          if (hash && hash === "faq-why-modulo") details.open = true
+          if (hash && hash === "why-doesnt-decimalish-support--0") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
+          </details>
+        </div>
+        <div id="whats-the-difference-between-remainder-and-modulo">
+          <details>
+            <summary>
+              <h3>
+                <a href="#whats-the-difference-between-remainder-and-modulo">What's the difference between remainder and modulo?</a>
+              </h3>
+            </summary>
+            <p>
+              Decimalish provides the <code><a href="#rem()" class="function">rem()</a></code> function as a <code><a href="#decimal" class="type">decimal</a></code> friendly version of <code>%</code>
+which uses the same behavior as JavaScript (round down truncation).
+While JavaScript officially calls this the &quot;remainder&quot; operator, it's often
+referred to as the modulus or modulo operator. However there are many potential
+ways to define modulo and standard math definitions and different programming
+languages differ in how they choose this definition.
+            </p>
+            <p>
+              <a target="_blank" href="https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition">https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition</a>
+            </p>
+            <script>{
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "whats-the-difference-between-remainder-and-modulo") details.open = true
         }
         window.addEventListener('hashchange', update)
         update()
