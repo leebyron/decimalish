@@ -69,7 +69,7 @@ type ReadmeSection = {
 }
 
 type ReadmeSections = {
-  [name: string]: ReadmeSection
+  [name: string | symbol]: ReadmeSection
 }
 
 function getReadmeSections(): ReadmeSections {
@@ -83,22 +83,25 @@ function getReadmeSections(): ReadmeSections {
   return markdownSections(compiled, "h1")
 }
 
+const PREAMBLE = Symbol("PREAMBLE")
+
 function markdownSections(nodes: JSX.Element[], level: string): ReadmeSections {
   const sections: ReadmeSections = {}
-  let sectionName: string | undefined
+  let sectionName: string | symbol = PREAMBLE
   let sectionHeader: JSX.Element[] = []
   let sectionBody: JSX.Element[] = []
   for (let i = 0; i <= nodes.length; i++) {
-    if ((i === nodes.length || nodes[i].type === level) && sectionName) {
+    if (i === nodes.length || nodes[i].type === level) {
       sections[sectionName] = {
         header: sectionHeader,
         body: sectionBody,
       }
+      sectionHeader = []
       sectionBody = []
     }
     if (i < nodes.length) {
       const node = nodes[i]
-      if (node.type === "h1") {
+      if (node.type === level) {
         sectionName = node.props.id
         sectionHeader = node.props.children
       } else {
@@ -358,149 +361,30 @@ const GetStarted = () => (
   </section>
 )
 
-const WhySection = () => (
-  <section id="why">
-    <div>
-      <h2>
-        <a href="#why">Why use Decimalish?</a>
-      </h2>
-      <P>
-        "BigDecimal" arbitrary-precision decimal arithmetic libraries are
-        nothing new. Some programming languages like Java and Python come with
-        one built-in. There are decades-old standards to consult. In JavaScript
-        there are many existing decimal libraries, such as the very popular
-        [Big.js](https://mikemcl.github.io/big.js), as well as a
-        [proposal](https://github.com/tc39/proposal-decimal) to add a native
-        BigDecimal type. So why choose Decimalish?
-      </P>
-      <p>
-        Simply put, Decimalish is easy to use, runs everywhere without
-        dependencies or polyfills, reduces common mistakes, and feels JavaScript
-        native, all while keeping a light footprint.
-      </p>
-    </div>
-    <div class="two-grid">
-      <div id="lightweight">
-        <h3>
-          <a href="#lightweight">Lightweight</a>
-        </h3>
-        <p>
-          Decimalish is smaller than any library with comparable features. The
-          entire library is 5KB minified and 2.3KB gzipped. Even better,
-          Decimalish supports <em>tree shaking</em> so you only bundle what you
-          use, as little as 0.45KB.
-        </p>
-        <p>
-          See how this <a href="#comparison">compares</a> to other libraries.
-        </p>
+const WhySection = () => {
+  const why = useReadmeSection("why-use-decimalish")
+  const whySections = markdownSections(why.body, "h3")
+  return (
+    <section id="why">
+      <div>
+        <h2>
+          <a href="#why">{why.header}</a>
+        </h2>
+        {whySections[PREAMBLE].body}
       </div>
-      <div id="functional">
-        <h3>
-          <a href="#functional">Functional API</a>
-        </h3>
-        <P>
-          All methods in Decimalish's API are provided as top level functions,
-          not prototype methods. This maintains similarity to the built-in
-          `Math` module, enables tree-shaking, and works well with functional
-          utility libraries like [ramda](https://ramdajs.com/) or
-          [lodash](https://lodash.com/).
-        </P>
+      <div class="two-grid">
+        {Object.entries(whySections).map(([id, whySection]) => (
+          <div id={id}>
+            <h3>
+              <a href={`#${id}`}>{whySection.header}</a>
+            </h3>
+            {whySection.body}
+          </div>
+        ))}
       </div>
-      <div id="primitive-type">
-        <h3>
-          <a href="#primitive-type">Native primitive type</a>
-        </h3>
-        <P>
-          Most BigDecimal libraries introduce a Decimal type as an Object, which
-          is potentially mutable, not comparable, and often require writing
-          bulky code with repeated calls to constructors. Decimalish’s `decimal`
-          type, much like the built in `number`, is an *immutable primitive*
-          …because it is a string.
-        </P>
-        <P>
-          A `decimal` can be used as an object key, compared for equality,
-          safely cached, written to or read from a JSON file, printed to a
-          console or debugger, or anything else you can do with a string.
-        </P>
-      </div>
-      <div id="no-special-values">
-        <h3>
-          <a href="#no-special-values">No special values</a>
-        </h3>
-        <P>
-          Unlike other BigDecimal libraries, Decimalish does not support the
-          "special values" `NaN`, `Infinity`, or `-0`. Forgetting to handle
-          these special values can be a common source of bugs, so that’s one
-          less thing to worry about.
-        </P>
-        <P>
-          Operations that cannot return a finite `decimal` value will throw an
-          error (such as `"DIV_ZERO"`).
-        </P>
-      </div>
-      <div id="no-implicit-rounding">
-        <h3>
-          <a href="#no-implicit-rounding">No implicit rounding</a>
-        </h3>
-        <p>
-          Many BigDecimal libraries automatically round the result of every
-          operation if too bigger, too smaller, or too high precision based on
-          some globally defined config. This can be confusing, cumbersome to
-          configure, and another common source of bugs.
-        </p>
-        <p>
-          Decimalish almost always returns exact results, only rounding when it
-          must (such as non-terminating division) and always allowing locally
-          configured behavior without any global state.
-        </p>
-      </div>
-      <div id="no-trailing-zeros">
-        <h3>
-          <a href="#no-trailing-zeros">No trailing zeros</a>
-        </h3>
-        <P>
-          Some BigDecimal libraries attempt to visually preserve precision after
-          an operation by adding trailing zeros. While this can be useful for
-          quick number formatting, this conflates mathematical value with
-          presentation, require multiple kinds of equality (is `1.0` equal to
-          `1`?), and sometimes operations such as multiple result in surprising
-          results and thus, you guessed it, another source of bugs.
-        </P>
-        <P>
-          Decimalish's `decimal()` constructor, and all other math functions
-          always return canonical normalized decimal values without any leading
-          or trailing zeros.
-        </P>
-      </div>
-      <div id="places-or-precision">
-        <h3>
-          <a href="#places-or-precision">Places or precision</a>
-        </h3>
-        <p>
-          When determining how many digits should be in a rounded value, most
-          BigDecimal libraries only interpret this as either decimal places or
-          precision (significant digits). It's not always clear which based on
-          reading code alone.
-        </p>
-        <p>
-          Decimalish offers both for all methods that might round with an easy
-          to read API, alongside a rich set of rounding and division modes.
-        </p>
-      </div>
-      <div id="extensible">
-        <h3>
-          <a href="#extensible">Extensible</a>
-        </h3>
-        <P>
-          Decimalish exposes the core functions it uses to convert between
-          `decimal` string values and an internal normalized form, making it
-          straightforward to introduce new operations and functionality on an
-          equal footing to Decimalish’s own API.
-        </P>
-      </div>
-    </div>
-  </section>
-)
+    </section>
+  )
+}
 
 const APISection = () => (
   <>
