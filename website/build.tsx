@@ -222,206 +222,6 @@ function getJSDoc(node: ts.Node): JSDoc | undefined {
   return jsDoc
 }
 
-const ReadmeSectionsContext = jsx.createContext<ReadmeSections | null>(null)
-
-function useReadmeSection(name: string): ReadmeSection {
-  const section = jsx.useContext(ReadmeSectionsContext)![name]
-  if (!section) throw new Error(`Missing readme section: ${name}`)
-  return section
-}
-
-const TypedefsContext = jsx.createContext<Typedefs | null>(null)
-
-function useTypedefs(): Typedefs {
-  return jsx.useContext(TypedefsContext)!
-}
-
-const HighlighterContext = jsx.createContext<shiki.Highlighter | null>(null)
-
-function useHighlighter(): shiki.Highlighter {
-  return jsx.useContext(HighlighterContext)!
-}
-
-const Index = () => (
-  <html lang="en">
-    <head>
-      <title>
-        Decimalish — arbitrary-precision decimal primitives for JavaScript.
-      </title>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta name="theme-color" content="#56585b" />
-      <link rel="icon" href="favicon.png" type="image/png" />
-      <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-      <link rel="manifest" href="manifest.json" />
-      <style innerHTML={fs.readFileSync(ROOT_DIR + "style.css", "utf8")} />
-      <script
-        innerHTML={fs.readFileSync(
-          path.resolve(ROOT_DIR, "../dist/decimalish.min.js"),
-          "utf8"
-        )}
-      />
-    </head>
-    <body>
-      <ThemeToggle />
-      <Header />
-      <IntroSection />
-      <GetStarted />
-      <WhySection />
-      <APISection />
-      <FAQSection />
-      <Footer />
-    </body>
-  </html>
-)
-
-const ThemeToggle = () => (
-  <div class="theme-toggle">
-    <svg
-      viewBox="0 0 23 23"
-      class="dark-toggle"
-      onclick="document.body.className='light'"
-    >
-      <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-        d="M4.69421 14.6557C4.85337 14.9984 5.03766 15.327 5.24469 15.6392C6.5876 17.6646 8.88783 19 11.5 19C15.6421 19 19 15.6421 19 11.5C19 7.93459 16.5121 4.95028 13.1777 4.18832C12.825 4.10773 12.4628 4.052 12.0931 4.02307C12.1978 4.35361 12.2767 4.69787 12.3294 5.05229C12.5843 6.76486 12.2269 8.71464 11.1961 10.5C9.89591 12.752 7.83332 14.207 5.76797 14.5681C5.4088 14.6309 5.04955 14.6606 4.69421 14.6557Z"
-      />
-    </svg>
-    <svg
-      viewBox="0 0 23 23"
-      class="light-toggle"
-      onclick="document.body.className='dark'"
-    >
-      <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
-        d="M3.01472 19.2782L3.72183 19.9853L5.13604 18.5711L4.42893 17.864L3.01472 19.2782Z M18.5711 17.864L17.864 18.5711L19.2782 19.9853L19.9853 19.2782L18.5711 17.864Z M3.01472 3.72182L4.42893 5.13604L5.13604 4.42893L3.72183 3.01472L3.01472 3.72182Z M17.864 4.42893L18.5711 5.13604L19.9853 3.72182L19.2782 3.01472L17.864 4.42893Z M0 12H2V11H0V12Z M12 2V0H11V2H12Z M12 23V21H11V23H12Z M21 12H23V11H21V12Z M11.5 19C15.6421 19 19 15.6421 19 11.5C19 7.35786 15.6421 4 11.5 4C7.35786 4 4 7.35786 4 11.5C4 15.6421 7.35786 19 11.5 19Z"
-      />
-    </svg>
-  </div>
-)
-
-const Header = () => (
-  <header>
-    <nav>
-      <a href="#intro" class="skip-nav">
-        Skip nav
-      </a>
-      <a href="#getstarted">Get started</a>
-      <a href="#api">API</a>
-      <a href="#faq">FAQ</a>
-      <a href="https://github.com/leebyron/decimalish" target="_blank">
-        Github
-      </a>
-    </nav>
-    <SplitFlap />
-  </header>
-)
-
-const Footer = () => (
-  <footer>
-    <div>
-      Made with &#9829; in San Francisco by{" "}
-      <a href="https://twitter.com/leeb" target="_blank">
-        @leeb
-      </a>
-    </div>
-  </footer>
-)
-
-const SplitFlap = () => (
-  <div id="split-flap">
-    <style innerHTML={fs.readFileSync(ROOT_DIR + "split-flap.css", "utf8")} />
-    <svg outerHTML={fs.readFileSync(ROOT_DIR + "split-flap.svg", "utf8")} />
-    <script innerHTML={fs.readFileSync(ROOT_DIR + "split-flap.js", "utf8")} />
-  </div>
-)
-
-const IntroSection = () => (
-  <section id="intro">
-    <div>
-      <h3>
-        <a href="#intro">{useReadmeSection("decimalish").header}</a>
-      </h3>
-      <div class="two-col">{useReadmeSection("decimalish").body}</div>
-    </div>
-  </section>
-)
-
-const GetStarted = () => (
-  <section id="get-started" class="odd">
-    <div>
-      <h2>
-        <a href="#get-started">{useReadmeSection("get-started").header}</a>
-      </h2>
-      {useReadmeSection("get-started").body}
-    </div>
-  </section>
-)
-
-const WhySection = () => {
-  const why = useReadmeSection("why-use-decimalish")
-  const whySections = markdownSections(why.body, "h3")
-  return (
-    <section id="why">
-      <div>
-        <h2>
-          <a href="#why">{why.header}</a>
-        </h2>
-        {whySections[PREAMBLE].body}
-      </div>
-      <div class="two-grid">
-        {Object.entries(whySections).map(([id, whySection]) => (
-          <div id={id}>
-            <h3>
-              <a href={`#${id}`}>{whySection.header}</a>
-            </h3>
-            {whySection.body}
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-const APISection = () => (
-  <>
-    <section id="api" class="api-toc-sec">
-      <h2>
-        <a href="#api">API</a>
-      </h2>
-      <div>
-        {Object.entries(useTypedefs().categories).map(([category, members]) => (
-          <div>
-            <h3>{category}</h3>
-            <ul>
-              {members.map(member => (
-                <li>
-                  <a href={"#" + member.id}>
-                    <span>{getJSDoc(member.node)?.title}</span>
-                    <code class={member.kind}>{member.id}</code>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </section>
-    {Object.entries(useTypedefs().categories).map(
-      ([category, members], index) => (
-        <section class={{ odd: index % 2 !== 0 }}>
-          <h2>{category}</h2>
-          {members.map(member => (
-            <APIItemSection item={member} />
-          ))}
-        </section>
-      )
-    )}
-  </>
-)
-
 const colorClass: { [color: string]: string | undefined } = {
   "#569cd6": "keyword",
   "#dcdcaa": "function",
@@ -703,6 +503,202 @@ const Source = ({ node }: { node: ts.Node }) =>
       throw new Error(`Unexpected ${ts.SyntaxKind[node.kind]}`)
     })()
   )
+
+const HighlighterContext = jsx.createContext<shiki.Highlighter | null>(null)
+
+function useHighlighter(): shiki.Highlighter {
+  return jsx.useContext(HighlighterContext)!
+}
+
+const ReadmeSectionsContext = jsx.createContext<ReadmeSections | null>(null)
+
+function useReadmeSection(name: string): ReadmeSection {
+  const section = jsx.useContext(ReadmeSectionsContext)![name]
+  if (!section) throw new Error(`Missing readme section: ${name}`)
+  return section
+}
+
+const TypedefsContext = jsx.createContext<Typedefs | null>(null)
+
+function useTypedefs(): Typedefs {
+  return jsx.useContext(TypedefsContext)!
+}
+
+const Index = () => (
+  <html lang="en">
+    <head>
+      <title>
+        Decimalish — arbitrary-precision decimal primitives for JavaScript.
+      </title>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="theme-color" content="#56585b" />
+      <link rel="icon" href="favicon.png" type="image/png" />
+      <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+      <link rel="manifest" href="manifest.json" />
+      <style innerHTML={fs.readFileSync(ROOT_DIR + "style.css", "utf8")} />
+      <script
+        innerHTML={fs.readFileSync(
+          path.resolve(ROOT_DIR, "../dist/decimalish.min.js"),
+          "utf8"
+        )}
+      />
+    </head>
+    <body>
+      <ThemeToggle />
+      <Header />
+      <IntroSection />
+      <GetStarted />
+      <WhySection />
+      <APISection />
+      <FAQSection />
+      <footer>
+        <div>
+          Made with &#9829; in San Francisco by{" "}
+          <a href="https://twitter.com/leeb" target="_blank">
+            @leeb
+          </a>
+        </div>
+      </footer>
+    </body>
+  </html>
+)
+
+const ThemeToggle = () => (
+  <div class="theme-toggle">
+    <svg
+      viewBox="0 0 23 23"
+      class="dark-toggle"
+      onclick="document.body.className='light'"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M4.69421 14.6557C4.85337 14.9984 5.03766 15.327 5.24469 15.6392C6.5876 17.6646 8.88783 19 11.5 19C15.6421 19 19 15.6421 19 11.5C19 7.93459 16.5121 4.95028 13.1777 4.18832C12.825 4.10773 12.4628 4.052 12.0931 4.02307C12.1978 4.35361 12.2767 4.69787 12.3294 5.05229C12.5843 6.76486 12.2269 8.71464 11.1961 10.5C9.89591 12.752 7.83332 14.207 5.76797 14.5681C5.4088 14.6309 5.04955 14.6606 4.69421 14.6557Z"
+      />
+    </svg>
+    <svg
+      viewBox="0 0 23 23"
+      class="light-toggle"
+      onclick="document.body.className='dark'"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M3.01472 19.2782L3.72183 19.9853L5.13604 18.5711L4.42893 17.864L3.01472 19.2782Z M18.5711 17.864L17.864 18.5711L19.2782 19.9853L19.9853 19.2782L18.5711 17.864Z M3.01472 3.72182L4.42893 5.13604L5.13604 4.42893L3.72183 3.01472L3.01472 3.72182Z M17.864 4.42893L18.5711 5.13604L19.9853 3.72182L19.2782 3.01472L17.864 4.42893Z M0 12H2V11H0V12Z M12 2V0H11V2H12Z M12 23V21H11V23H12Z M21 12H23V11H21V12Z M11.5 19C15.6421 19 19 15.6421 19 11.5C19 7.35786 15.6421 4 11.5 4C7.35786 4 4 7.35786 4 11.5C4 15.6421 7.35786 19 11.5 19Z"
+      />
+    </svg>
+  </div>
+)
+
+const Header = () => (
+  <header>
+    <nav>
+      <a href="#intro" class="skip-nav">
+        Skip nav
+      </a>
+      <a href="#getstarted">Get started</a>
+      <a href="#api">API</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/leebyron/decimalish" target="_blank">
+        Github
+      </a>
+    </nav>
+    <SplitFlap />
+  </header>
+)
+
+const SplitFlap = () => (
+  <div id="split-flap">
+    <style innerHTML={fs.readFileSync(ROOT_DIR + "split-flap.css", "utf8")} />
+    <svg outerHTML={fs.readFileSync(ROOT_DIR + "split-flap.svg", "utf8")} />
+    <script innerHTML={fs.readFileSync(ROOT_DIR + "split-flap.js", "utf8")} />
+  </div>
+)
+
+const IntroSection = () => (
+  <section id="intro">
+    <div>
+      <h3>
+        <a href="#intro">{useReadmeSection("decimalish").header}</a>
+      </h3>
+      <div class="two-col">{useReadmeSection("decimalish").body}</div>
+    </div>
+  </section>
+)
+
+const GetStarted = () => (
+  <section id="get-started" class="odd">
+    <div>
+      <h2>
+        <a href="#get-started">{useReadmeSection("get-started").header}</a>
+      </h2>
+      {useReadmeSection("get-started").body}
+    </div>
+  </section>
+)
+
+const WhySection = () => {
+  const why = useReadmeSection("why-use-decimalish")
+  const whySections = markdownSections(why.body, "h3")
+  return (
+    <section id="why">
+      <div>
+        <h2>
+          <a href="#why">{why.header}</a>
+        </h2>
+        {whySections[PREAMBLE].body}
+      </div>
+      <div class="two-grid">
+        {Object.entries(whySections).map(([id, whySection]) => (
+          <div id={id}>
+            <h3>
+              <a href={`#${id}`}>{whySection.header}</a>
+            </h3>
+            {whySection.body}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+const APISection = () => (
+  <>
+    <section id="api" class="api-toc-sec">
+      <h2>
+        <a href="#api">API</a>
+      </h2>
+      <div>
+        {Object.entries(useTypedefs().categories).map(([category, members]) => (
+          <div>
+            <h3>{category}</h3>
+            <ul>
+              {members.map(member => (
+                <li>
+                  <a href={"#" + member.id}>
+                    <span>{getJSDoc(member.node)?.title}</span>
+                    <code class={member.kind}>{member.id}</code>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+    {Object.entries(useTypedefs().categories).map(
+      ([category, members], index) => (
+        <section class={{ odd: index % 2 !== 0 }}>
+          <h2>{category}</h2>
+          {members.map(member => (
+            <APIItemSection item={member} />
+          ))}
+        </section>
+      )
+    )}
+  </>
+)
 
 const FAQSection = () => {
   const faq = useReadmeSection("faq")
