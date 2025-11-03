@@ -768,6 +768,9 @@ export function lte(a: Numeric, b: Numeric): boolean {
  * @category Comparison
  */
 export function cmp(a: Numeric, b: Numeric): 1 | -1 | 0 {
+  // Cheap equality check
+  if (a === b) return 0
+
   const [signA, digitsA, scaleA, precisionA] = deconstruct(a)
   const [signB, digitsB, scaleB, precisionB] = deconstruct(b)
 
