@@ -15,7 +15,7 @@ pitfall of nearly all numbers represented by computers.
 
 While we read numbers in decimal, computers read binary and must
 convert. Information can be lost when converting a fixed number of
-bits and yield confusing results. In finance or engineering these
+bits and can yield confusing results. In finance or engineering these
 errors are simply unacceptable.
 
 Decimalish addresses exactly this concern. It removes the need to
@@ -24,7 +24,7 @@ convert by directly representing numbers in decimal.
 It's also unconstrained by size so it can represent exact numbers with
 arbitrarily high precision (significant digits or decimal places).
 
-**So what’s the catch?** Well speed for one, computers
+**So what’s the catch?** Well, speed for one, computers
 are specifically designed to make working with floating point numbers
 fast. While nowhere close to native speed, Decimalish is unlikely to
 be your program’s bottleneck.
@@ -80,7 +80,7 @@ See how this <a href="#comparison">compares</a> to other libraries.
 
 ### Functional API
 
-All methods in Decimalish's API are provided as top level functions,
+All methods in Decimalish's API are provided as top-level functions,
 not prototype methods. This maintains similarity to the built-in
 `Math` module, enables tree-shaking, and works well with functional
 utility libraries like [ramda](https://ramdajs.com/) or
@@ -89,7 +89,7 @@ utility libraries like [ramda](https://ramdajs.com/) or
 ### Native primitive type
 
 Most BigDecimal libraries introduce a Decimal type as an Object, which
-is potentially mutable, not comparable, and often require writing
+is potentially mutable, not comparable, and often requires writing
 bulky code with repeated calls to constructors. Decimalish’s `decimal`
 type, much like the built in `number`, is an _immutable primitive_
 …because it is a string.
@@ -111,9 +111,9 @@ error (such as `"DIV_ZERO"`).
 ### No implicit rounding
 
 Many BigDecimal libraries automatically round the result of every
-operation if too bigger, too smaller, or too high precision based on
-some globally defined config. This can be confusing, cumbersome to
-configure, and another common source of bugs.
+operation if the value is too big, too small, or exceeds a precision
+limit based on some globally defined config. This can be confusing,
+cumbersome to configure, and another common source of bugs.
 
 Decimalish almost always returns exact results, only rounding when it
 must (such as non-terminating division) and always allowing locally
@@ -124,11 +124,11 @@ configured behavior without any global state.
 Some BigDecimal libraries attempt to visually preserve precision after
 an operation by adding trailing zeros. While this can be useful for
 quick number formatting, this conflates mathematical value with
-presentation, require multiple kinds of equality (is `1.0` equal to
-`1`?), and sometimes operations such as multiple result in surprising
-results and thus, you guessed it, another source of bugs.
+presentation, requires multiple kinds of equality (is `1.0` equal to
+`1`?), and sometimes operations such as multiplication can result in
+surprising results and thus, you guessed it, another source of bugs.
 
-Decimalish's `decimal()` constructor, and all other math functions
+Decimalish's `decimal()` constructor and all other math functions
 always return canonical normalized decimal values without any leading
 or trailing zeros.
 
@@ -139,8 +139,8 @@ BigDecimal libraries only interpret this as either decimal places or
 precision (significant digits). It's not always clear which based on
 reading code alone.
 
-Decimalish offers both for all methods that might round with an easy
-to read API, alongside a rich set of rounding and division modes.
+Decimalish offers both for all methods that might round with an easy-to-read
+API, alongside a rich set of rounding and division modes.
 
 ### Extensible
 
@@ -151,20 +151,32 @@ equal footing to Decimalish’s own API.
 
 # FAQ
 
-TK
+### How do I convert between `number` and `decimal`?
 
-### Why doesn't Decimalish support -0?
-
-Negative zero (`-0`) is a corner case of floating point numbers and frequent
-source of confusion...
+Call `decimal(value)` to convert a JavaScript `number` or numeric string into a
+Decimalish `decimal`. To go back to a native number, pass the decimal string to
+`Number(decimalValue)` or `parseFloat(decimalValue)`, keeping in mind that very
+large or highly precise decimals may not round-trip exactly.
 
 ### What's the difference between remainder and modulo?
 
 Decimalish provides the `rem()` function as a `decimal` friendly version of `%`
 which uses the same behavior as JavaScript (round down truncation).
 While JavaScript officially calls this the "remainder" operator, it's often
-referred to as the modulus or modulo operator. However there are many potential
-ways to define modulo and standard math definitions and different programming
-languages differ in how they choose this definition.
+referred to as the modulus or modulo operator. However, standard math
+definitions and different programming languages choose different ways to define
+modulo.
 
-https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition
+[Wikipedia: Modulo operation](https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition)
+
+### Why doesn't Decimalish support -0?
+
+Negative zero (`-0`) exists in IEEE-754 to carry sign information through
+rounding and operations that can produce infinities. Decimalish doesn’t produce
+`Infinity`, doesn’t rely on direction-dependent functions, and always returns
+canonical decimal strings, so there’s no benefit to keeping a separate `-0`.
+Normalizing all zero-like values to `"0"` keeps equality checks simple and lets
+decimals work cleanly as object keys. If you need to track the sign of zero for
+a specific algorithm, store that sign alongside the decimal value.
+
+Have a question that’s not answered here? Please open an issue.

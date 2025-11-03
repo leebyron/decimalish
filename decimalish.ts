@@ -14,7 +14,7 @@
  *  - mod and rem done - need tests
  *  - div needs more tests
  *  - divRem done but needs more tests
- *  - EUCLIDIAN mode for divRem/round. floor/truncated mode.
+ *  - EUCLIDEAN mode for divRem/round. floor/truncated mode.
  *  - divInt
  *  - toFixed / toExponential. with all rounding modes.
  *  - scaleBy - needs tests
@@ -39,7 +39,7 @@
  *  - trig / PI?
  *  - exp/ln/log?
  *  - sum
- *  - toLocaleString would be useful, but I"m not sure how to get this working
+ *  - toLocaleString would be useful, but I'm not sure how to get this working
  *  - cmp ideally can accept +-Infinity - is this actually useful?
  *
  *  - rest of decimal.js lib?
@@ -52,7 +52,7 @@
  *
  * Pitch:
  *
- *  - decimal is a primitive! therefore immutable and can be used as keys
+ *  - Decimal is a primitive, so it is immutable and can be used as keys
  *  - canonical. Equivalent canonical decimals are also `===` so can be used in Set() and as object property keys!
  *  - 11 rounding modes
  *  - no global configuration or state
@@ -66,7 +66,7 @@
  * Why no -0?
  *
  *  It is mainly useful in floating point to represent the sign of an
- *  underflowed number (eg not zero but smaller than you can represent,
+ *  underflowed number (e.g. not zero but smaller than you can represent,
  *  therefore should have a sign). Underflow is not a concern here!
  *
  * No default rounding
@@ -102,7 +102,7 @@ declare const $$decimal: unique symbol
  * Throws a `"NOT_NUM"` Error if the provided value is not numeric and cannot be
  * translated to decimal.
  *
- * Note: unlike number, decimal cannot represent `Infinity`, `NaN`, or `-0`.
+ * Unlike number, decimal cannot represent `Infinity`, `NaN`, or `-0`.
  *
  * @category Types
  */
@@ -354,7 +354,7 @@ export function div(
   const [quotient] = divRem(
     dividend,
     divisor,
-    normalizeRules(rules, HALF_EVEN, 34),
+    normalizeRoundingRules(rules, HALF_EVEN, 34),
   )
   return quotient
 }
@@ -362,15 +362,16 @@ export function div(
 /**
  * Divide and remainder
  *
- * Divides two numeric values to a given places or precision returning both the
- * quotient and the remainder while satisfying the two conditions:
+ * Divides two numeric values to a given number of decimal places or to a specified
+ * precision, returning both the quotient and the remainder while satisfying the two
+ * conditions:
  *
  *   - `dividend = divisor * quotient + remainder`
  *   - `abs(remainder) < abs(divisor)`.
  *
- * However there is not only one quotient and remainder which satisfies these
- * conditions. A choice of the sign of the remainder (via `RoundingMode`) and
- * precision of the quotient can be provided via `rules`.
+ * However, multiple quotient and remainder pairs satisfy these conditions. A choice
+ * of the sign of the remainder (via `RoundingMode`) and precision of the quotient
+ * can be provided via `rules`.
  *
  * All rounding modes may be used and these conditions will be satisfied.
  *
@@ -400,7 +401,7 @@ export function divRem(
 ): [quotient: decimal, remainder: decimal] {
   const [signA, digitsA, scaleA, precisionA] = deconstruct(dividend)
   const [signB, digitsB, scaleB, precisionB] = deconstruct(divisor)
-  rules = normalizeRules(rules, DOWN)
+  rules = normalizeRoundingRules(rules, DOWN)
 
   // The resulting scale of a division is the difference between the
   // scales of the dividend and divisor.
@@ -579,8 +580,8 @@ export function rem(
  * Returns the modulo of dividing a by b using floored (round "floor") division.
  * The result always has the same sign as the second argument (or 0).
  *
- * Note: this is not the same as the % (remainder) operator. Use `rem()` for an
- * equivalent to `%`.
+ * This is not the same as the % (remainder) operator. Use `rem()` for an equivalent
+ * to `%`.
  *
  * @equivalent ((a % b) + b) % b
  * @see rem
@@ -593,8 +594,8 @@ export function mod(a: Numeric, b: Numeric): decimal {
 /**
  * Power (Exponent)
  *
- * Raises `base` to the power `exponent`, where `exponent` must be a positive
- * whole number.
+ * Raises `base` to the power `exponent`, where `exponent` must be a non-negative
+ * integer.
  *
  * @equivalent Math.pow(base, exponent)
  * @category Arithmetic
@@ -643,7 +644,7 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
     error("SQRT_NEG", value)
   }
 
-  rules = normalizeRules(rules, HALF_EVEN, 34)
+  rules = normalizeRoundingRules(rules, HALF_EVEN, 34)
   const iterationPrecision = getRoundingPrecision(rules, scale)
 
   // Sqrt 0 -> 0
@@ -747,9 +748,9 @@ export function lte(a: Numeric, b: Numeric): boolean {
  * Compares two numeric values and returns `1` if a is greater than b, `-1` if b
  * is greater than a, and `0` if a and b are equivalent.
  *
- * Note: This is equivalent to, but much faster than, `sign(sub(a, b))`.
+ * This is equivalent to, but much faster than, `sign(sub(a, b))`.
  *
- * @equivalant a > b ? 1 : a < b ? -1 : 0
+ * @equivalent a > b ? 1 : a < b ? -1 : 0
  * @category Comparison
  */
 export function cmp(a: Numeric, b: Numeric): 1 | -1 | 0 {
@@ -829,9 +830,7 @@ export function neg(value: Numeric): decimal {
  * Sign
  *
  * Returns a number indicating the sign of the provided value. A `1` for
- * positive values, `-1` for negative, or `0` for zero.
- *
- * Note: decimal does not represent negative zero.
+ * positive values, `-1` for negative, or `0` for zero (Decimal does not represent negative zero).
  *
  * @equivalent Math.sign(value)
  * @category Magnitude
@@ -882,10 +881,10 @@ export function scale(value: Numeric): number {
 /**
  * Move decimal point
  *
- * Returns the `value` with the decimal point to the right a relative number of
- * `places`. Negative values of `places` moves the decimal point to the left.
+ * Returns the value with the decimal point moved to the right by the given number
+ * of places; negative values move it to the left.
  *
- * Note: This is equivalent to, but much faster than,
+ * This is equivalent to, but much faster than,
  * `mul(value, pow(10, places))`.
  *
  * @equivalent value * Math.pow(10, places)
@@ -935,7 +934,7 @@ export function roundRem(
   rules?: RoundingRules,
 ): [rounded: decimal, remainder: decimal] {
   let [sign, digits, scale, precision] = deconstruct(value)
-  let roundingRules = normalizeRules(rules, HALF_EVEN)
+  let roundingRules = normalizeRoundingRules(rules, HALF_EVEN)
 
   // Determine the desired rounding mode and precision.
   let roundingMode = roundingRules[MODE]
@@ -987,7 +986,7 @@ export function roundRem(
  *
  * Rounds down to the nearest whole number in the direction of `-Infinity`.
  *
- * Note: Equivalent to `round(value, { mode: "floor" })`
+ * Equivalent to `round(value, { mode: "floor" })`
  *
  * @equivalent Math.floor(value)
  * @see round
@@ -1002,7 +1001,7 @@ export function floor(value: Numeric): decimal {
  *
  * Rounds up to the nearest whole number in the direction of `Infinity`.
  *
- * Note: Equivalent to `round(value, { mode: "ceil" })`
+ * Equivalent to `round(value, { mode: "ceil" })`
  *
  * @equivalent Math.ceil(value)
  * @see round
@@ -1018,7 +1017,7 @@ export function ceil(value: Numeric): decimal {
  * Returns the integer part of a number by rounding to the nearest whole number
  * in the direction of 0, also known as truncation.
  *
- * Note: Equivalent to `round(value, { mode: "down" })`
+ * Equivalent to `round(value, { mode: "down" })`
  *
  * @equivalent Math.trunc(value)
  * @see round
@@ -1088,7 +1087,7 @@ function extremum(values: IArguments, direction: number): decimal {
  *
  * Constrains `value` between `low` and `high` values.
  *
- * @equivalent value < low ? low : value > high : high : value
+ * @equivalent value < low ? low : value > high ? high : value
  * @category Rounding
  */
 export function clamp(value: Numeric, low: Numeric, high: Numeric): decimal {
@@ -1104,8 +1103,9 @@ export interface RoundingRules {
   /**
    * Decimal places
    *
-   * The number of decimal places to round to. Negative places rounds to higher
-   * integer places. Only one of `places` or `precision` can be provided.
+   * The number of decimal places to round to. A negative value for `places`
+   * rounds to higher integer places. Only one of `places` or `precision` can be
+   * provided.
    *
    * For most functions, the default is `0`, rounding to an integer whole number.
    */
@@ -1209,7 +1209,7 @@ export type RoundingMode =
    * Rounds a result towards the nearest neighboring value, otherwise towards
    * the value with an even least significant digit if exactly between the two.
    *
-   * This is particularly useful to avoid aggregated bias when adding together
+   * This is particularly useful to avoid aggregate bias when adding together
    * multiple rounded values as there is an equal chance of rounding up or down.
    */
   | "half even"
@@ -1247,7 +1247,7 @@ export type RoundingMode =
  *
  * @internal
  */
-function normalizeRules(
+function normalizeRoundingRules(
   rules: RoundingRules | undefined,
   defaultMode: RoundingMode,
   defaultPrecision?: number,
@@ -1280,7 +1280,7 @@ function normalizeRules(
       precision != null ? expectInt(PRECISION, precision) : defaultPrecision
   }
 
-  // Note: indexOf() or find() would work, however neither are available in ES3.
+  // indexOf() or find() would work, however neither are available in ES3.
   for (const i in validModes) {
     // @ts-ignore
     isValidMode |= validModes[i] == mode
@@ -1342,7 +1342,7 @@ function normalizeRoundingMode(
  *
  * Converts a `Numeric` value (including `decimal`) to a JavaScript number.
  *
- * Throws an `"INEXACT"` Error if the converting the value would lead to a loss
+ * Throws an `"INEXACT"` Error if converting the value would lead to a loss
  * of precision. To convert to a number while allowing precision loss, use the
  * native `Number(value)` function.
  *
@@ -1360,8 +1360,8 @@ export function toNumber(value: Numeric): number {
  * Fixed notation
  *
  * A string representation of the provided Numeric `value` using fixed notation.
- * Uses rules to specify `precision` or `places` and the rounding `mode` should
- * that result in fewer digits.
+ * Uses `rules` to set `precision` or `places`, and a rounding `mode` when that
+ * results in fewer digits.
  *
  * @category Et cetera
  */
@@ -1373,8 +1373,8 @@ export function toFixed(value: Numeric, rules?: RoundingRules): NumericString {
  * Scientific notation
  *
  * A string representation of the provided Numeric `value` using exponential
- * scientific notation. Uses rules to specify `precision` or `places` and the
- * rounding `mode` should that result in fewer digits.
+ * scientific notation. Uses `rules` to set `precision` or `places`, and a rounding
+ * `mode` when that results in fewer digits.
  *
  * @category Et cetera
  */
@@ -1486,7 +1486,7 @@ type Sign = 1 | -1 | 0
 /**
  * decimal → Elements
  *
- * Given a numeric value, deconstruct to normalized representation of a decimal:
+ * Given a numeric value, deconstruct to a normalized representation of a decimal:
  * a `[sign, digits, scale, precision]` tuple.
  *
  * Functions within this library internally operate on the normalized
@@ -1497,9 +1497,9 @@ type Sign = 1 | -1 | 0
  *  - `sign`: Either 1 for a positive number, -1 for a negative number, or 0 for 0.
  *  - `digits`: A string of significant digits expressed in scientific
  *    notation, where the first digit is the ones place, or an empty string for 0.
- *  - `scale`: The power of ten the digits is multiplied by, or 0 for 0.
+ *  - `scale`: The power of ten the digits are multiplied by, or 0 for 0.
  *  - `precision`: The number of digits found in digits (e.g. number of
- *    significant digits). Yes this is redundant information with
+ *    significant digits). Yes, this is redundant information with
  *    `digits.length` but it is convenient to access directly.
  *
  * @example deconstruct("-1.23e4") returns [-1, "123", 4, 3]
@@ -1610,15 +1610,15 @@ function error(code: ErrorCode, message: unknown): never {
  * values of ErrorCode as well as a link to documentation describing the error.
  *
  * Detect this property in a catch clause to provide customized error handling
- * behavior. For example, to re-introduce `Infinity` as a result of division:
+ * behavior. For example, to re-introduce `"Infinity"` as a result of division:
  *
  * ```
- * function customDivide(a: Numeric, b: Numeric): decimal {
+ * function customDivide(a: Numeric, b: Numeric): decimal | "Infinity" {
  *   try {
  *     return div(a, b)
  *   } catch (error) {
  *     if (error.code === "DIV_ZERO") {
- *       return sign(a) * Infinity
+ *       return "Infinity"
  *     }
  *     throw error
  *   }
@@ -1648,8 +1648,8 @@ export type ErrorCode =
   /**
    * Not positive
    *
-   * Thrown when a positive number was expected in an argument or property but
-   * not received. For instance, the `exponent` in `pow()` must be a positive
+   * Thrown when a non-negative number was expected in an argument or property but
+   * not received. For instance, the `exponent` in `pow()` must be a non-negative
    * integer.
    */
   | "NOT_POS"
@@ -1666,7 +1666,7 @@ export type ErrorCode =
    * Cannot provide both
    *
    * Thrown when both `RoundingRules.places` and `RoundingRules.precision`
-   * fields are simutaneously provided. Only one of these fields may be provided
+   * fields are simultaneously provided. Only one of these fields may be provided
    * per use.
    */
   | "NOT_BOTH"

@@ -289,13 +289,16 @@ li:not(:last-child) {
 }
 
 pre {
-  overflow: scroll;
+  overflow-x: auto;
   padding: 0.5em 1em;
   margin: 1em 0;
   border-radius: 2px;
   background-color: var(--pre-bg-color);
   width: fit-content;
-  min-width: min(100% - 2em, 60ch);
+  min-width: min(var(--max-width), 100% - 2em, 60ch);
+  max-width: min(var(--max-width), 100vw - 2 * var(--gutter-size));
+  box-sizing: border-box;
+  white-space: pre;
 }
 
 pre,
@@ -306,6 +309,10 @@ code {
   color: var(--text-color);
 }
 
+pre code {
+  white-space: inherit;
+}
+
 code span {
   color: var(--text-color);
 }
@@ -313,6 +320,10 @@ code span {
 a {
   white-space: nowrap;
   --underline-color: var(--text-color);
+}
+
+h3 a {
+  white-space: normal;
 }
 
 a,
@@ -475,6 +486,7 @@ header nav {
 
 header nav a {
   padding: 0.5em 1em;
+  white-space: nowrap;
   --underline-color: transparent;
 }
 
@@ -517,7 +529,7 @@ header nav a:last-child {
   display: grid;
   grid-template-columns: repeat(
     auto-fill,
-    minmax(var(--medium-col-width), 1fr)
+    minmax(min(100%, var(--medium-col-width)), 1fr)
   );
   gap: 0 var(--column-gap);
   margin-top: 0;
@@ -533,7 +545,10 @@ header nav a:last-child {
 
 .api-toc-sec > div {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--small-col-width), 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, var(--small-col-width)), 1fr)
+  );
   gap: var(--column-gap);
 }
 
