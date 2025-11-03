@@ -234,7 +234,7 @@ export function add(a: Numeric, b: Numeric): decimal {
     precisionA - scaleA > precisionB - scaleB
       ? precisionA - scaleA
       : precisionB - scaleB
-  let digitsArray = new Array(pos + scale)
+  let digitsArray = createDigitArray(pos + scale)
   let result = 0
 
   // If the operands have the same sign, add the two digits.
@@ -318,14 +318,13 @@ export function mul(a: Numeric, b: Numeric): decimal {
     return ZERO
   }
 
-  const digitsArray = new Array(precisionA + precisionB)
+  const digitsArray = createDigitArray(precisionA + precisionB)
   let result = 0
 
   for (let i = precisionA; i--; ) {
     result = 0
     for (let j = precisionB; j--; ) {
-      result +=
-        (digitsArray[i + j + 1] || 0) + +(digitsA[i] || 0) * +(digitsB[j] || 0)
+      result += digitsArray[i + j + 1] + +digitsA[i] * +digitsB[j]
       digitsArray[i + j + 1] = result % 10
       result = (result / 10) | 0
     }
@@ -337,6 +336,19 @@ export function mul(a: Numeric, b: Numeric): decimal {
     digitsArray.join(""),
     scaleA + scaleB + 1,
   )
+}
+
+/**
+ * Produces an array of fixed size filled with zeros. Equivalent to
+ * `Array(len).fill(0)` but ES3-safe.
+ * @internal
+ */
+function createDigitArray(len: number): number[] {
+  const array = new Array(len)
+  for (let i = 0; i < len; i++) {
+    array[i] = 0
+  }
+  return array
 }
 
 /**
@@ -435,7 +447,7 @@ export function divRem(
   // Remainder is a mutable list of digits, starting as a copy of the dividend
   // (a) which is at least as long as the divisor (b).
   let remainderLength = precisionB > precisionA ? precisionB : precisionA
-  const remainderDigitsArray: number[] = []
+  const remainderDigitsArray = createDigitArray(remainderLength)
   for (let i = remainderLength; i--; ) {
     remainderDigitsArray[i] = +(digitsA[i] || 0)
   }
@@ -478,7 +490,7 @@ export function divRem(
 
       // Subtract at this location
       for (let i = place + precisionB; i-- > place; ) {
-        remainderDigitsArray[i] -= +(digitsB[i - place] || 0)
+        remainderDigitsArray[i] -= +digitsB[i - place]
         if (remainderDigitsArray[i] < 0) {
           remainderDigitsArray[i] += 10
           remainderDigitsArray[i - 1] -= 1

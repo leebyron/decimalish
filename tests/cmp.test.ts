@@ -18,4 +18,9 @@ describe("cmp", () => {
     expect(cmp("0.0001", "0.0002")).toBe(-1)
     expect(cmp(-2, -1)).toBe(-1)
   })
+
+  it("handles numbers with equal scale but different precision", () => {
+    expect(cmp("1.2", "1.23")).toBe(-1)
+    expect(cmp("1.230", "1.2")).toBe(1)
+  })
 })

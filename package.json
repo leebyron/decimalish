@@ -30,7 +30,7 @@
   "scripts": {
     "test": "run-s lint unit build integration website:build",
     "format": "prettier --ignore-path .gitignore -w '**/*.{js,ts,tsx,css,md,json,yml,yaml}'",
-    "unit": "jest --collectCoverage",
+    "unit": "jest --collectCoverage --coverageReporters=text --coverageThreshold '{\"global\":{\"branches\":100,\"functions\":100,\"lines\":100,\"statements\":100}}'",
     "lint": "run-p -slc lint:*",
     "lint:format": "prettier --ignore-path .gitignore -c '**/*.{js,ts,tsx,css,md,json,yml,yaml}'",
     "lint:typecheck": "tsc",
