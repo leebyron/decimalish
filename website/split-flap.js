@@ -94,7 +94,7 @@ class SplitFlap {
       this._updateDOM(
         this.current === this.target && !this.extra
           ? this.targetChar
-          : SplitFlap.symbols[this.current]
+          : SplitFlap.symbols[this.current],
       )
       const timing = {
         duration: Math.round(SplitFlap.speed * (0.95 + 0.1 * Math.random())),
@@ -105,7 +105,7 @@ class SplitFlap {
           { transform: "translate3d(0, -2.25%, 0)" },
           { transform: "translate3d(0, 0, 0)", offset: 0.7 },
         ],
-        timing
+        timing,
       )
       const perspective = 6 * this.flap.clientWidth
       this.flap.animate(
@@ -118,11 +118,11 @@ class SplitFlap {
             offset: 0.7,
           },
         ],
-        timing
+        timing,
       )
       this.shadow.animate(
         [{ opacity: "0" }, { opacity: "1", offset: 0.7 }],
-        timing
+        timing,
       )
       this.shine.animate(
         [
@@ -130,7 +130,7 @@ class SplitFlap {
           { opacity: "0.5", offset: 0.2 },
           { opacity: "0", offset: 0.7 },
         ],
-        timing
+        timing,
       )
       await animation.finished
     }
@@ -158,12 +158,12 @@ function sfDisplay(text, reset) {
   text = text.map((v, i) =>
     typeof v === "string"
       ? { char: v, delay: i * 50 }
-      : { ...v, delay: v.delay ?? i * 50 }
+      : { ...v, delay: v.delay ?? i * 50 },
   )
   return Promise.all(
     text.map((data, i) =>
-      reset ? cells[i].reset(data.char) : cells[i].set(data)
-    )
+      reset ? cells[i].reset(data.char) : cells[i].set(data),
+    ),
   )
 }
 

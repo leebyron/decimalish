@@ -35,12 +35,12 @@ declare module "typescript" {
   }
   export function findPrecedingToken(
     position: number,
-    sourceFile: ts.SourceFile
+    sourceFile: ts.SourceFile,
   ): ts.Token<ts.SyntaxKind>
   export function parseIsolatedJSDocComment(
     content: string,
     start: number,
-    length: number
+    length: number,
   ): { jsDoc: ts.JSDoc } | undefined
 }
 
@@ -117,7 +117,7 @@ function getTypedefByCategory(): Typedefs {
     file,
     fs.readFileSync(file, "utf8"),
     ts.ScriptTarget.ES2015,
-    /* parentReferences */ true
+    /* parentReferences */ true,
   )
 
   const ids: TypedefsById = {}
@@ -131,7 +131,7 @@ function getTypedefByCategory(): Typedefs {
       const category = getJSDoc(node)?.tags.category || OTHER_CATEGORY
       if (!ids[id]) {
         ;(categories[category] || (categories[category] = [])).push(
-          (ids[id] = { id, name, kind, node })
+          (ids[id] = { id, name, kind, node }),
         )
 
         // Interface field ids
@@ -149,7 +149,7 @@ function getTypedefByCategory(): Typedefs {
           ts.isUnionTypeNode(node.type) &&
           node.type.types.every(
             type =>
-              ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal)
+              ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal),
           )
         ) {
           for (const member of node.type.types) {
@@ -190,14 +190,14 @@ function getJSDoc(node: ts.Node): JSDoc | undefined {
       ts.getLeadingCommentRanges(source.text, node.pos) ||
         ts.getLeadingCommentRanges(
           source.text,
-          ts.findPrecedingToken(node.pos, source).pos
-        )
+          ts.findPrecedingToken(node.pos, source).pos,
+        ),
     )
     if (comment) {
       rawJsDoc = ts.parseIsolatedJSDocComment(
         source.text,
         comment.pos,
-        comment.end - comment.pos
+        comment.end - comment.pos,
       )?.jsDoc
     }
   }
@@ -214,7 +214,7 @@ function getJSDoc(node: ts.Node): JSDoc | undefined {
       rawJsDoc.tags?.map(tag => [
         tag.tagName.getText(source),
         ts.getTextOfJSDocComment(tag.comment),
-      ]) || []
+      ]) || [],
     )
     jsDoc = { title, comment, tags }
   }
@@ -294,7 +294,7 @@ const Code = ({
   const tokenLines = highlighter.codeToThemedTokens(
     children,
     language,
-    "dark-plus"
+    "dark-plus",
   )
   const lines = tokenLines.map(line => (
     <>
@@ -304,7 +304,7 @@ const Code = ({
           ? ids[safeId(content.slice(1, -1))]
           : ids[
               safeId(
-                content + (line[index + 1]?.content[0] === "(" ? "()" : "")
+                content + (line[index + 1]?.content[0] === "(" ? "()" : ""),
               )
             ]
         return typeDef ? (
@@ -350,7 +350,7 @@ const APIItemSection = ({ item }: { item: Typedef }) => (
     {ts.isTypeAliasDeclaration(item.node) &&
       ts.isUnionTypeNode(item.node.type) &&
       item.node.type.types.every(
-        type => ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal)
+        type => ts.isLiteralTypeNode(type) && ts.isStringLiteral(type.literal),
       ) &&
       item.node.type.types.map(member => (
         <TypeMemberSection
@@ -540,7 +540,7 @@ const Index = () => (
       <script
         innerHTML={fs.readFileSync(
           path.resolve(ROOT_DIR, "../dist/decimalish.min.js"),
-          "utf8"
+          "utf8",
         )}
       />
     </head>
@@ -695,7 +695,7 @@ const APISection = () => (
             <APIItemSection item={member} />
           ))}
         </section>
-      )
+      ),
     )}
   </>
 )
@@ -750,6 +750,6 @@ const FAQSection = () => {
   console.log(
     path.relative(process.cwd(), path.resolve(ROOT_DIR, "../decimalish.tsx")) +
       " → " +
-      path.relative(process.cwd(), ROOT_DIR + "dist/index.html")
+      path.relative(process.cwd(), ROOT_DIR + "dist/index.html"),
   )
 })()

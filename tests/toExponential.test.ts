@@ -9,7 +9,7 @@ describe("toExponential", () => {
     expect(toExponential("0.123456")).toBe("1.23456e-1")
     expect(toExponential("0.00123456")).toBe("1.23456e-3")
     expect(toExponential("12345678901234567890.1234567890123456789")).toBe(
-      "1.23456789012345678901234567890123456789e+19"
+      "1.23456789012345678901234567890123456789e+19",
     )
   })
 
@@ -77,49 +77,49 @@ describe("toExponential", () => {
     expect(toExponential("1.23456", { precision: 1, mode: "up" })).toBe("2e+0")
     expect(toExponential("0.123456", { precision: 1, mode: "up" })).toBe("2e-1")
     expect(toExponential("0.00123456", { precision: 1, mode: "up" })).toBe(
-      "2e-3"
+      "2e-3",
     )
 
     expect(toExponential("123456", { precision: 4, mode: "up" })).toBe(
-      "1.235e+5"
+      "1.235e+5",
     )
     expect(toExponential("123.456", { precision: 4, mode: "up" })).toBe(
-      "1.235e+2"
+      "1.235e+2",
     )
     expect(toExponential("1.23456", { precision: 4, mode: "up" })).toBe(
-      "1.235e+0"
+      "1.235e+0",
     )
     expect(toExponential("0.123456", { precision: 4, mode: "up" })).toBe(
-      "1.235e-1"
+      "1.235e-1",
     )
     expect(toExponential("0.00123456", { precision: 4, mode: "up" })).toBe(
-      "1.235e-3"
+      "1.235e-3",
     )
 
     expect(toExponential("123456", { precision: 8, mode: "up" })).toBe(
-      "1.2345600e+5"
+      "1.2345600e+5",
     )
     expect(toExponential("123.456", { precision: 8, mode: "up" })).toBe(
-      "1.2345600e+2"
+      "1.2345600e+2",
     )
     expect(toExponential("1.23456", { precision: 8, mode: "up" })).toBe(
-      "1.2345600e+0"
+      "1.2345600e+0",
     )
     expect(toExponential("0.123456", { precision: 8, mode: "up" })).toBe(
-      "1.2345600e-1"
+      "1.2345600e-1",
     )
     expect(toExponential("0.00123456", { precision: 8, mode: "up" })).toBe(
-      "1.2345600e-3"
+      "1.2345600e-3",
     )
 
     expect(toExponential("123456", { precision: -1, mode: "up" })).toBe("1e+7")
     expect(toExponential("123.456", { precision: -1, mode: "up" })).toBe("1e+4")
     expect(toExponential("1.23456", { precision: -1, mode: "up" })).toBe("1e+2")
     expect(toExponential("0.123456", { precision: -1, mode: "up" })).toBe(
-      "1e+1"
+      "1e+1",
     )
     expect(toExponential("0.00123456", { precision: -1, mode: "up" })).toBe(
-      "1e-1"
+      "1e-1",
     )
   })
 })

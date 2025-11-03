@@ -262,7 +262,7 @@ export function add(a: Numeric, b: Numeric): decimal {
       precisionA,
       digitsB,
       scaleB,
-      precisionB
+      precisionB,
     )
 
     // There will only be a result if the operands are not equivalent (A != B),
@@ -330,7 +330,7 @@ export function mul(a: Numeric, b: Numeric): decimal {
   return construct(
     (signA * signB) as Sign,
     digitsArray.join(""),
-    scaleA + scaleB + 1
+    scaleA + scaleB + 1,
   )
 }
 
@@ -349,12 +349,12 @@ export function mul(a: Numeric, b: Numeric): decimal {
 export function div(
   dividend: Numeric,
   divisor: Numeric,
-  rules?: RoundingRules
+  rules?: RoundingRules,
 ): decimal {
   const [quotient] = divRem(
     dividend,
     divisor,
-    normalizeRules(rules, HALF_EVEN, 34)
+    normalizeRules(rules, HALF_EVEN, 34),
   )
   return quotient
 }
@@ -396,7 +396,7 @@ export function div(
 export function divRem(
   dividend: Numeric,
   divisor: Numeric,
-  rules?: RoundingRules
+  rules?: RoundingRules,
 ): [quotient: decimal, remainder: decimal] {
   const [signA, digitsA, scaleA, precisionA] = deconstruct(dividend)
   const [signB, digitsB, scaleB, precisionB] = deconstruct(divisor)
@@ -507,7 +507,7 @@ export function divRem(
     if (roundingMode === HALF_UP || roundingMode === HALF_DOWN) {
       const midpointCmp = cmp(
         mul(2, remainderDigits as decimal),
-        digitsB as decimal
+        digitsB as decimal,
       )
       shouldRoundUp =
         roundingMode === HALF_UP ? midpointCmp >= 0 : midpointCmp > 0
@@ -541,7 +541,7 @@ export function divRem(
 export function divInt(
   dividend: Numeric,
   divisor: Numeric,
-  rules?: RoundingRules
+  rules?: RoundingRules,
 ): decimal {
   const [quotient] = divRem(dividend, divisor, rules)
   return quotient
@@ -567,7 +567,7 @@ export function divInt(
 export function rem(
   dividend: Numeric,
   divisor: Numeric,
-  rules?: RoundingRules
+  rules?: RoundingRules,
 ): decimal {
   const [, remainder] = divRem(dividend, divisor, rules)
   return remainder
@@ -655,12 +655,12 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
     const estimate = Math.sqrt(+(digits + ((precision + scale) & 1 ? "" : "0")))
     digits = (estimate == 1 / 0 ? "5" : deconstruct(estimate)[1]).slice(
       0,
-      iterationPrecision
+      iterationPrecision,
     )
     result = construct(
       1,
       digits,
-      (((scale + 1) / 2) | 0) - +(scale < 0 || scale & 1)
+      (((scale + 1) / 2) | 0) - +(scale < 0 || scale & 1),
     )
 
     // Use Newton's method to generate and confirm additional precision.
@@ -668,7 +668,7 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
     do {
       result = mul(
         0.5,
-        add(result, div(value, result, { precision: iterationPrecision + 4 }))
+        add(result, div(value, result, { precision: iterationPrecision + 4 })),
       )
       prevDigits = digits
       digits = deconstruct(result)[1].slice(0, iterationPrecision)
@@ -762,12 +762,12 @@ export function cmp(a: Numeric, b: Numeric): 1 | -1 | 0 {
       !signA
         ? -signB | 0
         : // If b is zero, or the signs differ, return a's sign.
-        !signB || signA !== signB
-        ? signA
-        : // Otherwise they are the same sign, so compare absolute values and flip if negative.
-          (cmpAbs(digitsA, scaleA, precisionA, digitsB, scaleB, precisionB) *
-            signA) |
-          0
+          !signB || signA !== signB
+          ? signA
+          : // Otherwise they are the same sign, so compare absolute values and flip if negative.
+            (cmpAbs(digitsA, scaleA, precisionA, digitsB, scaleB, precisionB) *
+              signA) |
+            0
     ) as Sign
   )
 }
@@ -784,7 +784,7 @@ function cmpAbs(
   precisionA: number,
   digitsB: string,
   scaleB: number,
-  precisionB: number
+  precisionB: number,
 ): Sign {
   if (scaleA !== scaleB) return scaleA > scaleB ? 1 : -1
   for (
@@ -932,7 +932,7 @@ export function round(value: Numeric, rules?: RoundingRules): decimal {
  */
 export function roundRem(
   value: Numeric,
-  rules?: RoundingRules
+  rules?: RoundingRules,
 ): [rounded: decimal, remainder: decimal] {
   let [sign, digits, scale, precision] = deconstruct(value)
   let roundingRules = normalizeRules(rules, HALF_EVEN)
@@ -952,7 +952,7 @@ export function roundRem(
       roundingMode,
       sign,
       sign,
-      +(digits[roundingPrecision - 1] || 0)
+      +(digits[roundingPrecision - 1] || 0),
     )
 
     if (roundingMode === EXACT) {
@@ -965,11 +965,11 @@ export function roundRem(
       roundingMode === HALF_UP
         ? roundingDigit > 4
         : // A half down mode found the subsequent digit to be greater than 5, or 5 with additional digits
-        roundingMode === HALF_DOWN
-        ? roundingDigit > 5 ||
-          (roundingDigit === 5 && precision > roundingPrecision + 1)
-        : // The rounding mode is up and the value is non-zero
-          roundingMode === UP && sign
+          roundingMode === HALF_DOWN
+          ? roundingDigit > 5 ||
+            (roundingDigit === 5 && precision > roundingPrecision + 1)
+          : // The rounding mode is up and the value is non-zero
+            roundingMode === UP && sign
     ) {
       // Round up by adding one to the the least significant digit of the absolute value
       // and subtracting one from the remainder.
@@ -1038,7 +1038,7 @@ export function int(value: Numeric): decimal {
  * @category Rounding
  */
 export function intFrac(
-  value: Numeric
+  value: Numeric,
 ): [integer: decimal, fractional: decimal] {
   return roundRem(value, { mode: DOWN })
 }
@@ -1250,7 +1250,7 @@ export type RoundingMode =
 function normalizeRules(
   rules: RoundingRules | undefined,
   defaultMode: RoundingMode,
-  defaultPrecision?: number
+  defaultPrecision?: number,
 ): RoundingRules {
   let precision = rules && rules[PRECISION]
   let places = rules && rules[PLACES]
@@ -1314,7 +1314,7 @@ function normalizeRoundingMode(
   roundingMode: RoundingMode | undefined,
   sign: number,
   dividendSign: number,
-  leastSignificantDigit: number
+  leastSignificantDigit: number,
 ): "up" | "down" | "half up" | "half down" | "exact" | undefined {
   // prettier-ignore
   return (
@@ -1380,7 +1380,7 @@ export function toFixed(value: Numeric, rules?: RoundingRules): NumericString {
  */
 export function toExponential(
   value: Numeric,
-  rules?: RoundingRules
+  rules?: RoundingRules,
 ): NumericString {
   // Interpret "places" relative to the final exponential notation rather than
   // the original number. In exponential scientific notation, the precision of
@@ -1390,7 +1390,7 @@ export function toExponential(
     value,
     rules && rules[PLACES] != null
       ? { precision: toNumber(rules[PLACES]!) + 1, mode: rules[MODE] }
-      : rules
+      : rules,
   )
 }
 
@@ -1402,10 +1402,10 @@ export function toExponential(
 function toFormat(
   asExponential: boolean,
   value: Numeric,
-  rules?: RoundingRules
+  rules?: RoundingRules,
 ): NumericString {
   const [sign, digits, scale, precision] = deconstruct(
-    rules ? round(value, rules) : value
+    rules ? round(value, rules) : value,
   )
   const printPrecision = rules ? getRoundingPrecision(rules, scale) : precision
   const decimalPart = print(
@@ -1413,7 +1413,7 @@ function toFormat(
     digits,
     precision,
     printPrecision,
-    asExponential ? 1 : scale + 1
+    asExponential ? 1 : scale + 1,
   )
   const exponentialPart = asExponential ? (scale < 0 ? "e" : "e+") + scale : ""
   return (decimalPart + exponentialPart) as NumericString
@@ -1429,7 +1429,7 @@ function print(
   digits: string,
   precision: number,
   printPrecision: number,
-  decimalPoint: number
+  decimalPoint: number,
 ): NumericString {
   let result = sign < 0 ? "-" : ""
 
@@ -1465,7 +1465,9 @@ function parse(value: unknown): DecimalParts | null {
   return decimalRegex.exec(
     // Similar to ToNumeric() and ToPrimitive(), converts value to a primitive,
     // and booleans to a number, before converting it all to a string.
-    String(value === true || value === false ? +value : Object(value).valueOf())
+    String(
+      value === true || value === false ? +value : Object(value).valueOf(),
+    ),
   ) as DecimalParts | null
 }
 
@@ -1476,7 +1478,7 @@ type DecimalParts = [
   sign: string | undefined,
   integer: string,
   fractional: string | undefined,
-  exponent: string | undefined
+  exponent: string | undefined,
 ]
 
 type Sign = 1 | -1 | 0
@@ -1504,7 +1506,7 @@ type Sign = 1 | -1 | 0
  * @category Et cetera
  */
 export function deconstruct(
-  value: unknown
+  value: unknown,
 ): [sign: 1 | -1 | 0, digits: string, scale: number, precision: number] {
   const parts = parse(value)
   if (!parts) {
@@ -1514,7 +1516,7 @@ export function deconstruct(
   return normalizeRepresentation(
     sign === "-" ? -1 : 1,
     fractional ? integer + fractional : integer,
-    +(exponent || 0) + integer.length - 1
+    +(exponent || 0) + integer.length - 1,
   )
 }
 
@@ -1530,12 +1532,12 @@ export function deconstruct(
 export function construct(
   sign: 1 | -1 | 0,
   digits: string,
-  scale: number
+  scale: number,
 ): decimal {
   const [signA, digitsA, scaleA, precisionA] = normalizeRepresentation(
     sign,
     digits,
-    scale
+    scale,
   )
   return print(signA, digitsA, precisionA, precisionA, scaleA + 1) as decimal
 }
@@ -1549,7 +1551,7 @@ export function construct(
 function normalizeRepresentation(
   sign: Sign,
   digits: string,
-  scale: number
+  scale: number,
 ): [sign: Sign, digits: string, scale: number, precision: number] {
   let precision = digits.length
   let leadingZeros = 0

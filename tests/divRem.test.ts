@@ -4,13 +4,13 @@ describe("divRem", () => {
   it("throws for divide by zero", () => {
     expect(() => divRem(1, 0)).toThrow("https://decimali.sh/#DIV_ZERO 1/0")
     expect(() => divRem(123, 123, { places: 0.5 })).toThrow(
-      "https://decimali.sh/#NOT_INT places: 0.5"
+      "https://decimali.sh/#NOT_INT places: 0.5",
     )
     expect(() => divRem(123, 123, { precision: 0.5 })).toThrow(
-      "https://decimali.sh/#NOT_INT precision: 0.5"
+      "https://decimali.sh/#NOT_INT precision: 0.5",
     )
     expect(() => divRem(123, 123, { precision: 1, places: 1 })).toThrow(
-      "https://decimali.sh/#NOT_BOTH places: 1, precision: 1"
+      "https://decimali.sh/#NOT_BOTH places: 1, precision: 1",
     )
   })
 

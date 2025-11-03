@@ -5,30 +5,30 @@ describe("decimal", () => {
   it("throws on non numeric", () => {
     expect(() => decimal(NaN)).toThrow("https://decimali.sh/#NOT_NUM NaN")
     expect(() => decimal(Infinity)).toThrow(
-      "https://decimali.sh/#NOT_NUM Infinity"
+      "https://decimali.sh/#NOT_NUM Infinity",
     )
     expect(() => decimal(-Infinity)).toThrow(
-      "https://decimali.sh/#NOT_NUM -Infinity"
+      "https://decimali.sh/#NOT_NUM -Infinity",
     )
     expect(() => decimal("abc")).toThrow("https://decimali.sh/#NOT_NUM abc")
     expect(() => decimal("")).toThrow("https://decimali.sh/#NOT_NUM ")
     expect(() => decimal(".")).toThrow("https://decimali.sh/#NOT_NUM .")
     expect(() => decimal("1.2a")).toThrow("https://decimali.sh/#NOT_NUM 1.2a")
     expect(() => decimal("0xF00D")).toThrow(
-      "https://decimali.sh/#NOT_NUM 0xF00D"
+      "https://decimali.sh/#NOT_NUM 0xF00D",
     )
     expect(() => decimal(Symbol("3"))).toThrow(
-      "https://decimali.sh/#NOT_NUM Symbol(3)"
+      "https://decimali.sh/#NOT_NUM Symbol(3)",
     )
     expect(() => decimal({})).toThrow(
-      "https://decimali.sh/#NOT_NUM [object Object]"
+      "https://decimali.sh/#NOT_NUM [object Object]",
     )
     expect(() =>
       decimal({
         toString() {
           return "abc"
         },
-      })
+      }),
     ).toThrow("https://decimali.sh/#NOT_NUM abc")
   })
 
@@ -64,14 +64,14 @@ describe("decimal", () => {
         valueOf() {
           return -42
         },
-      })
+      }),
     ).toBe("-42")
     expect(
       decimal({
         toString() {
           return "12345"
         },
-      })
+      }),
     ).toBe("12345")
   })
 

@@ -10,7 +10,7 @@ describe("movePoint", () => {
 
   it("requires an integer", () => {
     expect(() => movePoint(10, 0.5)).toThrow(
-      "https://decimali.sh/#NOT_INT places: 0.5"
+      "https://decimali.sh/#NOT_INT places: 0.5",
     )
   })
 })

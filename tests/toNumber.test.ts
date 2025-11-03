@@ -11,10 +11,10 @@ describe("toNumber", () => {
 
   it("Does not allow implicit precision loss", () => {
     expect(() => toNumber(12345678901234567890n)).toThrow(
-      "https://decimali.sh/#INEXACT toNumber(12345678901234567890)"
+      "https://decimali.sh/#INEXACT toNumber(12345678901234567890)",
     )
     expect(() => toNumber("12345678901234567890")).toThrow(
-      "https://decimali.sh/#INEXACT toNumber(12345678901234567890)"
+      "https://decimali.sh/#INEXACT toNumber(12345678901234567890)",
     )
     expect(Number("12345678901234567890")).toBe(12345678901234567000)
   })

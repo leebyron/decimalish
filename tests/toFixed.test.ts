@@ -9,7 +9,7 @@ describe("toFixed", () => {
     expect(toFixed("0.123456")).toBe("0.123456")
     expect(toFixed("0.00123456")).toBe("0.00123456")
     expect(toFixed("12345678901234567890.1234567890123456789")).toBe(
-      "12345678901234567890.1234567890123456789"
+      "12345678901234567890.1234567890123456789",
     )
   })
 
@@ -83,7 +83,7 @@ describe("toFixed", () => {
     expect(toFixed("1.23456", { precision: 8, mode: "up" })).toBe("1.2345600")
     expect(toFixed("0.123456", { precision: 8, mode: "up" })).toBe("0.12345600")
     expect(toFixed("0.00123456", { precision: 8, mode: "up" })).toBe(
-      "0.0012345600"
+      "0.0012345600",
     )
 
     expect(toFixed("123456", { precision: -1, mode: "up" })).toBe("10000000")

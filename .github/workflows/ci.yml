@@ -12,7 +12,8 @@ jobs:
           node-version: 18
           cache: npm
       - run: npm ci
-      - run: npm test
+      - run: npm run lint
+      - run: npm run unit
       - run: npm run build
       - run: npm run integration
       - run: npm run website:build
@@ -22,8 +23,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: website/dist
           cname: decimali.sh
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
       - if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: JS-DevTools/npm-publish@v1
         with:

@@ -5,17 +5,17 @@ describe("round", () => {
     // @ts-expect-error 'abc' is not Numeric
     expect(() => round("abc")).toThrow("https://decimali.sh/#NOT_NUM abc")
     expect(() => round("123", { places: 0.5 })).toThrow(
-      "https://decimali.sh/#NOT_INT places: 0.5"
+      "https://decimali.sh/#NOT_INT places: 0.5",
     )
     expect(() => round("123", { precision: 0.5 })).toThrow(
-      "https://decimali.sh/#NOT_INT precision: 0.5"
+      "https://decimali.sh/#NOT_INT precision: 0.5",
     )
     expect(() => round("123", { precision: 1, places: 1 })).toThrow(
-      "https://decimali.sh/#NOT_BOTH places: 1, precision: 1"
+      "https://decimali.sh/#NOT_BOTH places: 1, precision: 1",
     )
     // @ts-expect-error 'sideways' is not a valid mode.
     expect(() => round("123", { mode: "sideways" })).toThrow(
-      "https://decimali.sh/#NOT_MODE sideways"
+      "https://decimali.sh/#NOT_MODE sideways",
     )
   })
 
@@ -193,7 +193,7 @@ describe("round", () => {
     // exact
     expect(round(1, { mode: "exact" })).toBe("1")
     expect(() => round(0.5, { mode: "exact" })).toThrow(
-      "https://decimali.sh/#INEXACT round 0.5"
+      "https://decimali.sh/#INEXACT round 0.5",
     )
     expect(round(0, { mode: "exact" })).toBe("0")
   })
