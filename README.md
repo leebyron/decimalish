@@ -155,8 +155,9 @@ equal footing to Decimalish’s own API.
 
 Call `decimal(value)` to convert a JavaScript `number` or numeric string into a
 Decimalish `decimal`. To go back to a native number, pass the decimal string to
-`Number(decimalValue)` or `parseFloat(decimalValue)`, keeping in mind that very
-large or highly precise decimals may not round-trip exactly.
+`toNumber(decimalValue)` for guaranteed accurate conversion (or thrown Error),
+or `parseFloat(decimalValue)`, keeping in mind that very large or highly precise
+decimals may not round-trip exactly.
 
 ### What's the difference between remainder and modulo?
 

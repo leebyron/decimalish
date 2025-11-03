@@ -17,6 +17,7 @@ describe("divRem", () => {
   it("returns 0 when 0 is divided", () => {
     expect(divRem(0, 1)).toStrictEqual(["0", "0"])
     expect(divRem(0, "12345678901234567890")).toStrictEqual(["0", "0"])
+    expect(divRem(0, -7)).toStrictEqual(["0", "0"])
   })
 
   it("returns no remainder when dividing evenly", () => {
@@ -67,5 +68,21 @@ describe("divRem", () => {
     expect(divRem(10, -3, { mode: "euclidean" })).toStrictEqual(["-3", "1"])
     expect(divRem(-10, 3, { mode: "euclidean" })).toStrictEqual(["-4", "2"])
     expect(divRem(-10, -3, { mode: "euclidean" })).toStrictEqual(["4", "2"])
+  })
+
+  it("throws for inexact division when asserting exact mode", () => {
+    expect(() => divRem(1, 3, { mode: "exact" })).toThrow(
+      "https://decimali.sh/#INEXACT 1/3",
+    )
+  })
+
+  it("rounds the quotient up when requested and adjusts the remainder", () => {
+    expect(divRem(7, 3, { places: 0, mode: "up" })).toStrictEqual(["3", "-2"])
+    expect(divRem(-7, 3, { places: 0, mode: "up" })).toStrictEqual(["-3", "2"])
+  })
+
+  it("matches floor division semantics", () => {
+    expect(divRem(7, -3, { mode: "floor" })).toStrictEqual(["-3", "-2"])
+    expect(divRem(-7, 3, { mode: "floor" })).toStrictEqual(["-3", "2"])
   })
 })

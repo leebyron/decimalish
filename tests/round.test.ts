@@ -1,4 +1,5 @@
 import { round } from "../decimalish"
+import type { RoundingRules } from "../decimalish"
 
 describe("round", () => {
   it("throws on bad input", () => {
@@ -196,5 +197,33 @@ describe("round", () => {
       "https://decimali.sh/#INEXACT round 0.5",
     )
     expect(round(0, { mode: "exact" })).toBe("0")
+  })
+
+  it("does not change zero regardless of rounding rules", () => {
+    const ruleSets: Array<[string, RoundingRules | undefined]> = [
+      ["default", undefined],
+      ["places positive", { places: 5 }],
+      ["places zero", { places: 0 }],
+      ["places negative", { places: -5 }],
+      ["precision positive", { precision: 5 }],
+      ["precision zero", { precision: 0 }],
+      ["precision negative", { precision: -5 }],
+      ["mode up", { mode: "up" }],
+      ["mode down with places", { mode: "down", places: 3 }],
+      ["mode half up with negative places", { mode: "half up", places: -3 }],
+      ["mode half even with precision", { mode: "half even", precision: 4 }],
+      [
+        "mode euclidean with zero precision",
+        { mode: "euclidean", precision: 0 },
+      ],
+    ]
+
+    for (const [, rules] of ruleSets) {
+      const result = rules ? round("0", rules) : round("0")
+      expect(result).toBe("0")
+    }
+
+    expect(round("0", { precision: -1, mode: "exact" })).toBe("0")
+    expect(round("0", { places: -2, mode: "exact" })).toBe("0")
   })
 })

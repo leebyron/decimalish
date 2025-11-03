@@ -51,4 +51,22 @@ describe("div", () => {
       "0.0000000000000000002430000021870000199041301811273416",
     )
   })
+
+  it("rounds half to even by default", () => {
+    expect(div(5, 2, { places: 0 })).toBe("2")
+    expect(div(15, 2, { places: 0 })).toBe("8")
+  })
+
+  it("supports alternate rounding modes", () => {
+    expect(div(5, 2, { places: 0, mode: "half up" })).toBe("3")
+    expect(div(5, 2, { places: 0, mode: "half down" })).toBe("2")
+    expect(div(-5, 2, { places: 0, mode: "ceil" })).toBe("-2")
+  })
+
+  it("returns zero when the dividend is zero", () => {
+    expect(div(0, 1)).toBe("0")
+    expect(div(0, -7)).toBe("0")
+    expect(div(0, 2n)).toBe("0")
+    expect(div(0, "10", { precision: 4 })).toBe("0")
+  })
 })

@@ -313,7 +313,12 @@ export function mul(a: Numeric, b: Numeric): decimal {
   const [signA, digitsA, scaleA, precisionA] = deconstruct(a)
   const [signB, digitsB, scaleB, precisionB] = deconstruct(b)
 
-  let digitsArray = new Array(precisionA + precisionB)
+  // If either a or b is zero, return zero.
+  if (!signA || !signB) {
+    return ZERO
+  }
+
+  const digitsArray = new Array(precisionA + precisionB)
   let result = 0
 
   for (let i = precisionA; i--; ) {
@@ -403,6 +408,18 @@ export function divRem(
   const [signB, digitsB, scaleB, precisionB] = deconstruct(divisor)
   rules = normalizeRoundingRules(rules, DOWN)
 
+  // If the divisor is zero, throw an error.
+  if (!signB) {
+    error("DIV_ZERO", `${dividend}/${divisor}`)
+  }
+
+  // If the dividend is zero, the result is always zero, regardless of any
+  // rounding rules. This is important for performance and correctness since
+  // the long-division algorithm below assumes dividend is non-zero.
+  if (!signA) {
+    return [ZERO, ZERO]
+  }
+
   // The resulting scale of a division is the difference between the
   // scales of the dividend and divisor.
   const sign = (signA * signB) as Sign
@@ -411,10 +428,6 @@ export function divRem(
   // Determine the desired rounding mode and precision.
   let roundingMode = rules[MODE]
   let roundingPrecision = getRoundingPrecision(rules, scale)
-
-  if (!digitsB) {
-    error("DIV_ZERO", `${dividend}/${divisor}`)
-  }
 
   // Collect the digits of the quotient.
   let quotientDigits = ""
@@ -494,7 +507,7 @@ export function divRem(
   let remainder = construct(signA, remainderDigits, scaleA)
 
   // If there is a remainder, consider the provided rounding rule.
-  if (remainder !== ("0" as decimal)) {
+  if (remainder !== ZERO) {
     roundingMode = normalizeRoundingMode(roundingMode, sign, signA, digit)
 
     if (roundingMode === EXACT) {
@@ -644,37 +657,38 @@ export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
     error("SQRT_NEG", value)
   }
 
+  // Sqrt 0 -> 0
+  if (!sign) {
+    return ZERO
+  }
+
   rules = normalizeRoundingRules(rules, HALF_EVEN, 34)
   const iterationPrecision = getRoundingPrecision(rules, scale)
 
-  // Sqrt 0 -> 0
-  let result = "0" as decimal
-  if (sign) {
-    // Start with an estimated result using floating point sqrt based on the idea
-    // that the result is independent of original value's scale as long as it
-    // is the same parity.
-    const estimate = Math.sqrt(+(digits + ((precision + scale) & 1 ? "" : "0")))
-    digits = (estimate == 1 / 0 ? "5" : deconstruct(estimate)[1]).slice(
-      0,
-      iterationPrecision,
-    )
-    result = construct(
-      1,
-      digits,
-      (((scale + 1) / 2) | 0) - +(scale < 0 || scale & 1),
-    )
+  // Start with an estimated result using floating point sqrt based on the idea
+  // that the result is independent of original value's scale as long as it
+  // is the same parity.
+  const estimate = Math.sqrt(+(digits + ((precision + scale) & 1 ? "" : "0")))
+  digits = (estimate == 1 / 0 ? "5" : deconstruct(estimate)[1]).slice(
+    0,
+    iterationPrecision,
+  )
+  let result = construct(
+    1,
+    digits,
+    (((scale + 1) / 2) | 0) - +(scale < 0 || scale & 1),
+  )
 
-    // Use Newton's method to generate and confirm additional precision.
-    let prevDigits = digits
-    do {
-      result = mul(
-        0.5,
-        add(result, div(value, result, { precision: iterationPrecision + 4 })),
-      )
-      prevDigits = digits
-      digits = deconstruct(result)[1].slice(0, iterationPrecision)
-    } while (prevDigits !== digits)
-  }
+  // Use Newton's method to generate and confirm additional precision.
+  let prevDigits = digits
+  do {
+    result = mul(
+      0.5,
+      add(result, div(value, result, { precision: iterationPrecision + 4 })),
+    )
+    prevDigits = digits
+    digits = deconstruct(result)[1].slice(0, iterationPrecision)
+  } while (prevDigits !== digits)
 
   // Round the final result
   return round(result, rules)
@@ -935,6 +949,11 @@ export function roundRem(
 ): [rounded: decimal, remainder: decimal] {
   let [sign, digits, scale, precision] = deconstruct(value)
   let roundingRules = normalizeRoundingRules(rules, HALF_EVEN)
+
+  // Zero always rounds to zero
+  if (!sign) {
+    return [ZERO, ZERO]
+  }
 
   // Determine the desired rounding mode and precision.
   let roundingMode = roundingRules[MODE]
@@ -1706,6 +1725,7 @@ export type ErrorCode =
 // Constant keywords
 
 // TODO: code golf whether inlining these is better for bytes
+const ZERO = "0" as decimal
 const PLACES = "places"
 const PRECISION = "precision"
 const MODE = "mode"
