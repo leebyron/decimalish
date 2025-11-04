@@ -140,12 +140,27 @@
 
 html,
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
     sans-serif;
   font-kerning: normal;
   font-variant-ligatures: contextual common-ligatures;
-  font-feature-settings: "kern" 1, "liga" 1, "ccmp" 1, "case" 1, "calt" 1,
+  font-feature-settings:
+    "kern" 1,
+    "liga" 1,
+    "ccmp" 1,
+    "case" 1,
+    "calt" 1,
     "ss01" 1;
 
   --bg-color: var(--header-color);
@@ -286,13 +301,16 @@ li:not(:last-child) {
 }
 
 pre {
-  overflow: scroll;
+  overflow-x: auto;
   padding: 0.5em 1em;
   margin: 1em 0;
   border-radius: 2px;
   background-color: var(--pre-bg-color);
   width: fit-content;
-  min-width: min(100% - 2em, 60ch);
+  min-width: min(var(--max-width), 100% - 2em, 60ch);
+  max-width: min(var(--max-width), 100vw - 2 * var(--gutter-size));
+  box-sizing: border-box;
+  white-space: pre;
 }
 
 pre,
@@ -303,6 +321,10 @@ code {
   color: var(--text-color);
 }
 
+pre code {
+  white-space: inherit;
+}
+
 code span {
   color: var(--text-color);
 }
@@ -310,6 +332,10 @@ code span {
 a {
   white-space: nowrap;
   --underline-color: var(--text-color);
+}
+
+h3 a {
+  white-space: normal;
 }
 
 a,
@@ -472,6 +498,7 @@ header nav {
 
 header nav a {
   padding: 0.5em 1em;
+  white-space: nowrap;
   --underline-color: transparent;
 }
 
@@ -514,7 +541,7 @@ header nav a:last-child {
   display: grid;
   grid-template-columns: repeat(
     auto-fill,
-    minmax(var(--medium-col-width), 1fr)
+    minmax(min(100%, var(--medium-col-width)), 1fr)
   );
   gap: 0 var(--column-gap);
   margin-top: 0;
@@ -530,7 +557,10 @@ header nav a:last-child {
 
 .api-toc-sec > div {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--small-col-width), 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, var(--small-col-width)), 1fr)
+  );
   gap: var(--column-gap);
 }
 
@@ -664,7 +694,7 @@ a.string:before {
   --text-color: var(--comment-color);
 }
 </style>
-    <script>!function(n,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((n="undefined"!=typeof globalThis?globalThis:n||self).decimalish={})}(this,(function(n){"use strict";function r(n){var r=_(n);return j(r[0],r[1],r[2])}function e(n){return!!E(n)}function t(n){var r;return e(n)&&(r=_(n))[2]+1>=r[3]}function u(n,r){var e=_(n),t=e[0],u=e[1],i=e[2],o=e[3],f=_(r),c=f[0],a=f[1],l=f[2],s=f[3];if(!t)return j(c,a,l);if(!c)return j(t,u,i);var d,m=t,p=i>l?i:l,h=o-i>s-l?o-i:s-l,N=new Array(h+p),T=0;if(t===c){for(;h-- >-p;)T+=+(u[h+i]||0)+ +(a[h+l]||0),N[h+p]=T%10,T=T>9?1:0;d=N.join(""),T&&(d=T+d,p++)}else{var g=v(u,i,o,a,l,s);if(g)for(m*=g;h-- >-p;)T+=10+g*(+(u[h+i]||0)-+(a[h+l]||0)),N[h+p]=T%10,T=T>9?0:-1;d=N.join("")}return j(m,d,p)}function i(n,r){return u(n,s(r))}function o(n,r){for(var e=_(n),t=e[0],u=e[1],i=e[2],o=e[3],f=_(r),c=f[0],a=f[1],l=f[2],v=f[3],s=new Array(o+v),d=0,m=o;m--;){d=0;for(var p=v;p--;)d+=(s[m+p+1]||0)+ +(u[m]||0)*+(a[p]||0),s[m+p+1]=d%10,d=d/10|0;s[m]=d}return j(t*c,s.join(""),i+l+1)}function f(n,r,e){return c(n,r,T(e,H,34))[0]}function c(n,r,e){var t=_(n),f=t[0],c=t[1],a=t[2],v=t[3],s=_(r),d=s[0],m=s[1],p=s[2],h=s[3],N=f*d,x=a-p,b=(e=T(e,M))[C],w=g(e,x);m||R("DIV_ZERO",n+"/"+r);for(var E="",I=h>v?h:v,y=[],A=I;A--;)y[A]=+(c[A]||0);for(var S=0,X=0,F=0;X<w&&(X<=v-h||S<X+h-1);X++){I<X+h&&(y[I++]=0),F=-1;n:for(;F++<9;){if(S>=X)for(var B=-1,G=0;!G&&++B<h;)if((G=y[X+B]-+m[B])<0)break n;for(var H=X+h;H-- >X;)y[H]-=+(m[H-X]||0),y[H]<0&&(y[H]+=10,y[H-1]-=1);for(;0===y[S];)S++}0===X&&0===F&&null!=e[q]&&w++,E+=F}var Q=y.join(""),V=j(N,E,x),Z=j(f,Q,a);if("0"!==Z){(b=O(b,N,f,F))===U&&R("INEXACT",n+"/"+r);var $=b===D;if(b===P||b===k){var z=l(o(2,Q),m);$=b===P?z>=0:z>0}$&&(V=u(V,j(N,"1",x-X+1)),Z=i(Z,j(f,m,a-X+1)))}return[V,Z]}function a(n,r,e){return c(n,r,e)[1]}function l(n,r){var e=_(n),t=e[0],u=e[1],i=e[2],o=e[3],f=_(r),c=f[0],a=f[1],l=f[2],s=f[3];return t?c&&t===c?v(u,i,o,a,l,s)*t|0:t:0|-c}function v(n,r,e,t,u,i){if(r!==u)return r>u?1:-1;for(var o=-1,f=e<i?e:i;++o<f;)if(n[o]!==t[o])return n[o]>t[o]?1:-1;return e===i?0:e>i?1:-1}function s(n){var r=_(n);return j(-r[0],r[1],r[2])}function d(n,r){return m(n,r)[0]}function m(n,r){var e=_(n),t=e[0],o=e[1],f=e[2],c=e[3],a=T(r,H),l=a[C],v=g(a,f),s=v>0?v:0,d=j(t,o.slice(0,s),f),m=j(t,o.slice(s),f-s);if(v<c){(l=O(l,t,t,+(o[v-1]||0)))===U&&R("INEXACT","round "+n);var p=+(o[v]||0);if(l===P?p>4:l===k?p>5||5===p&&c>v+1:l===D&&t){var h=j(t,"1",f-v+1);d=u(d,h),m=i(m,h)}}return[d,m]}function p(){return N(arguments,1)}function h(){return N(arguments,-1)}function N(n,e){for(var t=r(n[0]),u=1;u<n.length;u++){var i=r(n[u]);l(i,t)===e&&(t=i)}return t}function T(n,r,e){var t,u=n&&n[q],i=n&&n[S],o=n&&n[C]||r,f=[D,M,X,F,Q,P,k,B,G,H,U];for(var c in null!=i?(null!=u&&R("NOT_BOTH",S+": "+i+", "+q+": "+u),i=A(S,i)):u=null!=u?A(q,u):e,f)t|=f[c]==o;return t||R("NOT_MODE",o),{precision:u,places:i,mode:o}}function g(n,r){return null!=n[q]?x(n[q]):x(n[S]||0)+r+1}function O(n,r,e,t){return n===X?r<0?M:D:n===F?r<0?D:M:n===Q?e<0?D:M:n===B?r<0?k:P:n===G?r<0?P:k:n===H?t%2?P:k:n}function x(n){var e=r(n);return r(+e)!==e&&R("INEXACT","toNumber("+n+")"),+e}function b(n,r,e){var t=_(e?d(r,e):r),u=t[0],i=t[1],o=t[2],f=t[3];return w(u,i,f,e?g(e,o):f,n?1:o+1)+(n?(o<0?"e":"e+")+o:"")}function w(n,r,e,t,u){for(var i=n<0?"-":"";e<t;)r+="0",e++;if(u<1){for(i+="0.";u++;)i+="0";i+=r}else if(u<t)i+=r.slice(0,u)+"."+r.slice(u);else for(i+=r;u-- >e;)i+="0";return i}function E(n){return I.exec(String(!0===n||!1===n?+n:Object(n).valueOf()))}var I=/^([-+])?(\d+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i;function _(n){var r=E(n);r||R("NOT_NUM",String(n));var e=r[1],t=r[2],u=r[3];return y("-"===e?-1:1,u?t+u:t,+(r[4]||0)+t.length-1)}function j(n,r,e){var t=y(n,r,e),u=t[0],i=t[1],o=t[2],f=t[3];return w(u,i,f,f,o+1)}function y(n,r,e){for(var t=r.length,u=0,i=0;"0"===r[u];)u++,e--;if(u===t)return[0,"",0,0];for(;"0"===r[t-1-i];)i++;return(u||i)&&(r=r.slice(u,t-i)),[n,r,e,t-u-i]}function A(n,r){return t(r)||R("NOT_INT",n+": "+r),x(r)}function R(n,r){var e=new Error("https://decimali.sh/#"+n+" "+r);throw e.code=n,e}var S="places",q="precision",C="mode",D="up",M="down",X="ceil",F="floor",P="half up",k="half down",B="half ceil",G="half floor",H="half even",Q="euclidean",U="exact";n.abs=function(n){var r=_(n);return j(1,r[1],r[2])},n.add=u,n.ceil=function(n){return d(n,{mode:X})},n.clamp=function(n,r,e){return h(e,p(r,n))},n.cmp=l,n.construct=j,n.decimal=r,n.deconstruct=_,n.div=f,n.divInt=function(n,r,e){return c(n,r,e)[0]},n.divRem=c,n.eq=function(n,r){return 0===l(n,r)},n.floor=function(n){return d(n,{mode:F})},n.gt=function(n,r){return 1===l(n,r)},n.gte=function(n,r){return-1!==l(n,r)},n.int=function(n){return d(n,{mode:M})},n.intFrac=function(n){return m(n,{mode:M})},n.isDecimal=function(n){return e(n)&&r(n)===n},n.isInteger=t,n.isNumeric=e,n.lt=function(n,r){return-1===l(n,r)},n.lte=function(n,r){return 1!==l(n,r)},n.max=p,n.min=h,n.mod=function(n,r){return a(n,r,{mode:F})},n.movePoint=function(n,r){var e=_(n);return j(e[0],e[1],e[2]+A("places",r))},n.mul=o,n.neg=s,n.places=function(n){var r=_(n),e=r[2],t=r[3]-e-1;return t>0?t:0},n.pow=function(n,e){var t=r(n),u="1",i=A("exponent",e);for(i<0&&R("NOT_POS","exponent: "+e);i;)1&i&&(u=o(u,t)),(i>>=1)&&(t=o(t,t));return u},n.precision=function(n){return _(n)[3]},n.rem=a,n.round=d,n.roundRem=m,n.scale=function(n){return _(n)[2]},n.sign=function(n){return _(n)[0]},n.sqrt=function(n,r){var e=_(n),t=e[0],i=e[1],c=e[2],a=e[3];t<0&&R("SQRT_NEG",n);var l=g(r=T(r,H,34),c),v="0";if(t){var s=Math.sqrt(+(i+(a+c&1?"":"0")));v=j(1,i=(s==1/0?"5":_(s)[1]).slice(0,l),((c+1)/2|0)-+(c<0||1&c));var m=i;do{m=i,i=_(v=o(.5,u(v,f(n,v,{precision:l+4}))))[1].slice(0,l)}while(m!==i)}return d(v,r)},n.sub=i,n.toExponential=function(n,r){return b(!0,n,r&&null!=r[S]?{precision:x(r[S])+1,mode:r[C]}:r)},n.toFixed=function(n,r){return b(!1,n,r)},n.toNumber=x}));</script>
+    <script>!function(n,r){"object"==typeof exports&&"undefined"!=typeof module?r(exports):"function"==typeof define&&define.amd?define(["exports"],r):r((n="undefined"!=typeof globalThis?globalThis:n||self).decimalish={})}(this,(function(n){"use strict";function r(n){var r=j(n);return y(r[0],r[1],r[2])}function t(n){return!!I(n)}function e(n){var r;return t(n)&&(r=j(n))[2]+1>=r[3]}function u(n,r){var t=j(n),e=t[0],u=t[1],i=t[2],o=t[3],c=j(r),a=c[0],l=c[1],v=c[2],d=c[3];if(!e)return y(a,l,v);if(!a)return y(e,u,i);var m,p=e,h=i>v?i:v,N=o-i>d-v?o-i:d-v,T=f(N+h),g=0;if(e===a){for(;N-- >-h;)g+=+(u[N+i]||0)+ +(l[N+v]||0),T[N+h]=g%10,g=g>9?1:0;m=T.join(""),g&&(m=g+m,h++)}else{var O=s(u,i,o,l,v,d);if(O)for(p*=O;N-- >-h;)g+=10+O*(+(u[N+i]||0)-+(l[N+v]||0)),T[N+h]=g%10,g=g>9?0:-1;m=T.join("")}return y(p,m,h)}function i(n,r){return u(n,d(r))}function o(n,r){var t=j(n),e=t[0],u=t[1],i=t[2],o=t[3],c=j(r),a=c[0],l=c[1],v=c[2],s=c[3];if(!e||!a)return q;for(var d=f(o+s),m=0,p=o;p--;){m=0;for(var h=s;h--;)m+=d[p+h+1]+ +u[p]*+l[h],d[p+h+1]=m%10,m=m/10|0;d[p]=m}return y(e*a,d.join(""),i+v+1)}function f(n){for(var r=new Array(n),t=0;t<n;t++)r[t]=0;return r}function c(n,r,t){return a(n,r,g(t,U,34))[0]}function a(n,r,t){var e=j(n),c=e[0],a=e[1],l=e[2],s=e[3],d=j(r),m=d[0],p=d[1],h=d[2],N=d[3];if(t=g(t,F),m||S("DIV_ZERO",n+"/"+r),!c)return[q,q];for(var T=c*m,b=l-h,E=t[M],w=O(t,b),I="",_=N>s?N:s,A=f(_),R=_;R--;)A[R]=+(a[R]||0);for(var C=0,P=0,k=0;P<w&&(P<=s-N||C<P+N-1);P++){_<P+N&&(A[_++]=0),k=-1;n:for(;k++<9;){if(C>=P)for(var H=-1,Q=0;!Q&&++H<N;)if((Q=A[P+H]-+p[H])<0)break n;for(var U=P+N;U-- >P;)A[U]-=+p[U-P],A[U]<0&&(A[U]+=10,A[U-1]-=1);for(;0===A[C];)C++}0===P&&0===k&&null!=t[D]&&w++,I+=k}var V=A.join(""),$=y(T,I,b),z=y(c,V,l);if(z!==q){(E=x(E,T,c,k))===Z&&S("INEXACT",n+"/"+r);var J=E===X;if(E===B||E===G){var K=v(o(2,V),p);J=E===B?K>=0:K>0}J&&($=u($,y(T,"1",b-P+1)),z=i(z,y(c,p,l-P+1)))}return[$,z]}function l(n,r,t){return a(n,r,t)[1]}function v(n,r){if(n===r)return 0;var t=j(n),e=t[0],u=t[1],i=t[2],o=t[3],f=j(r),c=f[0],a=f[1],l=f[2],v=f[3];return e?c&&e===c?s(u,i,o,a,l,v)*e|0:e:0|-c}function s(n,r,t,e,u,i){if(r!==u)return r>u?1:-1;for(var o=-1,f=t<i?t:i;++o<f;)if(n[o]!==e[o])return n[o]>e[o]?1:-1;return t===i?0:t>i?1:-1}function d(n){var r=j(n);return y(-r[0],r[1],r[2])}function m(n,r){return p(n,r)[0]}function p(n,r){var t=j(n),e=t[0],o=t[1],f=t[2],c=t[3],a=g(r,U);if(!e)return[q,q];var l=a[M],v=O(a,f),s=v>0?v:0,d=y(e,o.slice(0,s),f),m=y(e,o.slice(s),f-s);if(v<c){(l=x(l,e,e,+(o[v-1]||0)))===Z&&S("INEXACT","round "+n);var p=+(o[v]||0);if(l===B?p>4:l===G?p>5||5===p&&c>v+1:l===X&&e){var h=y(e,"1",f-v+1);d=u(d,h),m=i(m,h)}}return[d,m]}function h(){return T(arguments,1)}function N(){return T(arguments,-1)}function T(n,t){for(var e=r(n[0]),u=1;u<n.length;u++){var i=r(n[u]);v(i,e)===t&&(e=i)}return e}function g(n,r,t){var e,u=n&&n[D],i=n&&n[C],o=n&&n[M]||r,f=[X,F,P,k,V,B,G,H,Q,U,Z];for(var c in null!=i?(null!=u&&S("NOT_BOTH",C+": "+i+", "+D+": "+u),i=R(C,i)):u=null!=u?R(D,u):t,f)e|=f[c]==o;return e||S("NOT_MODE",o),{precision:u,places:i,mode:o}}function O(n,r){return null!=n[D]?b(n[D]):b(n[C]||0)+r+1}function x(n,r,t,e){return n===P?r<0?F:X:n===k?r<0?X:F:n===V?t<0?X:F:n===H?r<0?G:B:n===Q?r<0?B:G:n===U?e%2?B:G:n}function b(n){var t=r(n);return r(+t)!==t&&S("INEXACT","toNumber("+n+")"),+t}function E(n,r,t){var e=j(t?m(r,t):r),u=e[0],i=e[1],o=e[2],f=e[3];return w(u,i,f,t?O(t,o):f,n?1:o+1)+(n?(o<0?"e":"e+")+o:"")}function w(n,r,t,e,u){for(var i=n<0?"-":"";t<e;)r+="0",t++;if(u<1){for(i+="0.";u++;)i+="0";i+=r}else if(u<e)i+=r.slice(0,u)+"."+r.slice(u);else for(i+=r;u-- >t;)i+="0";return i}function I(n){return _.exec(String(!0===n||!1===n?+n:Object(n).valueOf()))}var _=/^([-+])?(\d+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i;function j(n){var r=I(n);r||S("NOT_NUM",String(n));var t=r[1],e=r[2],u=r[3];return A("-"===t?-1:1,u?e+u:e,+(r[4]||0)+e.length-1)}function y(n,r,t){var e=A(n,r,t),u=e[0],i=e[1],o=e[2],f=e[3];return w(u,i,f,f,o+1)}function A(n,r,t){for(var e=r.length,u=0,i=0;"0"===r[u];)u++,t--;if(u===e)return[0,"",0,0];for(;"0"===r[e-1-i];)i++;return(u||i)&&(r=r.slice(u,e-i)),[n,r,t,e-u-i]}function R(n,r){return e(r)||S("NOT_INT",n+": "+r),b(r)}function S(n,r){var t=new Error("https://decimali.sh/#"+n+" "+r);throw t.code=n,t}var q="0",C="places",D="precision",M="mode",X="up",F="down",P="ceil",k="floor",B="half up",G="half down",H="half ceil",Q="half floor",U="half even",V="euclidean",Z="exact";n.abs=function(n){var r=j(n);return y(1,r[1],r[2])},n.add=u,n.ceil=function(n){return m(n,{mode:P})},n.clamp=function(n,r,t){return N(t,h(r,n))},n.cmp=v,n.construct=y,n.decimal=r,n.deconstruct=j,n.div=c,n.divInt=function(n,r,t){return a(n,r,t)[0]},n.divRem=a,n.eq=function(n,r){return 0===v(n,r)},n.floor=function(n){return m(n,{mode:k})},n.gt=function(n,r){return 1===v(n,r)},n.gte=function(n,r){return-1!==v(n,r)},n.int=function(n){return m(n,{mode:F})},n.intFrac=function(n){return p(n,{mode:F})},n.isDecimal=function(n){return t(n)&&r(n)===n},n.isInteger=e,n.isNumeric=t,n.lt=function(n,r){return-1===v(n,r)},n.lte=function(n,r){return 1!==v(n,r)},n.max=h,n.min=N,n.mod=function(n,r){return l(n,r,{mode:k})},n.movePoint=function(n,r){var t=j(n);return y(t[0],t[1],t[2]+R("places",r))},n.mul=o,n.neg=d,n.places=function(n){var r=j(n),t=r[2],e=r[3]-t-1;return e>0?e:0},n.pow=function(n,t){var e=r(n),u="1",i=R("exponent",t);for(i<0&&S("NOT_POS","exponent: "+t);i;)1&i&&(u=o(u,e)),(i>>=1)&&(e=o(e,e));return u},n.precision=function(n){return j(n)[3]},n.rem=l,n.round=m,n.roundRem=p,n.scale=function(n){return j(n)[2]},n.sign=function(n){return j(n)[0]},n.sqrt=function(n,r){var t=j(n),e=t[0],i=t[1],f=t[2],a=t[3];if(e<0&&S("SQRT_NEG",n),!e)return q;var l=O(r=g(r,U,34),f),v=Math.sqrt(+(i+(a+f&1?"":"0"))),s=y(1,i=(v==1/0?"5":j(v)[1]).slice(0,l),((f+1)/2|0)-+(f<0||1&f)),d=i;do{d=i,i=j(s=o(.5,u(s,c(n,s,{precision:l+4}))))[1].slice(0,l)}while(d!==i);return m(s,r)},n.sub=i,n.toExponential=function(n,r){return E(!0,n,r&&null!=r[C]?{precision:b(r[C])+1,mode:r[M]}:r)},n.toFixed=function(n,r){return E(!1,n,r)},n.toNumber=b}));</script>
   </head>
   <body>
     <div class="theme-toggle">
@@ -1592,7 +1622,7 @@ a.string:before {
       this._updateDOM(
         this.current === this.target && !this.extra
           ? this.targetChar
-          : SplitFlap.symbols[this.current]
+          : SplitFlap.symbols[this.current],
       )
       const timing = {
         duration: Math.round(SplitFlap.speed * (0.95 + 0.1 * Math.random())),
@@ -1603,7 +1633,7 @@ a.string:before {
           { transform: "translate3d(0, -2.25%, 0)" },
           { transform: "translate3d(0, 0, 0)", offset: 0.7 },
         ],
-        timing
+        timing,
       )
       const perspective = 6 * this.flap.clientWidth
       this.flap.animate(
@@ -1616,11 +1646,11 @@ a.string:before {
             offset: 0.7,
           },
         ],
-        timing
+        timing,
       )
       this.shadow.animate(
         [{ opacity: "0" }, { opacity: "1", offset: 0.7 }],
-        timing
+        timing,
       )
       this.shine.animate(
         [
@@ -1628,7 +1658,7 @@ a.string:before {
           { opacity: "0.5", offset: 0.2 },
           { opacity: "0", offset: 0.7 },
         ],
-        timing
+        timing,
       )
       await animation.finished
     }
@@ -1656,12 +1686,12 @@ function sfDisplay(text, reset) {
   text = text.map((v, i) =>
     typeof v === "string"
       ? { char: v, delay: i * 50 }
-      : { ...v, delay: v.delay ?? i * 50 }
+      : { ...v, delay: v.delay ?? i * 50 },
   )
   return Promise.all(
     text.map((data, i) =>
-      reset ? cells[i].reset(data.char) : cells[i].set(data)
-    )
+      reset ? cells[i].reset(data.char) : cells[i].set(data),
+    ),
   )
 }
 
@@ -1765,7 +1795,7 @@ pitfall of nearly all numbers represented by computers.
           <p>
             While we read numbers in decimal, computers read binary and must
 convert. Information can be lost when converting a fixed number of
-bits and yield confusing results. In finance or engineering these
+bits and can yield confusing results. In finance or engineering these
 errors are simply unacceptable.
           </p>
           <p>
@@ -1777,7 +1807,7 @@ convert by directly representing numbers in decimal.
 arbitrarily high precision (significant digits or decimal places).
           </p>
           <p>
-            <strong>So what’s the catch?</strong> Well speed for one, computers
+            <strong>So what’s the catch?</strong> Well, speed for one, computers
 are specifically designed to make working with floating point numbers
 fast. While nowhere close to native speed, Decimalish is unlikely to
 be your program’s bottleneck.
@@ -1855,7 +1885,7 @@ use, as little as 0.45KB.
             <a href="#functional-api">Functional API</a>
           </h3>
           <p>
-            All methods in Decimalish's API are provided as top level functions,
+            All methods in Decimalish's API are provided as top-level functions,
 not prototype methods. This maintains similarity to the built-in
 <code><span class="param">Math</span></code> module, enables tree-shaking, and works well with functional
 utility libraries like <a target="_blank" href="https://ramdajs.com/">ramda</a> or
@@ -1868,7 +1898,7 @@ utility libraries like <a target="_blank" href="https://ramdajs.com/">ramda</a> 
           </h3>
           <p>
             Most BigDecimal libraries introduce a Decimal type as an Object, which
-is potentially mutable, not comparable, and often require writing
+is potentially mutable, not comparable, and often requires writing
 bulky code with repeated calls to constructors. Decimalish’s <code><a href="#decimal" class="type">decimal</a></code>
 type, much like the built in <code><span class="param">number</span></code>, is an <em>immutable primitive</em>
 …because it is a string.
@@ -1900,9 +1930,9 @@ error (such as <code><a href="#DIV-ZERO" class="string">&quot;DIV_ZERO&quot;</a>
           </h3>
           <p>
             Many BigDecimal libraries automatically round the result of every
-operation if too bigger, too smaller, or too high precision based on
-some globally defined config. This can be confusing, cumbersome to
-configure, and another common source of bugs.
+operation if the value is too big, too small, or exceeds a precision
+limit based on some globally defined config. This can be confusing,
+cumbersome to configure, and another common source of bugs.
           </p>
           <p>
             Decimalish almost always returns exact results, only rounding when it
@@ -1918,12 +1948,12 @@ configured behavior without any global state.
             Some BigDecimal libraries attempt to visually preserve precision after
 an operation by adding trailing zeros. While this can be useful for
 quick number formatting, this conflates mathematical value with
-presentation, require multiple kinds of equality (is <code><span class="number">1.0</span></code> equal to
-<code><span class="number">1</span></code>?), and sometimes operations such as multiple result in surprising
-results and thus, you guessed it, another source of bugs.
+presentation, requires multiple kinds of equality (is <code><span class="number">1.0</span></code> equal to
+<code><span class="number">1</span></code>?), and sometimes operations such as multiplication can result in
+surprising results and thus, you guessed it, another source of bugs.
           </p>
           <p>
-            Decimalish's <code><a href="#decimal()" class="function">decimal()</a></code> constructor, and all other math functions
+            Decimalish's <code><a href="#decimal()" class="function">decimal()</a></code> constructor and all other math functions
 always return canonical normalized decimal values without any leading
 or trailing zeros.
           </p>
@@ -1939,8 +1969,8 @@ precision (significant digits). It's not always clear which based on
 reading code alone.
           </p>
           <p>
-            Decimalish offers both for all methods that might round with an easy
-to read API, alongside a rich set of rounding and division modes.
+            Decimalish offers both for all methods that might round with an easy-to-read
+API, alongside a rich set of rounding and division modes.
           </p>
         </div>
         <div id="extensible">
@@ -2169,7 +2199,7 @@ strings, but not all numeric strings are decimals.
 translated to decimal.
             </p>
             <p>
-              Note: unlike number, decimal cannot represent <code><span class="keyword">Infinity</span></code>, <code><span class="keyword">NaN</span></code>, or <code>-<span class="number">0</span></code>.
+              Unlike number, decimal cannot represent <code><span class="keyword">Infinity</span></code>, <code><span class="keyword">NaN</span></code>, or <code>-<span class="number">0</span></code>.
             </p>
           </div>
         </div>
@@ -2344,8 +2374,9 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
           <div>
             <code class="decl"><span class="function">divRem</span>(<wbr><span class="param">dividend</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">divisor</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>):<br>[<wbr><span class="label">quotient</span>: <a href="#decimal" class="type">decimal</a>, <span class="label">remainder</span>: <a href="#decimal" class="type">decimal</a><wbr>]</code>
             <p>
-              Divides two numeric values to a given places or precision returning both the
-quotient and the remainder while satisfying the two conditions:
+              Divides two numeric values to a given number of decimal places or to a specified
+precision, returning both the quotient and the remainder while satisfying the two
+conditions:
             </p>
             <ul>
               <li>
@@ -2356,9 +2387,9 @@ quotient and the remainder while satisfying the two conditions:
               </li>
             </ul>
             <p>
-              However there is not only one quotient and remainder which satisfies these
-conditions. A choice of the sign of the remainder (via <code><a href="#RoundingMode" class="type">RoundingMode</a></code>) and
-precision of the quotient can be provided via <code><span class="param">rules</span></code>.
+              However, multiple quotient and remainder pairs satisfy these conditions. A choice
+of the sign of the remainder (via <code><a href="#RoundingMode" class="type">RoundingMode</a></code>) and precision of the quotient
+can be provided via <code><span class="param">rules</span></code>.
             </p>
             <p>
               All rounding modes may be used and these conditions will be satisfied.
@@ -2506,8 +2537,8 @@ instead. If you need both the quotient and the remainder, use <code><a href="#di
 The result always has the same sign as the second argument (or 0).
             </p>
             <p>
-              Note: this is not the same as the % (remainder) operator. Use <code><a href="#rem()" class="function">rem()</a></code> for an
-equivalent to <code>%</code>.
+              This is not the same as the % (remainder) operator. Use <code><a href="#rem()" class="function">rem()</a></code> for an equivalent
+to <code>%</code>.
             </p>
           </div>
         </div>
@@ -2520,8 +2551,8 @@ equivalent to <code>%</code>.
           <div>
             <code class="decl"><span class="function">pow</span>(<wbr><span class="param">base</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">exponent</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
-              Raises <code><span class="param">base</span></code> to the power <code><span class="param">exponent</span></code>, where <code><span class="param">exponent</span></code> must be a positive
-whole number.
+              Raises <code><span class="param">base</span></code> to the power <code><span class="param">exponent</span></code>, where <code><span class="param">exponent</span></code> must be a non-negative
+integer.
             </p>
           </div>
         </div>
@@ -2608,7 +2639,7 @@ mode, configurable by providing rounding <code><span class="param">rules</span><
 is greater than a, and <code><span class="number">0</span></code> if a and b are equivalent.
             </p>
             <p>
-              Note: This is equivalent to, but much faster than, <code><a href="#sign()" class="function">sign</a>(<a href="#sub()" class="function">sub</a>(<span class="param">a</span>, <span class="param">b</span>))</code>.
+              This is equivalent to, but much faster than, <code><a href="#sign()" class="function">sign</a>(<a href="#sub()" class="function">sub</a>(<span class="param">a</span>, <span class="param">b</span>))</code>.
             </p>
           </div>
         </div>
@@ -2645,10 +2676,7 @@ is greater than a, and <code><span class="number">0</span></code> if a and b are
             <code class="decl"><span class="function">sign</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span></code>
             <p>
               Returns a number indicating the sign of the provided value. A <code><span class="number">1</span></code> for
-positive values, <code>-<span class="number">1</span></code> for negative, or <code><span class="number">0</span></code> for zero.
-            </p>
-            <p>
-              Note: decimal does not represent negative zero.
+positive values, <code>-<span class="number">1</span></code> for negative, or <code><span class="number">0</span></code> for zero (Decimal does not represent negative zero).
             </p>
           </div>
         </div>
@@ -2695,11 +2723,11 @@ Equivalent to the exponent when the value is printed with <code><a href="#toExpo
           <div>
             <code class="decl"><span class="function">movePoint</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">places</span>: <a href="#Numeric" class="type">Numeric</a><wbr>): <a href="#decimal" class="type">decimal</a></code>
             <p>
-              Returns the <code><span class="param">value</span></code> with the decimal point to the right a relative number of
-<code><span class="param">places</span></code>. Negative values of <code><span class="param">places</span></code> moves the decimal point to the left.
+              Returns the value with the decimal point moved to the right by the given number
+of places; negative values move it to the left.
             </p>
             <p>
-              Note: This is equivalent to, but much faster than,
+              This is equivalent to, but much faster than,
 <code><a href="#mul()" class="function">mul</a>(<span class="param">value</span>, <a href="#pow()" class="function">pow</a>(<span class="number">10</span>, <span class="param">places</span>))</code>.
             </p>
           </div>
@@ -2755,7 +2783,7 @@ to <code>{ <span class="label">places</span>: <span class="number">0</span>, <sp
               Rounds down to the nearest whole number in the direction of <code>-<span class="keyword">Infinity</span></code>.
             </p>
             <p>
-              Note: Equivalent to <code><a href="#round()" class="function">round</a>(<span class="param">value</span>, { <span class="param">mode:</span> <a href="#floor" class="string">&quot;floor&quot;</a> })</code>
+              Equivalent to <code><a href="#round()" class="function">round</a>(<span class="param">value</span>, { <span class="param">mode:</span> <a href="#floor" class="string">&quot;floor&quot;</a> })</code>
             </p>
           </div>
         </div>
@@ -2771,7 +2799,7 @@ to <code>{ <span class="label">places</span>: <span class="number">0</span>, <sp
               Rounds up to the nearest whole number in the direction of <code><span class="keyword">Infinity</span></code>.
             </p>
             <p>
-              Note: Equivalent to <code><a href="#round()" class="function">round</a>(<span class="param">value</span>, { <span class="param">mode:</span> <a href="#ceil" class="string">&quot;ceil&quot;</a> })</code>
+              Equivalent to <code><a href="#round()" class="function">round</a>(<span class="param">value</span>, { <span class="param">mode:</span> <a href="#ceil" class="string">&quot;ceil&quot;</a> })</code>
             </p>
           </div>
         </div>
@@ -2788,7 +2816,7 @@ to <code>{ <span class="label">places</span>: <span class="number">0</span>, <sp
 in the direction of 0, also known as truncation.
             </p>
             <p>
-              Note: Equivalent to <code><a href="#round()" class="function">round</a>(<span class="param">value</span>, { <span class="param">mode:</span> <a href="#down" class="string">&quot;down&quot;</a> })</code>
+              Equivalent to <code><a href="#round()" class="function">round</a>(<span class="param">value</span>, { <span class="param">mode:</span> <a href="#down" class="string">&quot;down&quot;</a> })</code>
             </p>
           </div>
         </div>
@@ -2855,8 +2883,9 @@ whole number in the direction of 0 and including the remainder.
                 <a href="#RoundingRules.places">Decimal places</a>
               </h4>
               <p>
-                The number of decimal places to round to. Negative places rounds to higher
-integer places. Only one of <code><span class="param">places</span></code> or <code><span class="param">precision</span></code> can be provided.
+                The number of decimal places to round to. A negative value for <code><span class="param">places</span></code>
+rounds to higher integer places. Only one of <code><span class="param">places</span></code> or <code><span class="param">precision</span></code> can be
+provided.
               </p>
               <p>
                 For most functions, the default is <code><span class="number">0</span></code>, rounding to an integer whole number.
@@ -3151,7 +3180,7 @@ if exactly between the two.
 the value with an even least significant digit if exactly between the two.
               </p>
               <p>
-                This is particularly useful to avoid aggregated bias when adding together
+                This is particularly useful to avoid aggregate bias when adding together
 multiple rounded values as there is an equal chance of rounding up or down.
               </p>
               <script>{
@@ -3246,7 +3275,7 @@ in a non-terminating repeating decimal.
               Converts a <code><a href="#Numeric" class="type">Numeric</a></code> value (including <code><a href="#decimal" class="type">decimal</a></code>) to a JavaScript number.
             </p>
             <p>
-              Throws an <code><a href="#INEXACT" class="string">&quot;INEXACT&quot;</a></code> Error if the converting the value would lead to a loss
+              Throws an <code><a href="#INEXACT" class="string">&quot;INEXACT&quot;</a></code> Error if converting the value would lead to a loss
 of precision. To convert to a number while allowing precision loss, use the
 native <code><span class="function">Number</span>(<span class="param">value</span>)</code> function.
             </p>
@@ -3262,8 +3291,8 @@ native <code><span class="function">Number</span>(<span class="param">value</spa
             <code class="decl"><span class="function">toFixed</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code>
             <p>
               A string representation of the provided Numeric <code><span class="param">value</span></code> using fixed notation.
-Uses rules to specify <code><span class="param">precision</span></code> or <code><span class="param">places</span></code> and the rounding <code><span class="param">mode</span></code> should
-that result in fewer digits.
+Uses <code><span class="param">rules</span></code> to set <code><span class="param">precision</span></code> or <code><span class="param">places</span></code>, and a rounding <code><span class="param">mode</span></code> when that
+results in fewer digits.
             </p>
           </div>
         </div>
@@ -3277,8 +3306,8 @@ that result in fewer digits.
             <code class="decl"><span class="function">toExponential</span>(<wbr><span class="param">value</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">rules</span>?: <a href="#RoundingRules" class="type">RoundingRules</a><wbr>): <a href="#NumericString" class="type">NumericString</a></code>
             <p>
               A string representation of the provided Numeric <code><span class="param">value</span></code> using exponential
-scientific notation. Uses rules to specify <code><span class="param">precision</span></code> or <code><span class="param">places</span></code> and the
-rounding <code><span class="param">mode</span></code> should that result in fewer digits.
+scientific notation. Uses <code><span class="param">rules</span></code> to set <code><span class="param">precision</span></code> or <code><span class="param">places</span></code>, and a rounding
+<code><span class="param">mode</span></code> when that results in fewer digits.
             </p>
           </div>
         </div>
@@ -3291,7 +3320,7 @@ rounding <code><span class="param">mode</span></code> should that result in fewe
           <div>
             <code class="decl"><span class="function">deconstruct</span>(<wbr><span class="param">value</span>: <span class="type">unknown</span><wbr>):<br>[<wbr><span class="label">sign</span>: <span class="number">1</span> | <span class="number">-1</span> | <span class="number">0</span>, <span class="label">digits</span>: <span class="type">string</span>, <span class="label">scale</span>: <span class="type">number</span>, <span class="label">precision</span>: <span class="type">number</span><wbr>]</code>
             <p>
-              Given a numeric value, deconstruct to normalized representation of a decimal:
+              Given a numeric value, deconstruct to a normalized representation of a decimal:
 a <code>[<span class="param">sign</span>, <span class="param">digits</span>, <span class="param">scale</span>, <span class="param">precision</span>]</code> tuple.
             </p>
             <p>
@@ -3309,11 +3338,11 @@ mathematical functions on the decimal type.
 notation, where the first digit is the ones place, or an empty string for 0.
               </li>
               <li>
-                <code><span class="param">scale</span></code>: The power of ten the digits is multiplied by, or 0 for 0.
+                <code><span class="param">scale</span></code>: The power of ten the digits are multiplied by, or 0 for 0.
               </li>
               <li>
                 <code><span class="param">precision</span></code>: The number of digits found in digits (e.g. number of
-significant digits). Yes this is redundant information with
+significant digits). Yes, this is redundant information with
 <code><span class="param">digits</span>.<span class="param">length</span></code> but it is convenient to access directly.
               </li>
             </ul>
@@ -3349,14 +3378,14 @@ values of ErrorCode as well as a link to documentation describing the error.
             </p>
             <p>
               Detect this property in a catch clause to provide customized error handling
-behavior. For example, to re-introduce <code><span class="keyword">Infinity</span></code> as a result of division:
+behavior. For example, to re-introduce <code><span class="string">&quot;Infinity&quot;</span></code> as a result of division:
             </p>
-            <pre><code><span class="keyword">function</span> <span class="function">customDivide</span>(<span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a>): <a href="#decimal" class="type">decimal</a> {
+            <pre><code><span class="keyword">function</span> <span class="function">customDivide</span>(<span class="param">a</span>: <a href="#Numeric" class="type">Numeric</a>, <span class="param">b</span>: <a href="#Numeric" class="type">Numeric</a>): <a href="#decimal" class="type">decimal</a> | <span class="string">&quot;Infinity&quot;</span> {
   <span class="operator">try</span> {
     <span class="operator">return</span> <a href="#div()" class="function">div</a>(<span class="param">a</span>, <span class="param">b</span>)
   } <span class="operator">catch</span> (<span class="param">error</span>) {
     <span class="operator">if</span> (<span class="param">error</span>.<span class="param">code</span> === <a href="#DIV-ZERO" class="string">&quot;DIV_ZERO&quot;</a>) {
-      <span class="operator">return</span> <a href="#sign()" class="function">sign</a>(<span class="param">a</span>) * <span class="keyword">Infinity</span>
+      <span class="operator">return</span> <span class="string">&quot;Infinity&quot;</span>
     }
     <span class="operator">throw</span> <span class="param">error</span>
   }
@@ -3423,8 +3452,8 @@ received. For instance, the <code><a href="#RoundingRules.places" class="label">
                 <a href="#NOT-POS">Not positive</a>
               </h4>
               <p>
-                Thrown when a positive number was expected in an argument or property but
-not received. For instance, the <code><span class="param">exponent</span></code> in <code><a href="#pow()" class="function">pow()</a></code> must be a positive
+                Thrown when a non-negative number was expected in an argument or property but
+not received. For instance, the <code><span class="param">exponent</span></code> in <code><a href="#pow()" class="function">pow()</a></code> must be a non-negative
 integer.
               </p>
               <script>{
@@ -3475,7 +3504,7 @@ expected options of <code><a href="#RoundingMode" class="type">RoundingMode</a><
               </h4>
               <p>
                 Thrown when both <code><a href="#RoundingRules.places" class="label">RoundingRules.places</a></code> and <code><a href="#RoundingRules.precision" class="label">RoundingRules.precision</a></code>
-fields are simutaneously provided. Only one of these fields may be provided
+fields are simultaneously provided. Only one of these fields may be provided
 per use.
               </p>
               <script>{
@@ -3580,27 +3609,27 @@ which returns <code><span class="keyword">NaN</span></code>, however Decimalish 
         <h2>
           <a href="#faq">FAQ</a>
         </h2>
-        <p>
-          TK
-        </p>
       </div>
       <div class="two-grid">
-        <div id="why-doesnt-decimalish-support--0">
+        <div id="how-do-i-convert-between-number-and-decimal">
           <details>
             <summary>
               <h3>
-                <a href="#why-doesnt-decimalish-support--0">Why doesn't Decimalish support -0?</a>
+                <a href="#how-do-i-convert-between-number-and-decimal">How do I convert between <code><span class="param">number</span></code> and <code><a href="#decimal" class="type">decimal</a></code>?</a>
               </h3>
             </summary>
             <p>
-              Negative zero (<code>-<span class="number">0</span></code>) is a corner case of floating point numbers and frequent
-source of confusion...
+              Call <code><a href="#decimal()" class="function">decimal</a>(<span class="param">value</span>)</code> to convert a JavaScript <code><span class="param">number</span></code> or numeric string into a
+Decimalish <code><a href="#decimal" class="type">decimal</a></code>. To go back to a native number, pass the decimal string to
+<code><a href="#toNumber()" class="function">toNumber</a>(<span class="param">decimalValue</span>)</code> for guaranteed accurate conversion (or thrown Error),
+or <code><span class="function">parseFloat</span>(<span class="param">decimalValue</span>)</code>, keeping in mind that very large or highly precise
+decimals may not round-trip exactly.
             </p>
             <script>{
         const script = document.currentScript, details = script.parentElement
         const update = () => {
           const hash = window.location.hash.slice(1)
-          if (hash && hash === "why-doesnt-decimalish-support--0") details.open = true
+          if (hash && hash === "how-do-i-convert-between-number-and-decimal") details.open = true
         }
         window.addEventListener('hashchange', update)
         update()
@@ -3619,18 +3648,49 @@ source of confusion...
               Decimalish provides the <code><a href="#rem()" class="function">rem()</a></code> function as a <code><a href="#decimal" class="type">decimal</a></code> friendly version of <code>%</code>
 which uses the same behavior as JavaScript (round down truncation).
 While JavaScript officially calls this the &quot;remainder&quot; operator, it's often
-referred to as the modulus or modulo operator. However there are many potential
-ways to define modulo and standard math definitions and different programming
-languages differ in how they choose this definition.
+referred to as the modulus or modulo operator. However, standard math
+definitions and different programming languages choose different ways to define
+modulo.
             </p>
             <p>
-              <a target="_blank" href="https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition">https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition</a>
+              <a target="_blank" href="https://en.wikipedia.org/wiki/Modulo_operation#Variants_of_the_definition">Wikipedia: Modulo operation</a>
             </p>
             <script>{
         const script = document.currentScript, details = script.parentElement
         const update = () => {
           const hash = window.location.hash.slice(1)
           if (hash && hash === "whats-the-difference-between-remainder-and-modulo") details.open = true
+        }
+        window.addEventListener('hashchange', update)
+        update()
+        script.remove()
+      }</script>
+          </details>
+        </div>
+        <div id="why-doesnt-decimalish-support--0">
+          <details>
+            <summary>
+              <h3>
+                <a href="#why-doesnt-decimalish-support--0">Why doesn't Decimalish support -0?</a>
+              </h3>
+            </summary>
+            <p>
+              Negative zero (<code>-<span class="number">0</span></code>) exists in IEEE-754 to carry sign information through
+rounding and operations that can produce infinities. Decimalish doesn’t produce
+<code><span class="keyword">Infinity</span></code>, doesn’t rely on direction-dependent functions, and always returns
+canonical decimal strings, so there’s no benefit to keeping a separate <code>-<span class="number">0</span></code>.
+Normalizing all zero-like values to <code><span class="string">&quot;0&quot;</span></code> keeps equality checks simple and lets
+decimals work cleanly as object keys. If you need to track the sign of zero for
+a specific algorithm, store that sign alongside the decimal value.
+            </p>
+            <p>
+              Have a question that’s not answered here? Please open an issue.
+            </p>
+            <script>{
+        const script = document.currentScript, details = script.parentElement
+        const update = () => {
+          const hash = window.location.hash.slice(1)
+          if (hash && hash === "why-doesnt-decimalish-support--0") details.open = true
         }
         window.addEventListener('hashchange', update)
         update()
