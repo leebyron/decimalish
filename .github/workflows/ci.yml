@@ -35,7 +35,8 @@ jobs:
           user_name: "github-actions[bot]"
           user_email: "github-actions[bot]@users.noreply.github.com"
       - if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        uses: JS-DevTools/npm-publish@v1
+        uses: JS-DevTools/npm-publish@v4
         with:
           package: ./dist/package.json
           token: ${{ secrets.NPM_TOKEN }}
+          strategy: all
