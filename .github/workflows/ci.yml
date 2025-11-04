@@ -1,16 +1,25 @@
 name: CI
-on: push
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
 jobs:
   ci:
     runs-on: ubuntu-latest
     env:
       TERM: dumb
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 24
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            tests/webpack-tree-shaking/package-lock.json
       - run: npm ci
       - run: npm run lint
       - run: npm run unit
@@ -18,7 +27,7 @@ jobs:
       - run: npm run integration
       - run: npm run website:build
       - if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: website/dist
