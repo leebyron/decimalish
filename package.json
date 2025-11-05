@@ -1,17 +1,25 @@
 {
   "name": "decimalish",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "description": "Decimal \"big number\" arbitrary-precision primitives with a lightweight yet powerful math library",
+  "homepage": "https://decimali.sh",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leebyron/decimalish.git"
+  },
   "keywords": [
     "arbitrary",
     "precision",
     "exact",
+    "currency",
+    "accounting",
     "arithmetic",
     "math",
     "big",
     "bigdecimal",
     "decimal",
+    "decimal.js",
     "dec",
     "biginteger",
     "bigint",
@@ -19,6 +27,7 @@
     "int",
     "bignumber",
     "bignum",
+    "big.js",
     "number",
     "primitive"
   ],
@@ -26,7 +35,7 @@
   "module": "decimalish.mjs",
   "types": "decimalish.d.ts",
   "sideEffects": false,
-  "private": true,
+  "--exclude-from-npm-publish-below-this-line--": true,
   "scripts": {
     "test": "run-s lint unit build integration website:build",
     "bench": "ts-node benchmarks/decimalish.bench.ts",
@@ -39,7 +48,7 @@
     "build:clean": "rm -vrf dist && mkdir -v dist",
     "build:files": "run-p -slc build:files:*",
     "build:files:copy": "cp -v LICENSE README.md dist/",
-    "build:files:package": "node -e \"var o={},p=require('./package.json'),k;for(k in p){if(k==='private')break;o[k]=p[k]}console.log(JSON.stringify(o,null,2))\" > dist/package.json && echo 'package.json -> dist/package.json'",
+    "build:files:package": "node -e \"var o={},p=require('./package.json'),k;for(k in p){if(k==='--exclude-from-npm-publish-below-this-line--')break;o[k]=p[k]}console.log(JSON.stringify(o,null,2))\" > dist/package.json && echo 'package.json -> dist/package.json'",
     "build:files:main": "run-s build:files:main:*",
     "build:files:main:js": "rollup decimalish.ts -o dist/decimalish.js -f umd --output.name decimalish --no-esModule -p typescript -p buble",
     "build:files:main:min": "terser dist/decimalish.js -o dist/decimalish.min.js -cm --ie8 --safari10 && echo 'decimalish.ts → dist/decimalish.min.js'",
