@@ -137,6 +137,31 @@ const cases: BenchmarkCase[] = [
     }),
   },
   {
+    name: "Division · 4321 ÷ 1234",
+    prepare: () => ({
+      decimalish: () => div("4321", "1234"),
+      "Big.js": () => new Big("4321").div("1234"),
+      "decimal.js": () => new DecimalJs("4321").div("1234"),
+      native: () => parseFloat("4321") / parseFloat("1234"),
+    }),
+  },
+  {
+    name: "Division · 123456789987654321123456789000000000 ÷ 6300222004058",
+    prepare: () => ({
+      decimalish: () =>
+        div("123456789987654321123456789000000000", "6300222004058"),
+      "Big.js": () =>
+        new Big("123456789987654321123456789000000000").div("6300222004058"),
+      "decimal.js": () =>
+        new DecimalJs("123456789987654321123456789000000000").div(
+          "6300222004058",
+        ),
+      native: () =>
+        parseFloat("123456789987654321123456789000000000") /
+        parseFloat("6300222004058"),
+    }),
+  },
+  {
     name: "Division · 987654321.012345 ÷ 0.25",
     prepare: () => ({
       decimalish: () => div("987654321.012345", "0.25"),
