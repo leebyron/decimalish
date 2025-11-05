@@ -1,6 +1,6 @@
 {
   "name": "decimalish",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "license": "MIT",
   "description": "Decimal \"big number\" arbitrary-precision primitives with a lightweight yet powerful math library",
   "keywords": [
