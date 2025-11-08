@@ -1,6 +1,6 @@
 {
   "name": "decimalish",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "description": "Decimal \"big number\" arbitrary-precision primitives with a lightweight yet powerful math library",
   "homepage": "https://decimali.sh",
