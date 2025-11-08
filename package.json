@@ -32,8 +32,14 @@
     "primitive"
   ],
   "main": "decimalish.js",
-  "module": "decimalish.mjs",
   "types": "decimalish.d.ts",
+  "exports": {
+    ".": {
+      "types": "./decimalish.d.ts",
+      "import": "./decimalish.mjs",
+      "require": "./decimalish.js"
+    }
+  },
   "sideEffects": false,
   "--exclude-from-npm-publish-below-this-line--": true,
   "scripts": {
