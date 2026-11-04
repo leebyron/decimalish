@@ -1251,9 +1251,14 @@ function normalizeRoundingRules(
  * @internal
  */
 function getRoundingPrecision(rules: RoundingRules, scale: number): number {
-  return rules[PRECISION] != null
-    ? toNumber(rules[PRECISION] as Numeric)
-    : toNumber(rules[PLACES] || 0) + scale + 1
+  // Callers validate rules first. Formatting can still provide Numeric fields,
+  // so retain conversion for options that are not native numbers.
+  const precision = rules[PRECISION]
+  const value = precision != null ? precision : rules[PLACES] || 0
+  return (
+    (typeof value === "number" ? value : toNumber(value)) +
+    (precision != null ? 0 : scale + 1)
+  )
 }
 
 /**
@@ -1539,6 +1544,8 @@ function normalizeRepresentation(
  * @internal
  */
 function expectInt(name: string, value: Numeric): number {
+  // Native integer values already round-trip through Number exactly.
+  if (typeof value === "number" && value % 1 === 0) return value
   if (!isInteger(value)) {
     error("NOT_INT", `${name}: ${value}`)
   }
