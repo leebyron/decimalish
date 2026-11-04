@@ -40,8 +40,13 @@ export function decimal(value: unknown): decimal {
  * @category Types
  */
 export function isDecimal(value: unknown): value is decimal {
+  if (typeof value === "string") return canonicalDecimalRegex.test(value)
+  // Preserve the existing coercion and exception behavior for Numeric objects.
   return isNumeric(value) && decimal(value) === value
 }
+
+const canonicalDecimalRegex =
+  /^(?:0|-?(?:[1-9]\d*(?:\.\d*[1-9])?|0\.\d*[1-9]))$/
 
 /**
  * Is numeric value?
