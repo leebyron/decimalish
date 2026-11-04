@@ -239,15 +239,33 @@ export function mul(a: Numeric, b: Numeric): decimal {
 
   const digitsArray = createDigitArray(precisionA + precisionB)
   let result = 0
-
-  for (let i = precisionA; i--; ) {
-    result = 0
-    for (let j = precisionB; j--; ) {
-      result += digitsArray[i + j + 1] + +digitsA[i] * +digitsB[j]
-      digitsArray[i + j + 1] = result % 10
-      result = (result / 10) | 0
+  if (precisionA * precisionB < 64) {
+    // Short products avoid the allocation and decoding of two input arrays.
+    for (let i = precisionA; i--; ) {
+      const digitA = digitsA.charCodeAt(i) - 48
+      result = 0
+      for (let j = precisionB; j--; ) {
+        result += digitsArray[i + j + 1] + digitA * (digitsB.charCodeAt(j) - 48)
+        digitsArray[i + j + 1] = result % 10
+        result = (result / 10) | 0
+      }
+      digitsArray[i] = result
     }
-    digitsArray[i] = result
+  } else {
+    // Larger products reuse decoded input digits throughout the inner loop.
+    const valuesA = new Array<number>(precisionA)
+    const valuesB = new Array<number>(precisionB)
+    for (let i = 0; i < precisionA; i++) valuesA[i] = digitsA.charCodeAt(i) - 48
+    for (let i = 0; i < precisionB; i++) valuesB[i] = digitsB.charCodeAt(i) - 48
+    for (let i = precisionA; i--; ) {
+      result = 0
+      for (let j = precisionB; j--; ) {
+        result += digitsArray[i + j + 1] + valuesA[i] * valuesB[j]
+        digitsArray[i + j + 1] = result % 10
+        result = (result / 10) | 0
+      }
+      digitsArray[i] = result
+    }
   }
 
   return construct(
