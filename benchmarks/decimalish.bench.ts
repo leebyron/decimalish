@@ -314,6 +314,7 @@ async function runCase(testCase: BenchmarkCase): Promise<ScenarioReport> {
     bench.add(name, task)
   }
 
+  await bench.warmup()
   await bench.run()
 
   return {
