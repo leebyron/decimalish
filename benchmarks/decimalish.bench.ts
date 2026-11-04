@@ -1,3 +1,4 @@
+import { strict as assert } from "assert"
 import { Bench } from "tinybench"
 import Big from "big.js"
 import DecimalJs from "decimal.js"
@@ -23,13 +24,27 @@ interface ScenarioReport {
 // Config some libraries up front
 Big.DP = 40
 Big.RM = Big.roundHalfEven
+Big.NE = -50
+Big.PE = 50
 
 DecimalJs.set({
-  precision: 40,
+  precision: 200,
+  modulo: DecimalJs.ROUND_FLOOR,
   rounding: DecimalJs.ROUND_HALF_EVEN,
   toExpNeg: -50,
   toExpPos: 50,
 })
+
+// Big.js modulo truncates; adjust to decimalish's floor convention.
+function bigModulo(a: string, b: string): string {
+  const divisor = new Big(b)
+  const remainder = new Big(a).mod(divisor)
+  return (
+    remainder.eq(0) || remainder.s === divisor.s
+      ? remainder
+      : remainder.plus(divisor)
+  ).toString()
+}
 
 const cases: BenchmarkCase[] = [
   {
@@ -39,7 +54,6 @@ const cases: BenchmarkCase[] = [
       "Big.js": () => new Big("123456789123456789123456789").toString(),
       "decimal.js": () =>
         new DecimalJs("123456789123456789123456789").toString(),
-      native: () => BigInt("123456789123456789123456789").toString(),
     }),
   },
   {
@@ -50,27 +64,24 @@ const cases: BenchmarkCase[] = [
         new Big("-123456789123456789123456789.123456789").toString(),
       "decimal.js": () =>
         new DecimalJs("-123456789123456789123456789.123456789").toString(),
-      native: () =>
-        parseFloat("-123456789123456789123456789.123456789").toString(),
     }),
   },
   {
     name: "Addition · 1.2345 + 6.789",
     prepare: () => ({
       decimalish: () => add("1.2345", "6.789"),
-      "Big.js": () => new Big("1.2345").plus("6.789"),
-      "decimal.js": () => new DecimalJs("1.2345").add("6.789"),
-      native: () => parseFloat("1.2345") + parseFloat("6.789"),
+      "Big.js": () => new Big("1.2345").plus("6.789").toString(),
+      "decimal.js": () => new DecimalJs("1.2345").add("6.789").toString(),
     }),
   },
   {
     name: "Addition · 900719925474099 + 123456789012345",
     prepare: () => ({
       decimalish: () => add("900719925474099", "123456789012345"),
-      "Big.js": () => new Big("900719925474099").plus("123456789012345"),
+      "Big.js": () =>
+        new Big("900719925474099").plus("123456789012345").toString(),
       "decimal.js": () =>
-        new DecimalJs("900719925474099").add("123456789012345"),
-      native: () => BigInt("900719925474099") + BigInt("123456789012345"),
+        new DecimalJs("900719925474099").add("123456789012345").toString(),
     }),
   },
   {
@@ -82,25 +93,21 @@ const cases: BenchmarkCase[] = [
           "0.00000000009876543210987654321",
         ),
       "Big.js": () =>
-        new Big("1234567890.12345678901234567890").plus(
-          "0.00000000009876543210987654321",
-        ),
+        new Big("1234567890.12345678901234567890")
+          .plus("0.00000000009876543210987654321")
+          .toString(),
       "decimal.js": () =>
-        new DecimalJs("1234567890.12345678901234567890").add(
-          "0.00000000009876543210987654321",
-        ),
-      native: () =>
-        parseFloat("1234567890.12345678901234567890") +
-        parseFloat("0.00000000009876543210987654321"),
+        new DecimalJs("1234567890.12345678901234567890")
+          .add("0.00000000009876543210987654321")
+          .toString(),
     }),
   },
   {
     name: "Multiplication · 12.345 × 0.6789",
     prepare: () => ({
       decimalish: () => mul("12.345", "0.6789"),
-      "Big.js": () => new Big("12.345").times("0.6789"),
-      "decimal.js": () => new DecimalJs("12.345").mul("0.6789"),
-      native: () => parseFloat("12.345") * parseFloat("0.6789"),
+      "Big.js": () => new Big("12.345").times("0.6789").toString(),
+      "decimal.js": () => new DecimalJs("12.345").mul("0.6789").toString(),
     }),
   },
   {
@@ -109,16 +116,13 @@ const cases: BenchmarkCase[] = [
       decimalish: () =>
         mul("987654321.1234567890123456789", "123456789.9876543210987654321"),
       "Big.js": () =>
-        new Big("987654321.1234567890123456789").times(
-          "123456789.9876543210987654321",
-        ),
+        new Big("987654321.1234567890123456789")
+          .times("123456789.9876543210987654321")
+          .toString(),
       "decimal.js": () =>
-        new DecimalJs("987654321.1234567890123456789").mul(
-          "123456789.9876543210987654321",
-        ),
-      native: () =>
-        parseFloat("987654321.1234567890123456789") *
-        parseFloat("123456789.9876543210987654321"),
+        new DecimalJs("987654321.1234567890123456789")
+          .mul("123456789.9876543210987654321")
+          .toString(),
     }),
   },
   {
@@ -127,129 +131,128 @@ const cases: BenchmarkCase[] = [
       decimalish: () =>
         mul("999999999999999999999999", "888888888888888888888888"),
       "Big.js": () =>
-        new Big("999999999999999999999999").times("888888888888888888888888"),
+        new Big("999999999999999999999999")
+          .times("888888888888888888888888")
+          .toString(),
       "decimal.js": () =>
-        new DecimalJs("999999999999999999999999").mul(
-          "888888888888888888888888",
-        ),
-      native: () =>
-        BigInt("999999999999999999999999") * BigInt("888888888888888888888888"),
+        new DecimalJs("999999999999999999999999")
+          .mul("888888888888888888888888")
+          .toString(),
     }),
   },
   {
     name: "Division · 4321 ÷ 1234",
     prepare: () => ({
-      decimalish: () => div("4321", "1234"),
-      "Big.js": () => new Big("4321").div("1234"),
-      "decimal.js": () => new DecimalJs("4321").div("1234"),
-      native: () => parseFloat("4321") / parseFloat("1234"),
+      decimalish: () => div("4321", "1234", { places: 40, mode: "half even" }),
+      "Big.js": () => new Big("4321").div("1234").toString(),
+      "decimal.js": () =>
+        new DecimalJs("4321").div("1234").toDecimalPlaces(40).toString(),
     }),
   },
   {
     name: "Division · 123456789987654321123456789000000000 ÷ 6300222004058",
     prepare: () => ({
       decimalish: () =>
-        div("123456789987654321123456789000000000", "6300222004058"),
+        div("123456789987654321123456789000000000", "6300222004058", {
+          places: 40,
+          mode: "half even",
+        }),
       "Big.js": () =>
-        new Big("123456789987654321123456789000000000").div("6300222004058"),
+        new Big("123456789987654321123456789000000000")
+          .div("6300222004058")
+          .toString(),
       "decimal.js": () =>
-        new DecimalJs("123456789987654321123456789000000000").div(
-          "6300222004058",
-        ),
-      native: () =>
-        parseFloat("123456789987654321123456789000000000") /
-        parseFloat("6300222004058"),
+        new DecimalJs("123456789987654321123456789000000000")
+          .div("6300222004058")
+          .toDecimalPlaces(40)
+          .toString(),
     }),
   },
   {
     name: "Division · 987654321.012345 ÷ 0.25",
     prepare: () => ({
-      decimalish: () => div("987654321.012345", "0.25"),
-      "Big.js": () => new Big("987654321.012345").div("0.25"),
-      "decimal.js": () => new DecimalJs("987654321.012345").div("0.25"),
-      native: () => parseFloat("987654321.012345") / parseFloat("0.25"),
+      decimalish: () =>
+        div("987654321.012345", "0.25", { places: 40, mode: "half even" }),
+      "Big.js": () => new Big("987654321.012345").div("0.25").toString(),
+      "decimal.js": () =>
+        new DecimalJs("987654321.012345")
+          .div("0.25")
+          .toDecimalPlaces(40)
+          .toString(),
     }),
   },
   {
     name: "Division · 12345678901234567890 ÷ 0.00001",
     prepare: () => ({
-      decimalish: () => div("12345678901234567890", "0.00001"),
-      "Big.js": () => new Big("12345678901234567890").div("0.00001"),
-      "decimal.js": () => new DecimalJs("12345678901234567890").div("0.00001"),
-      native: () => parseFloat("12345678901234567890") / parseFloat("0.00001"),
+      decimalish: () =>
+        div("12345678901234567890", "0.00001", {
+          places: 40,
+          mode: "half even",
+        }),
+      "Big.js": () => new Big("12345678901234567890").div("0.00001").toString(),
+      "decimal.js": () =>
+        new DecimalJs("12345678901234567890")
+          .div("0.00001")
+          .toDecimalPlaces(40)
+          .toString(),
     }),
   },
   {
-    name: "Division · 10 ÷ 3 (precision 34, half even)",
+    name: "Division · 10 ÷ 3 (40 places, half even)",
     prepare: () => ({
-      decimalish: () => div("10", "3", { precision: 34, mode: "half even" }),
-      "Big.js": () => new Big("10").div("3"),
-      "decimal.js": () => new DecimalJs("10").div("3"),
-      native: () => parseFloat("10") / parseFloat("3"),
+      decimalish: () => div("10", "3", { places: 40, mode: "half even" }),
+      "Big.js": () => new Big("10").div("3").toString(),
+      "decimal.js": () =>
+        new DecimalJs("10").div("3").toDecimalPlaces(40).toString(),
     }),
   },
   {
     name: "Modulo · 12345.678 % 0.901",
     prepare: () => ({
       decimalish: () => mod("12345.678", "0.901"),
-      "Big.js": () => new Big("12345.678").mod("0.901"),
-      "decimal.js": () => new DecimalJs("12345.678").mod("0.901"),
-      native: () => {
-        const dividend = parseFloat("12345.678")
-        const divisor = parseFloat("0.901")
-        const result = dividend % divisor
-        return result < 0 && divisor > 0 ? result + divisor : result
-      },
+      "Big.js": () => bigModulo("12345.678", "0.901").toString(),
+      "decimal.js": () => new DecimalJs("12345.678").mod("0.901").toString(),
     }),
   },
   {
     name: "Modulo · 999999999999999999 % 123456789",
     prepare: () => ({
       decimalish: () => mod("999999999999999999", "123456789"),
-      "Big.js": () => new Big("999999999999999999").mod("123456789"),
-      "decimal.js": () => new DecimalJs("999999999999999999").mod("123456789"),
-      native: () => BigInt("999999999999999999") % BigInt("123456789"),
+      "Big.js": () => bigModulo("999999999999999999", "123456789").toString(),
+      "decimal.js": () =>
+        new DecimalJs("999999999999999999").mod("123456789").toString(),
     }),
   },
   {
     name: "Modulo · -123456789 % 97",
     prepare: () => ({
       decimalish: () => mod("-123456789", "97"),
-      "Big.js": () => new Big("-123456789").mod("97"),
-      "decimal.js": () => new DecimalJs("-123456789").mod("97"),
-      native: () => {
-        const dividend = BigInt("-123456789")
-        const divisor = BigInt("97")
-        const result = dividend % divisor
-        return result < 0n && divisor > 0n ? result + divisor : result
-      },
+      "Big.js": () => bigModulo("-123456789", "97").toString(),
+      "decimal.js": () => new DecimalJs("-123456789").mod("97").toString(),
     }),
   },
   {
     name: "Power · 1.2345 ^ 6",
     prepare: () => ({
       decimalish: () => pow("1.2345", 6),
-      "Big.js": () => new Big("1.2345").pow(6),
-      "decimal.js": () => new DecimalJs("1.2345").pow(6),
-      native: () => Math.pow(parseFloat("1.2345"), 6),
+      "Big.js": () => new Big("1.2345").pow(6).toString(),
+      "decimal.js": () => new DecimalJs("1.2345").pow(6).toString(),
     }),
   },
   {
     name: "Power · 0.999999 ^ 20",
     prepare: () => ({
       decimalish: () => pow("0.999999", 20),
-      "Big.js": () => new Big("0.999999").pow(20),
-      "decimal.js": () => new DecimalJs("0.999999").pow(20),
-      native: () => Math.pow(parseFloat("0.999999"), 20),
+      "Big.js": () => new Big("0.999999").pow(20).toString(),
+      "decimal.js": () => new DecimalJs("0.999999").pow(20).toString(),
     }),
   },
   {
     name: "Power · 987654321 ^ 5",
     prepare: () => ({
       decimalish: () => pow("987654321", 5),
-      "Big.js": () => new Big("987654321").pow(5),
-      "decimal.js": () => new DecimalJs("987654321").pow(5),
-      native: () => BigInt("987654321") ** 5n,
+      "Big.js": () => new Big("987654321").pow(5).toString(),
+      "decimal.js": () => new DecimalJs("987654321").pow(5).toString(),
     }),
   },
 ]
@@ -310,7 +313,9 @@ async function runCase(testCase: BenchmarkCase): Promise<ScenarioReport> {
   const bench = new Bench(benchSettings)
   const tasks = testCase.prepare()
 
+  const expected = tasks.decimalish()
   for (const [name, task] of Object.entries(tasks)) {
+    assert.equal(task(), expected, testCase.name + " / " + name)
     bench.add(name, task)
   }
 
