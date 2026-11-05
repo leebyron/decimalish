@@ -909,7 +909,12 @@ export function roundRem(
   return [construct(sign, digits, scale), remainder]
 }
 
-/** Round once, retaining parts until the caller chooses an output format. @internal */
+/**
+ * Round once, retaining normalized parts until the caller chooses an output
+ * format. Only compute a remainder when requested by roundRem().
+ *
+ * @internal
+ */
 function roundRepresentation(
   value: Numeric,
   rules: RoundingRules | undefined,
@@ -917,16 +922,29 @@ function roundRepresentation(
 ): [parts: [Sign, string, number, number], remainder: decimal] {
   const parts = deconstruct(value)
   const [sign, digits, scale, precision] = parts
+
+  // Determine the desired rounding mode and precision.
   const roundingRules = normalizeRoundingRules(rules, HALF_EVEN)
+
+  // Zero always rounds to zero
   if (!sign) return [parts, ZERO]
+
   const roundingPrecision = getRoundingPrecision(roundingRules, scale)
+
+  // Only round if the rounded precision is less than the original precision.
   if (roundingPrecision >= precision) return [parts, ZERO]
+
+  // Start the rounded value as a truncated value to the desired precision.
   const slicePoint = roundingPrecision > 0 ? roundingPrecision : 0
   let roundedDigits = digits.slice(0, slicePoint)
   let roundedScale = scale
+
+  // Compute the remainder only when requested by roundRem().
   let remainder = withRemainder
     ? construct(sign, digits.slice(slicePoint), scale - slicePoint)
     : ZERO
+
+  // Interpret sign-dependent and half-even modes using the retained digit.
   const roundingMode = normalizeRoundingMode(
     roundingRules[MODE],
     sign,
@@ -934,14 +952,20 @@ function roundRepresentation(
     +(digits[roundingPrecision - 1] || 0),
   )
   if (roundingMode === EXACT) error("INEXACT", "round " + String(value))
+
   const roundingDigit = +(digits[roundingPrecision] || 0)
   const increment =
+    // A half up mode found the subsequent digit to be 5 or greater
     roundingMode === HALF_UP
       ? roundingDigit > 4
-      : roundingMode === HALF_DOWN
+      : // A half down mode found the subsequent digit to be greater than 5, or 5 with additional digits
+        roundingMode === HALF_DOWN
         ? roundingDigit > 5 ||
           (roundingDigit === 5 && precision > roundingPrecision + 1)
-        : roundingMode === UP
+        : // The rounding mode is up and the value is non-zero
+          roundingMode === UP
+
+  // Round up by adding one to the least significant digit of the absolute value.
   if (increment) {
     // Carry through the retained prefix. Carried zeros can be discarded because
     // the result is normalized; only a carry past its first digit changes scale.
@@ -953,8 +977,13 @@ function roundRepresentation(
         String.fromCharCode(roundedDigits.charCodeAt(end - 1) + 1)
     } else {
       roundedDigits = "1"
+      // A carry through all retained digits raises the scale by one. With
+      // nonpositive precision, the increment starts further to the left.
       roundedScale += roundingPrecision > 0 ? 1 : 1 - roundingPrecision
     }
+
+    // Subtract the same increment from the remainder to preserve
+    // value = rounded + remainder.
     if (withRemainder) {
       remainder = sub(
         remainder,
