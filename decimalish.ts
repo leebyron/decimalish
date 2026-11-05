@@ -738,14 +738,9 @@ function cmpAbs(
   precisionB: number,
 ): Sign {
   if (scaleA !== scaleB) return scaleA > scaleB ? 1 : -1
-  for (
-    let i = -1, j = precisionA < precisionB ? precisionA : precisionB;
-    ++i < j;
-
-  ) {
-    if (digitsA[i] !== digitsB[i]) return digitsA[i] > digitsB[i] ? 1 : -1
-  }
-  return precisionA === precisionB ? 0 : precisionA > precisionB ? 1 : -1
+  // At equal scale, normalized digits have no trailing zeros. A longer
+  // string with an equal prefix therefore has a nonzero remaining suffix.
+  return digitsA === digitsB ? 0 : digitsA > digitsB ? 1 : -1
 }
 
 // Magnitude
