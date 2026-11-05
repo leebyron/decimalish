@@ -1473,6 +1473,7 @@ function zeroes(count: number): string {
   if (count === 1) return "0"
   if (count === 2) return "00"
   if (count === 3) return "000"
+  if (count === 4) return "0000"
   let result = ""
   let block = "0"
   while (count > 0) {

@@ -15,7 +15,7 @@ const fractions = values.map(
     ((signs[i] < 0 ? "-" : "") + value + ".4") as sourceApi.NumericString,
 )
 const tasks: Record<string, (i: number) => string> = {}
-for (const count of [0, 1, 2, 6, 16, 128, 1000]) {
+for (const count of [0, 1, 2, 3, 4, 5, 6, 16, 128, 1000]) {
   const trailing = `construct / trailing ${count}`
   const leading = `construct / leading ${count}`
   tasks[trailing] = i =>
@@ -39,8 +39,10 @@ for (const places of [0, 1, 2, 6, 16]) {
 tasks["toFixed / fractional currency"] = i =>
   api.toFixed(fractions[i], { places: 2 })
 tasks["toFixed / zero currency"] = () => api.toFixed("0", { places: 2 })
+tasks["toFixed / zero, 3 places"] = () => api.toFixed("0", { places: 3 })
 assert.equal(tasks["toFixed / fractional currency"](0), values[0] + ".40")
 assert.equal(tasks["toFixed / zero currency"](0), "0.00")
+assert.equal(tasks["toFixed / zero, 3 places"](0), "0.000")
 
 let sink = 0
 let cursor = 0
