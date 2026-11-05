@@ -155,13 +155,16 @@ export function add(a: Numeric, b: Numeric): decimal {
     precisionA - scaleA > precisionB - scaleB
       ? precisionA - scaleA
       : precisionB - scaleB
-  let digitsArray = createDigitArray(pos + scale)
+  let digitsArray: number[]
   let result = 0
 
   // If the operands have the same sign, add the two digits.
   if (signA === signB) {
+    digitsArray = new Array(pos + scale)
     while (pos-- > -scale) {
-      result += +(digitsA[pos + scaleA] || 0) + +(digitsB[pos + scaleB] || 0)
+      result +=
+        (digitsA.charCodeAt(pos + scaleA) - 48 || 0) +
+        (digitsB.charCodeAt(pos + scaleB) - 48 || 0)
       digitsArray[pos + scale] = result % 10
       result = result > 9 ? 1 : 0
     }
@@ -186,16 +189,18 @@ export function add(a: Numeric, b: Numeric): decimal {
       precisionB,
     )
 
-    // There will only be a result if the operands are not equivalent (A != B),
-    // otherwise: A - B == 0
-    if (direction) {
+    // Cancellation needs no digit buffer.
+    if (!direction) return ZERO
+    digitsArray = new Array(pos + scale)
+    {
       // Correct the resulting sign for the subtraction direction.
       sign = (sign * direction) as 1 | -1
       while (pos-- > -scale) {
         result +=
           10 +
           direction *
-            (+(digitsA[pos + scaleA] || 0) - +(digitsB[pos + scaleB] || 0))
+            ((digitsA.charCodeAt(pos + scaleA) - 48 || 0) -
+              (digitsB.charCodeAt(pos + scaleB) - 48 || 0))
         digitsArray[pos + scale] = result % 10
         result = result > 9 ? 0 : -1
       }
