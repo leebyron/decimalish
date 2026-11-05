@@ -885,8 +885,8 @@ export function movePoint(value: Numeric, places: Numeric): decimal {
  * @category Rounding
  */
 export function round(value: Numeric, rules?: RoundingRules): decimal {
-  let [rounded] = roundRem(value, rules)
-  return rounded
+  const [[sign, digits, scale]] = roundRepresentation(value, rules, false)
+  return construct(sign, digits, scale)
 }
 
 /**
@@ -901,57 +901,68 @@ export function roundRem(
   value: Numeric,
   rules?: RoundingRules,
 ): [rounded: decimal, remainder: decimal] {
-  let [sign, digits, scale, precision] = deconstruct(value)
-  let roundingRules = normalizeRoundingRules(rules, HALF_EVEN)
+  const [[sign, digits, scale], remainder] = roundRepresentation(
+    value,
+    rules,
+    true,
+  )
+  return [construct(sign, digits, scale), remainder]
+}
 
-  // Zero always rounds to zero
-  if (!sign) {
-    return [ZERO, ZERO]
-  }
-
-  // Determine the desired rounding mode and precision.
-  let roundingMode = roundingRules[MODE]
-  let roundingPrecision = getRoundingPrecision(roundingRules, scale)
-
-  // Start the rounded value as a truncated value to the desired precision.
-  let slicePoint = roundingPrecision > 0 ? roundingPrecision : 0
-  let rounded = construct(sign, digits.slice(0, slicePoint), scale)
-  let remainder = construct(sign, digits.slice(slicePoint), scale - slicePoint)
-
-  // Only round if the rounded precision is less than the original precision.
-  if (roundingPrecision < precision) {
-    roundingMode = normalizeRoundingMode(
-      roundingMode,
-      sign,
-      sign,
-      +(digits[roundingPrecision - 1] || 0),
-    )
-
-    if (roundingMode === EXACT) {
-      error("INEXACT", `round ${value}`)
+/** Round once, retaining parts until the caller chooses an output format. @internal */
+function roundRepresentation(
+  value: Numeric,
+  rules: RoundingRules | undefined,
+  withRemainder: boolean,
+): [parts: [Sign, string, number, number], remainder: decimal] {
+  const parts = deconstruct(value)
+  const [sign, digits, scale, precision] = parts
+  const roundingRules = normalizeRoundingRules(rules, HALF_EVEN)
+  if (!sign) return [parts, ZERO]
+  const roundingPrecision = getRoundingPrecision(roundingRules, scale)
+  if (roundingPrecision >= precision) return [parts, ZERO]
+  const slicePoint = roundingPrecision > 0 ? roundingPrecision : 0
+  let roundedDigits = digits.slice(0, slicePoint)
+  let roundedScale = scale
+  let remainder = withRemainder
+    ? construct(sign, digits.slice(slicePoint), scale - slicePoint)
+    : ZERO
+  const roundingMode = normalizeRoundingMode(
+    roundingRules[MODE],
+    sign,
+    sign,
+    +(digits[roundingPrecision - 1] || 0),
+  )
+  if (roundingMode === EXACT) error("INEXACT", "round " + String(value))
+  const roundingDigit = +(digits[roundingPrecision] || 0)
+  const increment =
+    roundingMode === HALF_UP
+      ? roundingDigit > 4
+      : roundingMode === HALF_DOWN
+        ? roundingDigit > 5 ||
+          (roundingDigit === 5 && precision > roundingPrecision + 1)
+        : roundingMode === UP
+  if (increment) {
+    // Carry through the retained prefix. Carried zeros can be discarded because
+    // the result is normalized; only a carry past its first digit changes scale.
+    let end = roundedDigits.length
+    while (end && roundedDigits[end - 1] === "9") end--
+    if (end) {
+      roundedDigits =
+        roundedDigits.slice(0, end - 1) +
+        String.fromCharCode(roundedDigits.charCodeAt(end - 1) + 1)
+    } else {
+      roundedDigits = "1"
+      roundedScale += roundingPrecision > 0 ? 1 : 1 - roundingPrecision
     }
-
-    const roundingDigit = +(digits[roundingPrecision] || 0)
-    if (
-      // A half up mode found the subsequent digit to be 5 or greater
-      roundingMode === HALF_UP
-        ? roundingDigit > 4
-        : // A half down mode found the subsequent digit to be greater than 5, or 5 with additional digits
-          roundingMode === HALF_DOWN
-          ? roundingDigit > 5 ||
-            (roundingDigit === 5 && precision > roundingPrecision + 1)
-          : // The rounding mode is up and the value is non-zero
-            roundingMode === UP && sign
-    ) {
-      // Round up by adding one to the the least significant digit of the absolute value
-      // and subtracting one from the remainder.
-      let roundBy = construct(sign, "1", scale - roundingPrecision + 1)
-      rounded = add(rounded, roundBy)
-      remainder = sub(remainder, roundBy)
+    if (withRemainder) {
+      remainder = sub(
+        remainder,
+        construct(sign, "1", scale - roundingPrecision + 1),
+      )
     }
   }
-
-  return [rounded, remainder]
+  return [normalizeRepresentation(sign, roundedDigits, roundedScale), remainder]
 }
 
 /**
@@ -1382,9 +1393,9 @@ function toFormat(
   value: Numeric,
   rules?: RoundingRules,
 ): NumericString {
-  const [sign, digits, scale, precision] = deconstruct(
-    rules ? round(value, rules) : value,
-  )
+  const [sign, digits, scale, precision] = rules
+    ? roundRepresentation(value, rules, false)[0]
+    : deconstruct(value)
   const printPrecision = rules ? getRoundingPrecision(rules, scale) : precision
   const decimalPart = print(
     sign,

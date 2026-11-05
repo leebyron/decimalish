@@ -1,3 +1,4 @@
+import { strict as assert } from "assert"
 import { Bench } from "tinybench"
 import { cpus } from "os"
 import {
@@ -49,7 +50,9 @@ const tasks: Record<string, () => unknown> = {
   "isDecimal / canonical": () => isDecimal(next()),
   "isDecimal / exponent": () => isDecimal("1e100"),
   "round / no change": () => round(next(), { places: 12 }),
-  "round / increment": () => round(next(), { places: 2 }),
+  "round / truncation": () => round(next(), { places: 2 }),
+  "round / increment": () => round("123.4567", { places: 2 }),
+  "round / carry": () => round("999.995", { places: 2 }),
   "toFixed / numeric options": () => toFixed(next(), { places: 2 }),
   "toFixed / string options": () => toFixed(next(), { places: "2" }),
   "toFixed / padding consumed": () =>
@@ -58,6 +61,8 @@ const tasks: Record<string, () => unknown> = {
 }
 
 async function run() {
+  assert.equal(tasks["round / increment"](), "123.46")
+  assert.equal(tasks["round / carry"](), "1000")
   const time = Number(process.env.BENCH_TIME_MS || 200)
   if (!(time > 0 && Number.isFinite(time)))
     throw new Error("BENCH_TIME_MS must be positive and finite")
