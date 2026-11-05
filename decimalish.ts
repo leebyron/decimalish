@@ -45,9 +45,6 @@ export function isDecimal(value: unknown): value is decimal {
   return isNumeric(value) && decimal(value) === value
 }
 
-const canonicalDecimalRegex =
-  /^(?:0|-?(?:[1-9]\d*(?:\.\d*[1-9])?|0\.\d*[1-9]))$/
-
 /**
  * Is numeric value?
  *
@@ -1420,7 +1417,7 @@ function print(
  * @internal
  */
 function parse(value: unknown): DecimalParts | null {
-  return decimalRegex.exec(
+  return numericDecimalRegex.exec(
     // Similar to ToNumeric() and ToPrimitive(), converts value to a primitive,
     // and booleans to a number, before converting it all to a string.
     String(
@@ -1429,7 +1426,10 @@ function parse(value: unknown): DecimalParts | null {
   ) as DecimalParts | null
 }
 
-const decimalRegex = /^([-+])?(\d+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
+const numericDecimalRegex =
+  /^([-+])?(\d+|(?=\.\d))(?:\.(\d+)?)?(?:e([-+]?\d+))?$/i
+const canonicalDecimalRegex =
+  /^(?:0|-?(?:[1-9]\d*(?:\.\d*[1-9])?|0\.\d*[1-9]))$/
 
 type DecimalParts = [
   decimal: string,
