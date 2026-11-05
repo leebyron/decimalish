@@ -1450,24 +1450,37 @@ function print(
   decimalPoint: number,
 ): NumericString {
   let result = sign < 0 ? "-" : ""
-
-  while (precision < printPrecision) {
-    digits += "0"
-    precision++
+  if (precision < printPrecision) {
+    digits += zeroes(printPrecision - precision)
+    precision = printPrecision
   }
-
   if (decimalPoint < 1) {
     result += "0."
-    while (decimalPoint++) result += "0"
+    if (decimalPoint < 0) result += zeroes(-decimalPoint)
     result += digits
   } else if (decimalPoint < printPrecision) {
     result += digits.slice(0, decimalPoint) + "." + digits.slice(decimalPoint)
   } else {
     result += digits
-    while (decimalPoint-- > precision) result += "0"
+    if (decimalPoint > precision) result += zeroes(decimalPoint - precision)
   }
-
   return result as NumericString
+}
+
+/** Builds padding with logarithmically many concatenations, using ES3 methods. @internal */
+function zeroes(count: number): string {
+  // Avoid block-building overhead for common short padding.
+  if (count === 1) return "0"
+  if (count === 2) return "00"
+  if (count === 3) return "000"
+  let result = ""
+  let block = "0"
+  while (count > 0) {
+    if (count % 2) result += block
+    count = Math.floor(count / 2)
+    if (count) block += block
+  }
+  return result
 }
 
 /**
