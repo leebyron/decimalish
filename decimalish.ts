@@ -556,12 +556,12 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
   // Iterate through the bits of exponent
   while (exponentInt) {
     // If a bit is set, multiply the result by that power of two.
-    if (exponentInt & 1) {
+    if (exponentInt % 2) {
       result = mul(result, baseToPowerOf2)
     }
     // Shift the exponent to align the next bit and if any bits are still set,
     // square to get the next power of two.
-    if ((exponentInt >>= 1)) {
+    if ((exponentInt = Math.floor(exponentInt / 2))) {
       baseToPowerOf2 = mul(baseToPowerOf2, baseToPowerOf2)
     }
   }
