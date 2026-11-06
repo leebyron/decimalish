@@ -396,6 +396,11 @@ export function divRem(
     remainderDigitsArray[i] = +(digitsA[i] || 0)
   }
 
+  // Decode once: each divisor digit is reused throughout long division.
+  const divisorDigits = new Array<number>(precisionB)
+  for (let i = 0; i < precisionB; i++)
+    divisorDigits[i] = digitsB.charCodeAt(i) - 48
+
   // The most significant digit of the remainder.
   let msd = 0
 
@@ -425,7 +430,7 @@ export function divRem(
       // then stop counting subtractions.
       if (msd >= place) {
         for (let i = -1, difference = 0; !difference && ++i < precisionB; ) {
-          difference = remainderDigitsArray[place + i] - +digitsB[i]
+          difference = remainderDigitsArray[place + i] - divisorDigits[i]
           if (difference < 0) {
             break countSubtractions
           }
@@ -434,7 +439,7 @@ export function divRem(
 
       // Subtract at this location
       for (let i = place + precisionB; i-- > place; ) {
-        remainderDigitsArray[i] -= +digitsB[i - place]
+        remainderDigitsArray[i] -= divisorDigits[i - place]
         if (remainderDigitsArray[i] < 0) {
           remainderDigitsArray[i] += 10
           remainderDigitsArray[i - 1] -= 1
