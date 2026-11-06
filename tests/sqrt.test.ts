@@ -1,4 +1,4 @@
-import { Numeric, sqrt } from "../decimalish"
+import { Numeric, RoundingMode, sqrt } from "../decimalish"
 
 describe("sqrt", () => {
   it("Does not allow negative numbers", () => {
@@ -7,6 +7,71 @@ describe("sqrt", () => {
 
   it("Supports sqrt of 0", () => {
     expect(sqrt(0)).toBe("0")
+  })
+
+  it("converges before rounding to few places", () => {
+    expect(sqrt("2", { places: 0 })).toBe("1")
+    expect(sqrt("0.0002", { places: 2 })).toBe("0.01")
+    expect(sqrt("0.0002", { precision: 2 })).toBe("0.014")
+    expect(sqrt("2e-40", { places: 22 })).toBe("0.0000000000000000000141")
+  })
+
+  it("rounds exact midpoints according to the mode", () => {
+    const cases: [RoundingMode, string, string][] = [
+      ["down", "1", "2"],
+      ["floor", "1", "2"],
+      ["euclidean", "1", "2"],
+      ["up", "2", "3"],
+      ["ceil", "2", "3"],
+      ["half up", "2", "3"],
+      ["half ceil", "2", "3"],
+      ["half down", "1", "2"],
+      ["half floor", "1", "2"],
+      ["half even", "2", "2"],
+    ]
+    for (const [mode, odd, even] of cases) {
+      expect(sqrt("2.25", { places: 0, mode })).toBe(odd)
+      expect(sqrt("6.25", { places: 0, mode })).toBe(even)
+    }
+  })
+
+  it("distinguishes values arbitrarily close to rounding boundaries", () => {
+    const below = ("2.24" + "9".repeat(80)) as Numeric
+    const above = ("2.25" + "0".repeat(80) + "1") as Numeric
+    expect(sqrt(below, { places: 0 })).toBe("1")
+    expect(sqrt(above, { places: 0, mode: "half down" })).toBe("2")
+    expect(
+      sqrt(("3." + "9".repeat(80)) as Numeric, { places: 0, mode: "down" }),
+    ).toBe("1")
+    expect(
+      sqrt(("4." + "0".repeat(80) + "1") as Numeric, { places: 0, mode: "up" }),
+    ).toBe("3")
+  })
+
+  it("handles rounding units larger than the root", () => {
+    expect(sqrt("2", { places: -1 })).toBe("0")
+    expect(sqrt("2", { places: -1, mode: "up" })).toBe("10")
+    expect(sqrt("2500", { places: -2 })).toBe("0")
+    expect(sqrt("2500", { places: -2, mode: "half up" })).toBe("100")
+    expect(sqrt("2501", { precision: 0 })).toBe("100")
+    expect(sqrt("2", { precision: -1 })).toBe("0")
+    expect(sqrt("2", { places: -10000000000 })).toBe("0")
+  })
+
+  it("requires the rounded root to be exact in exact mode", () => {
+    expect(sqrt("2.25", { places: 1, mode: "exact" })).toBe("1.5")
+    expect(() => sqrt("2", { places: 0, mode: "exact" })).toThrow(
+      "https://decimali.sh/#INEXACT sqrt 2",
+    )
+    expect(() => sqrt("4", { places: -1, mode: "exact" })).toThrow(
+      "https://decimali.sh/#INEXACT sqrt 4",
+    )
+    expect(() =>
+      sqrt(("4." + "0".repeat(80) + "1") as Numeric, {
+        places: 0,
+        mode: "exact",
+      }),
+    ).toThrow("https://decimali.sh/#INEXACT")
   })
 
   it("Performs accurate sqrt", () => {
