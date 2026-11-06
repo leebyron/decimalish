@@ -312,10 +312,11 @@ export function div(
   divisor: Numeric,
   rules?: RoundingRules,
 ): decimal {
-  const [quotient] = divRem(
+  const [quotient] = divide(
     dividend,
     divisor,
     normalizeRoundingRules(rules, HALF_EVEN, 34),
+    false,
   )
   return quotient
 }
@@ -359,6 +360,19 @@ export function divRem(
   dividend: Numeric,
   divisor: Numeric,
   rules?: RoundingRules,
+): [quotient: decimal, remainder: decimal] {
+  return divide(dividend, divisor, rules, true)
+}
+
+/**
+ * Divide once, constructing a remainder only when the caller returns it.
+ * @internal
+ */
+function divide(
+  dividend: Numeric,
+  divisor: Numeric,
+  rules: RoundingRules | undefined,
+  withRemainder: boolean,
 ): [quotient: decimal, remainder: decimal] {
   const [signA, digitsA, scaleA, precisionA] = deconstruct(dividend)
   const [signB, digitsB, scaleB, precisionB] = deconstruct(divisor)
@@ -465,10 +479,12 @@ export function divRem(
   // Determine the quotient and remainder from the resulting digits.
   let remainderDigits = remainderDigitsArray.join("")
   let quotient = construct(sign, quotientDigits, scale)
-  let remainder = construct(signA, remainderDigits, scaleA)
+  let remainder = withRemainder
+    ? construct(signA, remainderDigits, scaleA)
+    : ZERO
 
   // If there is a remainder, consider the provided rounding rule.
-  if (remainder !== ZERO) {
+  if (msd < remainderLength) {
     roundingMode = normalizeRoundingMode(roundingMode, sign, signA, digit)
 
     if (roundingMode === EXACT) {
@@ -493,7 +509,12 @@ export function divRem(
       // least significant digit. Then subtract one additional dividend from the
       // remainder at the same scale.
       quotient = add(quotient, construct(sign, "1", scale - place + 1))
-      remainder = sub(remainder, construct(signA, digitsB, scaleA - place + 1))
+      if (withRemainder) {
+        remainder = sub(
+          remainder,
+          construct(signA, digitsB, scaleA - place + 1),
+        )
+      }
     }
   }
 
@@ -518,7 +539,7 @@ export function divInt(
   divisor: Numeric,
   rules?: RoundingRules,
 ): decimal {
-  const [quotient] = divRem(dividend, divisor, rules)
+  const [quotient] = divide(dividend, divisor, rules, false)
   return quotient
 }
 
