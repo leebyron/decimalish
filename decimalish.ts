@@ -632,48 +632,80 @@ export function pow(base: Numeric, exponent: Numeric): decimal {
  * @category Arithmetic
  */
 export function sqrt(value: Numeric, rules?: RoundingRules): decimal {
-  let [sign, digits, scale, precision] = deconstruct(value)
+  const [sign, digits, scale, precision] = deconstruct(value)
 
-  // Negative number
   if (sign < 0) {
     error("SQRT_NEG", value)
   }
-
-  // Sqrt 0 -> 0
   if (!sign) {
     return ZERO
   }
 
   rules = normalizeRoundingRules(rules, HALF_EVEN, 34)
-  const iterationPrecision = getRoundingPrecision(rules, scale)
+  const rootScale = Math.floor(scale / 2)
+  const roundingPrecision = getRoundingPrecision(rules, rootScale)
+  const unitScale = rootScale - roundingPrecision + 1
+  let result = ZERO
 
-  // Start with an estimated result using floating point sqrt based on the idea
-  // that the result is independent of original value's scale as long as it
-  // is the same parity.
-  const estimate = Math.sqrt(+(digits + ((precision + scale) & 1 ? "" : "0")))
-  digits = (estimate == 1 / 0 ? "5" : deconstruct(estimate)[1]).slice(
-    0,
-    iterationPrecision,
-  )
-  let result = construct(
+  // If the rounding unit is larger than the root, its truncated value is zero.
+  if (roundingPrecision > 0) {
+    const workPrecision = roundingPrecision + 4
+    const workRules: RoundingRules = { precision: workPrecision, mode: UP }
+
+    // Estimate the significant digits independently of the root's scale.
+    const estimate = Math.sqrt(+(digits + ((precision + scale) & 1 ? "" : "0")))
+    const estimateDigits = estimate == 1 / 0 ? "5" : deconstruct(estimate)[1]
+    result = construct(1, estimateDigits, rootScale)
+    if (estimateDigits.length > workPrecision) result = round(result, workRules)
+
+    // Rounding upwards makes the first Newton step an upper bound. Subsequent
+    // steps decrease on a fixed finite grid, so equality terminates the loop
+    // without oscillating around a root or trusting a short matching prefix.
+    let previous
+    do {
+      previous = result
+      result = round(
+        mul(0.5, add(result, div(value, result, workRules))),
+        workRules,
+      )
+    } while (result !== previous)
+
+    result = round(result, { places: -unitScale, mode: DOWN })
+  }
+
+  // The upper estimate can land just above an output boundary. Correct it
+  // using exact squares to obtain the largest rounding-unit multiple <= sqrt.
+  let squareCmp = cmp(mul(result, result), value)
+  while (squareCmp > 0) {
+    result = sub(result, construct(1, "1", unitScale))
+    squareCmp = cmp(mul(result, result), value)
+  }
+  if (squareCmp === 0) return result
+
+  const roundingMode = normalizeRoundingMode(
+    rules[MODE],
     1,
-    digits,
-    (((scale + 1) / 2) | 0) - +(scale < 0 || scale & 1),
+    1,
+    +(deconstruct(result)[1][roundingPrecision - 1] || 0),
   )
+  if (roundingMode === EXACT) error("INEXACT", "sqrt " + String(value))
 
-  // Use Newton's method to generate and confirm additional precision.
-  let prevDigits = digits
-  do {
-    result = mul(
-      0.5,
-      add(result, div(value, result, { precision: iterationPrecision + 4 })),
-    )
-    prevDigits = digits
-    digits = deconstruct(result)[1].slice(0, iterationPrecision)
-  } while (prevDigits !== digits)
+  let shouldRoundUp = roundingMode === UP
+  if (roundingMode === HALF_UP || roundingMode === HALF_DOWN) {
+    let midpointCmp
+    if (result === ZERO) {
+      // (0.5 * 10^unitScale)^2 = 2.5 * 10^(2*unitScale - 1).
+      // Compare normalized parts so coarse rounding need not expand the unit.
+      midpointCmp = cmpAbs(digits, scale, precision, "25", 2 * unitScale - 1, 2)
+    } else {
+      const midpoint = add(result, construct(1, "5", unitScale - 1))
+      midpointCmp = cmp(value, mul(midpoint, midpoint))
+    }
+    shouldRoundUp =
+      roundingMode === HALF_UP ? midpointCmp >= 0 : midpointCmp > 0
+  }
 
-  // Round the final result
-  return round(result, rules)
+  return shouldRoundUp ? add(result, construct(1, "1", unitScale)) : result
 }
 
 // Comparison
