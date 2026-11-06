@@ -18,6 +18,31 @@ describe("pow", () => {
     expect(pow(5, "3")).toBe("125")
   })
 
+  it("normalizes intermediate products", () => {
+    expect(pow("-0.0200", 3)).toBe("-0.000008")
+    expect(pow("1.2500", 4)).toBe("2.44140625")
+    expect(pow("10", 8)).toBe("100000000")
+    expect(pow("0", 17)).toBe("0")
+  })
+
+  it("validates the base even when the exponent is zero", () => {
+    expect(pow("1.2345", 0)).toBe("1")
+    expect(pow(0, 0)).toBe("1")
+    expect(() => pow(NaN, 0)).toThrow("https://decimali.sh/#NOT_NUM NaN")
+  })
+
+  it("coerces the base only once", () => {
+    let calls = 0
+    const base = {
+      valueOf() {
+        calls++
+        return 3
+      },
+    }
+    expect(pow(base, 8)).toBe("6561")
+    expect(calls).toBe(1)
+  })
+
   it("throws when exponent is negative", () => {
     expect(() => pow(2, -1)).toThrow(
       "https://decimali.sh/#NOT_POS exponent: -1",

@@ -236,12 +236,20 @@ export function sub(a: Numeric, b: Numeric): decimal {
  * @category Arithmetic
  */
 export function mul(a: Numeric, b: Numeric): decimal {
-  const [signA, digitsA, scaleA, precisionA] = deconstruct(a)
-  const [signB, digitsB, scaleB, precisionB] = deconstruct(b)
+  return formatRepresentation(mulRepresentation(deconstruct(a), deconstruct(b)))
+}
+
+/** Operate on normalized parts without crossing the public string boundary. @internal */
+function mulRepresentation(
+  a: Representation,
+  b: Representation,
+): Representation {
+  const [signA, digitsA, scaleA, precisionA] = a
+  const [signB, digitsB, scaleB, precisionB] = b
 
   // If either a or b is zero, return zero.
   if (!signA || !signB) {
-    return ZERO
+    return [0, "", 0, 0]
   }
 
   const digitsArray = createDigitArray(precisionA + precisionB)
@@ -275,7 +283,7 @@ export function mul(a: Numeric, b: Numeric): decimal {
     }
   }
 
-  return construct(
+  return normalizeRepresentation(
     (signA * signB) as Sign,
     digitsArray.join(""),
     scaleA + scaleB + 1,
@@ -596,28 +604,32 @@ export function mod(a: Numeric, b: Numeric): decimal {
  * @category Arithmetic
  */
 export function pow(base: Numeric, exponent: Numeric): decimal {
-  let baseToPowerOf2 = decimal(base)
-  let result = "1" as decimal
-
+  const baseValue = decimal(base)
   let exponentInt = expectInt("exponent", exponent)
   if (exponentInt < 0) {
     error("NOT_POS", `exponent: ${exponent}`)
   }
 
+  // Preserve base validation above, but avoid setting up unused arithmetic state.
+  if (!exponentInt) return "1" as decimal
+
+  let baseToPowerOf2 = deconstruct(baseValue)
+  let result: Representation = [1, "1", 0, 1]
+
   // Iterate through the bits of exponent
   while (exponentInt) {
     // If a bit is set, multiply the result by that power of two.
     if (exponentInt % 2) {
-      result = mul(result, baseToPowerOf2)
+      result = mulRepresentation(result, baseToPowerOf2)
     }
     // Shift the exponent to align the next bit and if any bits are still set,
     // square to get the next power of two.
     if ((exponentInt = Math.floor(exponentInt / 2))) {
-      baseToPowerOf2 = mul(baseToPowerOf2, baseToPowerOf2)
+      baseToPowerOf2 = mulRepresentation(baseToPowerOf2, baseToPowerOf2)
     }
   }
 
-  return result
+  return formatRepresentation(result)
 }
 
 /**
@@ -1669,6 +1681,24 @@ function normalizeRepresentation(
   }
 
   return [sign, digits, scale, precision - leadingZeros - trailingZeros]
+}
+
+/** Normalized private arithmetic state. @internal */
+type Representation = [
+  sign: Sign,
+  digits: string,
+  scale: number,
+  precision: number,
+]
+
+/** Format an already normalized representation. @internal */
+function formatRepresentation([
+  sign,
+  digits,
+  scale,
+  precision,
+]: Representation): decimal {
+  return print(sign, digits, precision, precision, scale + 1) as decimal
 }
 
 // Errors and validation
