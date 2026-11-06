@@ -1294,7 +1294,7 @@ function normalizeRoundingRules(
   }
 
   // indexOf() or find() would work, however neither are available in ES3.
-  for (const i in validModes) {
+  for (let i = 0; i < validModes.length; i++) {
     // @ts-ignore
     isValidMode |= validModes[i] == mode
   }
